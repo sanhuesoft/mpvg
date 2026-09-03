@@ -2,8 +2,9 @@
 //  PlayerBarView.swift
 //  mpvg
 //
-//  Bottom player and status bar matching CaskHub's terminal/status bar aesthetic.
-//  Includes live track info, controls, seek scrubber, and CoreAudio Exclusive Mode indicator.
+//  Floating crystal (liquid glass) player bar inspired by modern Apple Music.
+//  Features frosted glass translucency, live track artwork, scrub controls,
+//  and CoreAudio Exclusive Mode indicator.
 //
 
 import SwiftUI
@@ -14,84 +15,115 @@ struct PlayerBarView: View {
     @State private var dragValue: Double = 0.0
     
     var body: some View {
-        HStack(spacing: 16) {
-            // Left: Server Status & Library Info (CaskHub terminal style)
-            HStack(spacing: 8) {
-                // Server status dot
-                Circle()
-                    .fill(viewModel.isConnected ? ColorTheme.sageGreen : ColorTheme.amber)
-                    .frame(width: 7, height: 7)
-                
-                HStack(spacing: 6) {
-                    Text(viewModel.isConnected ? "navidrome: connected" : "navidrome: demo mode")
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                        .foregroundColor(ColorTheme.textSecondary)
+        VStack(spacing: 0) {
+            // Subtle Progress Bar on top edge of crystal bar
+            GeometryReader { geo in
+                let progress = viewModel.mpv.duration > 0 ? (viewModel.mpv.currentTime / viewModel.mpv.duration) : 0.0
+                ZStack(alignment: .leading) {
+                    Rectangle()
+                        .fill(ColorTheme.cardBorder.opacity(0.35))
+                        .frame(height: 2.5)
                     
-                    Text("•")
-                        .font(.system(size: 10))
-                        .foregroundColor(ColorTheme.textTertiary)
-                    
-                    Text("\(viewModel.albums.count) albums")
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                        .foregroundColor(ColorTheme.textSecondary)
+                    Rectangle()
+                        .fill(ColorTheme.terracotta)
+                        .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 2.5)
                 }
             }
-            .frame(minWidth: 220, alignment: .leading)
+            .frame(height: 2.5)
             
-            Spacer(minLength: 8)
-            
-            // Center: Playback Controls & Track Scrubber
-            HStack(spacing: 14) {
-                // Mini Playback Controls
+            HStack(spacing: 16) {
+                // Left: Album Artwork Thumbnail & Track Metadata
                 HStack(spacing: 10) {
-                    Button(action: { viewModel.previousTrack() }) {
-                        Image(systemName: "backward.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(ColorTheme.textSecondary)
-                    }
-                    .buttonStyle(.plain)
+                    // Mini Album Artwork
+                    let artURL: URL? = {
+                        if let coverId = viewModel.currentSong?.coverArt ?? viewModel.currentAlbum?.coverArt {
+                            return viewModel.coverArtURL(for: coverId)
+                        }
+                        return nil
+                    }()
                     
-                    Button(action: { viewModel.togglePlayPause() }) {
-                        Image(systemName: viewModel.mpv.isPaused ? "play.fill" : "pause.fill")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(ColorTheme.terracotta)
-                            .frame(width: 26, height: 26)
-                            .background(ColorTheme.terracottaLight.opacity(0.4))
-                            .clipShape(Circle())
+                    CachedAsyncImage(url: artURL) {
+                        ZStack {
+                            ColorTheme.cardBorder.opacity(0.5)
+                            Image(systemName: "opticaldisc")
+                                .font(.system(size: 15))
+                                .foregroundColor(ColorTheme.terracotta)
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .keyboardShortcut(.space, modifiers: [])
+                    .frame(width: 38, height: 38)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.white.opacity(0.3), lineWidth: 0.8)
+                    )
                     
-                    Button(action: { viewModel.nextTrack() }) {
-                        Image(systemName: "forward.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(ColorTheme.textSecondary)
-                    }
-                    .buttonStyle(.plain)
-                }
-                
-                // Track Info & Progress Bar
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 8) {
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(viewModel.currentSong?.title ?? "No track playing")
                             .font(.system(size: 12, weight: .bold))
                             .foregroundColor(ColorTheme.textPrimary)
                             .lineLimit(1)
                         
-                        if let artist = viewModel.currentSong?.displayArtist {
-                            Text("—  \(artist)")
-                                .font(.system(size: 11))
+                        HStack(spacing: 5) {
+                            Text(viewModel.currentSong?.displayArtist ?? "mpvg player")
+                                .font(.system(size: 11, weight: .medium))
                                 .foregroundColor(ColorTheme.textSecondary)
                                 .lineLimit(1)
+                            
+                            Text("•")
+                                .font(.system(size: 8))
+                                .foregroundColor(ColorTheme.textTertiary)
+                            
+                            Circle()
+                                .fill(viewModel.isConnected ? ColorTheme.sageGreen : ColorTheme.amber)
+                                .frame(width: 5, height: 5)
+                            
+                            Text(viewModel.isConnected ? "connected" : "demo")
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundColor(ColorTheme.textTertiary)
                         }
                     }
+                }
+                .frame(minWidth: 220, alignment: .leading)
+                
+                Spacer(minLength: 8)
+                
+                // Center: Playback Controls & Track Scrubber
+                HStack(spacing: 14) {
+                    // Controls
+                    HStack(spacing: 10) {
+                        Button(action: { viewModel.previousTrack() }) {
+                            Image(systemName: "backward.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(ColorTheme.textSecondary)
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Button(action: { viewModel.togglePlayPause() }) {
+                            Image(systemName: viewModel.mpv.isPaused ? "play.fill" : "pause.fill")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 28, height: 28)
+                                .background(ColorTheme.terracotta)
+                                .clipShape(Circle())
+                                .shadow(color: ColorTheme.terracotta.opacity(0.3), radius: 4, x: 0, y: 1.5)
+                        }
+                        .buttonStyle(.plain)
+                        .keyboardShortcut(.space, modifiers: [])
+                        
+                        Button(action: { viewModel.nextTrack() }) {
+                            Image(systemName: "forward.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(ColorTheme.textSecondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
                     
-                    // Scrubber
+                    // Scrubber with Elapsed / Remaining Times
                     HStack(spacing: 8) {
                         Text(formatTime(isDraggingSlider ? dragValue : viewModel.mpv.currentTime))
                             .font(.system(size: 10, weight: .medium, design: .monospaced))
                             .foregroundColor(ColorTheme.textTertiary)
-                            .frame(width: 32, alignment: .leading)
+                            .frame(width: 32, alignment: .trailing)
                         
                         Slider(
                             value: Binding(
@@ -112,118 +144,125 @@ struct PlayerBarView: View {
                             }
                         )
                         .accentColor(ColorTheme.terracotta)
-                        .frame(width: 140)
+                        .frame(width: 150)
                         
                         Text(formatTime(viewModel.mpv.duration))
                             .font(.system(size: 10, weight: .medium, design: .monospaced))
                             .foregroundColor(ColorTheme.textTertiary)
-                            .frame(width: 32, alignment: .trailing)
+                            .frame(width: 32, alignment: .leading)
                     }
                 }
-            }
-            
-            Spacer(minLength: 8)
-            
-            // Right: CoreAudio Exclusive Mode & Volume
-            HStack(spacing: 12) {
-                // Exclusive Audio Badge / Warning
-                Menu {
-                    if let warning = viewModel.mpv.deviceWarning {
-                        Text("⚠️ \(warning)")
-                            .foregroundColor(ColorTheme.terracotta)
+                
+                Spacer(minLength: 8)
+                
+                // Right: CoreAudio Exclusive Mode & Volume
+                HStack(spacing: 12) {
+                    // Exclusive Audio Badge / Dropdown Menu
+                    Menu {
+                        if let warning = viewModel.mpv.deviceWarning {
+                            Text("⚠️ \(warning)")
+                                .foregroundColor(ColorTheme.terracotta)
+                            Divider()
+                        }
+                        
+                        Button(action: { viewModel.mpv.toggleExclusive() }) {
+                            Label(
+                                viewModel.mpv.isExclusive ? "Disable Exclusive Mode" : "Enable Exclusive Mode",
+                                systemImage: viewModel.mpv.isExclusive ? "bolt.slash" : "bolt.fill"
+                            )
+                        }
+                        
                         Divider()
-                    }
-                    
-                    Button(action: { viewModel.mpv.toggleExclusive() }) {
-                        Label(
-                            viewModel.mpv.isExclusive ? "Disable Exclusive Mode" : "Enable Exclusive Mode",
-                            systemImage: viewModel.mpv.isExclusive ? "bolt.slash" : "bolt.fill"
-                        )
-                    }
-                    
-                    Divider()
-                    
-                    Text("Output device:")
-                    ForEach(viewModel.mpv.availableDevices) { dev in
-                        Button(action: { viewModel.mpv.setDevice(dev.id) }) {
-                            HStack {
-                                Text(dev.displayName)
-                                if viewModel.mpv.currentDevice == dev.id && viewModel.mpv.isDeviceConnected {
-                                    Image(systemName: "checkmark")
+                        
+                        Text("Output device:")
+                        ForEach(viewModel.mpv.availableDevices) { dev in
+                            Button(action: { viewModel.mpv.setDevice(dev.id) }) {
+                                HStack {
+                                    Text(dev.displayName)
+                                    if viewModel.mpv.currentDevice == dev.id && viewModel.mpv.isDeviceConnected {
+                                        Image(systemName: "checkmark")
+                                    }
                                 }
                             }
                         }
-                    }
-                } label: {
-                    HStack(spacing: 5) {
-                        if !viewModel.mpv.isDeviceConnected && !viewModel.mpv.preferredDeviceName.isEmpty {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .font(.system(size: 9))
-                                .foregroundColor(ColorTheme.terracotta)
+                    } label: {
+                        HStack(spacing: 5) {
+                            if !viewModel.mpv.isDeviceConnected && !viewModel.mpv.preferredDeviceName.isEmpty {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 9))
+                                    .foregroundColor(ColorTheme.terracotta)
+                                
+                                Text("DAC OFF")
+                                    .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                                    .foregroundColor(ColorTheme.terracotta)
+                            } else if viewModel.mpv.isExclusive {
+                                Image(systemName: "bolt.fill")
+                                    .font(.system(size: 9))
+                                    .foregroundColor(ColorTheme.terracotta)
+                                
+                                Text("EXCLUSIVE")
+                                    .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                                    .foregroundColor(ColorTheme.terracotta)
+                            } else {
+                                Text("SHARED")
+                                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                                    .foregroundColor(ColorTheme.textTertiary)
+                            }
                             
-                            Text("DAC OFF")
-                                .font(.system(size: 9, weight: .heavy, design: .monospaced))
-                                .foregroundColor(ColorTheme.terracotta)
-                        } else if viewModel.mpv.isExclusive {
-                            Image(systemName: "bolt.fill")
-                                .font(.system(size: 9))
-                                .foregroundColor(ColorTheme.terracotta)
-                            
-                            Text("EXCLUSIVE")
-                                .font(.system(size: 9, weight: .heavy, design: .monospaced))
-                                .foregroundColor(ColorTheme.terracotta)
-                        } else {
-                            Text("SHARED")
-                                .font(.system(size: 9, weight: .bold, design: .monospaced))
-                                .foregroundColor(ColorTheme.textTertiary)
+                            if let rate = viewModel.mpv.audioSampleRate {
+                                Text("• \(rate / 1000)kHz")
+                                    .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                                    .foregroundColor(ColorTheme.textSecondary)
+                            } else if !viewModel.mpv.preferredDeviceName.isEmpty && viewModel.mpv.isDeviceConnected {
+                                Text("• \(viewModel.mpv.preferredDeviceName)")
+                                    .font(.system(size: 9, weight: .semibold))
+                                    .foregroundColor(ColorTheme.textSecondary)
+                                    .lineLimit(1)
+                            }
                         }
-                        
-                        if let rate = viewModel.mpv.audioSampleRate {
-                            Text("• \(rate / 1000)kHz")
-                                .font(.system(size: 9, weight: .semibold, design: .monospaced))
-                                .foregroundColor(ColorTheme.textSecondary)
-                        } else if !viewModel.mpv.preferredDeviceName.isEmpty && viewModel.mpv.isDeviceConnected {
-                            Text("• \(viewModel.mpv.preferredDeviceName)")
-                                .font(.system(size: 9, weight: .semibold))
-                                .foregroundColor(ColorTheme.textSecondary)
-                                .lineLimit(1)
-                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(viewModel.mpv.isExclusive ? ColorTheme.terracottaLight.opacity(0.8) : ColorTheme.cardBorder.opacity(0.5))
+                        .cornerRadius(6)
                     }
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(viewModel.mpv.isExclusive ? ColorTheme.terracottaLight : ColorTheme.cardBorder.opacity(0.4))
-                    .cornerRadius(5)
-                }
-                .menuStyle(.borderlessButton)
-                
-                // Volume Slider
-                HStack(spacing: 4) {
-                    Image(systemName: viewModel.mpv.volume == 0 ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                        .font(.system(size: 11))
-                        .foregroundColor(ColorTheme.textSecondary)
+                    .menuStyle(.borderlessButton)
                     
-                    Slider(
-                        value: Binding(
-                            get: { viewModel.mpv.volume },
-                            set: { viewModel.mpv.setVolume($0) }
-                        ),
-                        in: 0...100
-                    )
-                    .accentColor(ColorTheme.textSecondary)
-                    .frame(width: 65)
+                    // Volume Slider
+                    HStack(spacing: 5) {
+                        Image(systemName: viewModel.mpv.volume == 0 ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(ColorTheme.textSecondary)
+                        
+                        Slider(
+                            value: Binding(
+                                get: { viewModel.mpv.volume },
+                                set: { viewModel.mpv.setVolume($0) }
+                            ),
+                            in: 0...100
+                        )
+                        .accentColor(ColorTheme.terracotta)
+                        .frame(width: 70)
+                    }
                 }
+                .frame(minWidth: 220, alignment: .trailing)
             }
-            .frame(minWidth: 220, alignment: .trailing)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
         }
-        .padding(.horizontal, 16)
-        .frame(height: 48)
-        .background(ColorTheme.bottomBarBackground)
-        .overlay(
-            Rectangle()
-                .frame(height: 1)
-                .foregroundColor(ColorTheme.bottomBarBorder),
-            alignment: .top
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(.ultraThinMaterial)
         )
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(ColorTheme.cardBackground.opacity(0.4))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .shadow(color: Color.black.opacity(0.12), radius: 16, x: 0, y: 5)
     }
     
     private func formatTime(_ seconds: Double) -> String {

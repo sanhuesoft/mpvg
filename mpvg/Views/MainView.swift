@@ -46,7 +46,7 @@ struct MainView: View {
     
     // MARK: - Desktop Layout (macOS)
     private var desktopLayout: some View {
-        VStack(spacing: 0) {
+        ZStack(alignment: .bottom) {
             HStack(spacing: 12) {
                 if viewModel.isSidebarVisible {
                     SidebarView(viewModel: viewModel)
@@ -79,11 +79,14 @@ struct MainView: View {
                 .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 2)
                 .padding(.trailing, 12)
                 .padding(.top, 10)
-                .padding(.bottom, 6)
+                .padding(.bottom, 10)
                 .padding(.leading, viewModel.isSidebarVisible ? 0 : 12)
             }
             
+            // Floating Crystal Player Bar (Liquid Glass Apple Music style)
             PlayerBarView(viewModel: viewModel)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 16)
         }
         .background(ColorTheme.windowBackground)
         .sheet(item: $viewModel.selectedAlbumForDetail) { album in

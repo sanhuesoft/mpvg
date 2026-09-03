@@ -30,8 +30,6 @@ struct BrowseView: View {
                         defaultBrowseContent
                     case .featured:
                         albumGridSection(title: "Featured Albums", albums: viewModel.featuredAlbums)
-                    case .topCharts:
-                        albumGridSection(title: "Top Charts & Most Played", albums: viewModel.featuredAlbums)
                     case .recentlyAdded:
                         albumGridSection(title: "Recently Added", albums: viewModel.recentAlbums)
                     case .albums:
@@ -47,7 +45,7 @@ struct BrowseView: View {
             }
             .padding(.horizontal, 24)
             .padding(.top, 10)
-            .padding(.bottom, 28)
+            .padding(.bottom, 78)
         }
         .background(ColorTheme.windowBackground)
     }
@@ -58,7 +56,7 @@ struct BrowseView: View {
             // Section 1: Most Popular
             VStack(alignment: .leading, spacing: 12) {
                 sectionHeader(title: "Most Popular") {
-                    viewModel.activeTab = .topCharts
+                    viewModel.activeTab = .featured
                 }
                 
                 if viewModel.viewMode == .grid {

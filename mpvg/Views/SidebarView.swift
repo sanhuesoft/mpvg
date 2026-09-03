@@ -104,9 +104,6 @@ struct SidebarView: View {
                         SidebarRowItem(tab: .featured, label: "Featured", count: nil, isSelected: viewModel.activeTab == .featured) {
                             viewModel.activeTab = .featured
                         }
-                        SidebarRowItem(tab: .topCharts, label: "Top Charts", count: nil, isSelected: viewModel.activeTab == .topCharts) {
-                            viewModel.activeTab = .topCharts
-                        }
                         SidebarRowItem(tab: .recentlyAdded, label: "Recently Added", count: nil, isSelected: viewModel.activeTab == .recentlyAdded) {
                             viewModel.activeTab = .recentlyAdded
                         }
