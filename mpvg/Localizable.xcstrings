@@ -7,6 +7,12 @@
     "-%@" : {
 
     },
+    "›" : {
+
+    },
+    "#" : {
+
+    },
     "%@ • %@" : {
       "localizations" : {
         "en" : {
@@ -141,6 +147,9 @@
     "Active: %@" : {
 
     },
+    "Add to Queue" : {
+
+    },
     "Ajustes" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -157,6 +166,9 @@
           }
         }
       }
+    },
+    "ALBUM" : {
+
     },
     "Albums" : {
       "localizations" : {
@@ -194,6 +206,9 @@
       }
     },
     "Artist" : {
+
+    },
+    "ARTIST" : {
 
     },
     "Artists" : {
@@ -360,6 +375,9 @@
           }
         }
       }
+    },
+    "Back" : {
+
     },
     "Bit-Perfect Sample Rate" : {
       "localizations" : {
@@ -781,6 +799,9 @@
         }
       }
     },
+    "FORMAT" : {
+
+    },
     "FS" : {
 
     },
@@ -1105,6 +1126,9 @@
         }
       }
     },
+    "Play Artist" : {
+
+    },
     "Playing" : {
 
     },
@@ -1155,6 +1179,9 @@
           }
         }
       }
+    },
+    "RATING" : {
+
     },
     "Recently Added" : {
       "localizations" : {
@@ -1459,6 +1486,12 @@
           }
         }
       }
+    },
+    "TIME" : {
+
+    },
+    "TITLE" : {
+
     },
     "Tracks" : {
       "extractionState" : "stale",

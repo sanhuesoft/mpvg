@@ -43,6 +43,7 @@ struct StarRatingView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(!interactive)
+                .pointingHandOnHover()
                 #if os(macOS)
                 .onHover { isHovering in
                     guard interactive else { return }

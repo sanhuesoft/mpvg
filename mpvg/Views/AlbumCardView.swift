@@ -24,7 +24,7 @@ struct AlbumCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Hero Cover Art (Perfect 1:1 Square)
-            ZStack(alignment: .bottomTrailing) {
+            ZStack(alignment: .center) {
                 artworkView
                     .aspectRatio(1.0, contentMode: .fill)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -33,29 +33,15 @@ struct AlbumCardView: View {
                             .stroke(ColorTheme.cardBorder, lineWidth: 1)
                     )
                 
-                // Hover Overlay with Play Button & Info Button
+                // Hover Overlay with Play Button
                 if isHovered || isCurrentlyPlaying {
                     ZStack {
                         Color.black.opacity(isHovered ? 0.35 : 0.15)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
-                        
-                        // Top right info button
-                        VStack {
-                            HStack {
-                                Spacer()
-                                Button(action: {
-                                    viewModel.selectAlbumForDetail(album)
-                                }) {
-                                    Image(systemName: "info.circle.fill")
-                                        .font(.system(size: 16))
-                                        .foregroundColor(.white.opacity(0.9))
-                                        .shadow(radius: 3)
-                                }
-                                .buttonStyle(.plain)
-                                .padding(8)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                viewModel.navigateToAlbum(album)
                             }
-                            Spacer()
-                        }
                         
                         // Center Play / Pause Button
                         Button(action: {
@@ -68,19 +54,25 @@ struct AlbumCardView: View {
                             ZStack {
                                 Circle()
                                     .fill(isCurrentlyPlaying ? ColorTheme.sageGreen : ColorTheme.terracotta)
-                                    .frame(width: 42, height: 42)
-                                    .shadow(color: Color.black.opacity(0.3), radius: 6, x: 0, y: 3)
+                                    .frame(width: 44, height: 44)
+                                    .shadow(color: Color.black.opacity(0.35), radius: 6, x: 0, y: 3)
                                 
                                 Image(systemName: isCurrentlyPlaying ? "pause.fill" : "play.fill")
-                                    .font(.system(size: 18, weight: .bold))
+                                    .font(.system(size: 19, weight: .bold))
                                     .foregroundColor(.white)
                                     .offset(x: isCurrentlyPlaying ? 0 : 1.5)
                             }
+                            .contentShape(Circle())
                         }
                         .buttonStyle(.plain)
+                        .pointingHandOnHover()
                     }
                     .transition(.opacity)
                 }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                viewModel.navigateToAlbum(album)
             }
             .frame(maxWidth: .infinity)
             
@@ -154,6 +146,10 @@ struct AlbumCardView: View {
                 .padding(.top, 1)
             }
             .padding(.horizontal, 2)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                viewModel.navigateToAlbum(album)
+            }
         }
         .padding(10)
         .background(ColorTheme.cardBackground)
@@ -163,13 +159,11 @@ struct AlbumCardView: View {
         )
         .cornerRadius(14)
         .shadow(color: Color.black.opacity(isHovered ? 0.06 : 0.02), radius: isHovered ? 8 : 3, x: 0, y: isHovered ? 3 : 1)
+        .contentShape(RoundedRectangle(cornerRadius: 14))
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 self.isHovered = hovering
             }
-        }
-        .onTapGesture {
-            viewModel.selectAlbumForDetail(album)
         }
         .pointingHandOnHover()
     }

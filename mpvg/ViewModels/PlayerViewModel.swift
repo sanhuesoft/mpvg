@@ -40,6 +40,18 @@ enum ViewMode: String {
     case list
 }
 
+enum NavigationDestination: Identifiable, Equatable {
+    case album(AlbumItem)
+    case artist(ArtistItem)
+    
+    var id: String {
+        switch self {
+        case .album(let album): return "album-\(album.id)"
+        case .artist(let artist): return "artist-\(artist.id)"
+        }
+    }
+}
+
 #if os(macOS)
 typealias AudioEngine = MPVProcessManager
 #else
@@ -48,10 +60,19 @@ typealias AudioEngine = IOSAudioEngine
 
 @MainActor
 final class PlayerViewModel: ObservableObject {
-    @Published var activeTab: SidebarTab = .browse
+    @Published var activeTab: SidebarTab = .browse {
+        didSet {
+            if oldValue != activeTab {
+                navigationStack.removeAll()
+            }
+        }
+    }
     @Published var viewMode: ViewMode = .grid
     @Published var searchQuery: String = ""
     @Published var isSidebarVisible: Bool = true
+    
+    // In-window Navigation Stack
+    @Published var navigationStack: [NavigationDestination] = []
     
     // Connection
     @Published var serverConfig: ServerConfig {
@@ -241,6 +262,48 @@ final class PlayerViewModel: ObservableObject {
                 $0.displayArtist.localizedCaseInsensitiveContains(trimmed)
             }
         }
+    }
+    
+    // MARK: - Navigation
+    func navigateToAlbum(_ album: AlbumItem) {
+        selectAlbumForDetail(album)
+        // Avoid duplicate pushes of same album
+        if case .album(let current) = navigationStack.last, current.id == album.id {
+            return
+        }
+        navigationStack.append(.album(album))
+    }
+    
+    func navigateToArtist(_ artist: ArtistItem) {
+        selectArtistForDetail(artist)
+        if case .artist(let current) = navigationStack.last, current.id == artist.id {
+            return
+        }
+        navigationStack.append(.artist(artist))
+    }
+    
+    func navigateBack() {
+        guard !navigationStack.isEmpty else { return }
+        navigationStack.removeLast()
+        
+        // Restore selected state for previous item if any
+        if let previous = navigationStack.last {
+            switch previous {
+            case .album(let album):
+                selectAlbumForDetail(album)
+            case .artist(let artist):
+                selectArtistForDetail(artist)
+            }
+        } else {
+            selectedAlbumForDetail = nil
+            selectedArtistForDetail = nil
+        }
+    }
+    
+    func popToRoot() {
+        navigationStack.removeAll()
+        selectedAlbumForDetail = nil
+        selectedArtistForDetail = nil
     }
     
     // MARK: - Album Details

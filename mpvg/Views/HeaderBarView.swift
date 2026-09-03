@@ -13,7 +13,7 @@ struct HeaderBarView: View {
     @FocusState private var isSearchFocused: Bool
     
     var body: some View {
-        HStack(alignment: .center, spacing: 16) {
+        HStack(alignment: .center, spacing: 14) {
             #if os(macOS)
             if !viewModel.isSidebarVisible {
                 Button(action: {
@@ -33,52 +33,98 @@ struct HeaderBarView: View {
                         .cornerRadius(8)
                 }
                 .buttonStyle(.plain)
+                .pointingHandOnHover()
                 .transition(.scale.combined(with: .opacity))
             }
             #endif
             
-            // Title & Count
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text(LocalizedStringKey(viewModel.activeTab.rawValue))
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(ColorTheme.textPrimary)
-                
-                Text(itemCountLabel)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(ColorTheme.textTertiary)
+            // Back Button when navigated into a detail view
+            if !viewModel.navigationStack.isEmpty {
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.18)) {
+                        viewModel.navigateBack()
+                    }
+                }) {
+                    HStack(spacing: 5) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 12, weight: .bold))
+                        Text("Back")
+                            .font(.system(size: 13, weight: .semibold))
+                    }
+                    .foregroundColor(ColorTheme.terracotta)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(ColorTheme.terracottaLight.opacity(0.6))
+                    .cornerRadius(7)
+                }
+                .buttonStyle(.plain)
+                .pointingHandOnHover()
+                .transition(.opacity.combined(with: .scale(scale: 0.95)))
+            }
+            
+            // Title & Count / Breadcrumbs
+            if let dest = viewModel.navigationStack.last {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(LocalizedStringKey(viewModel.activeTab.rawValue))
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(ColorTheme.textTertiary)
+                    
+                    Text("›")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(ColorTheme.textTertiary)
+                    
+                    Text(destinationTitle(dest))
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(ColorTheme.textPrimary)
+                        .lineLimit(1)
+                }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text(LocalizedStringKey(viewModel.activeTab.rawValue))
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(ColorTheme.textPrimary)
+                    
+                    Text(itemCountLabel)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(ColorTheme.textTertiary)
+                }
             }
             
             Spacer()
             
-            // Grid / List Toggle
-            HStack(spacing: 2) {
-                Button(action: { viewModel.viewMode = .grid }) {
-                    Image(systemName: "square.grid.2x2")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(viewModel.viewMode == .grid ? ColorTheme.textPrimary : ColorTheme.textTertiary)
-                        .frame(width: 28, height: 26)
-                        .background(viewModel.viewMode == .grid ? ColorTheme.cardBackground : Color.clear)
-                        .cornerRadius(6)
+            // Grid / List Toggle (only at root tab view)
+            if viewModel.navigationStack.isEmpty {
+                HStack(spacing: 2) {
+                    Button(action: { viewModel.viewMode = .grid }) {
+                        Image(systemName: "square.grid.2x2")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(viewModel.viewMode == .grid ? ColorTheme.textPrimary : ColorTheme.textTertiary)
+                            .frame(width: 28, height: 26)
+                            .background(viewModel.viewMode == .grid ? ColorTheme.cardBackground : Color.clear)
+                            .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .pointingHandOnHover()
+                    
+                    Button(action: { viewModel.viewMode = .list }) {
+                        Image(systemName: "list.bullet")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(viewModel.viewMode == .list ? ColorTheme.textPrimary : ColorTheme.textTertiary)
+                            .frame(width: 28, height: 26)
+                            .background(viewModel.viewMode == .list ? ColorTheme.cardBackground : Color.clear)
+                            .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .pointingHandOnHover()
                 }
-                .buttonStyle(.plain)
-                
-                Button(action: { viewModel.viewMode = .list }) {
-                    Image(systemName: "list.bullet")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(viewModel.viewMode == .list ? ColorTheme.textPrimary : ColorTheme.textTertiary)
-                        .frame(width: 28, height: 26)
-                        .background(viewModel.viewMode == .list ? ColorTheme.cardBackground : Color.clear)
-                        .cornerRadius(6)
-                }
-                .buttonStyle(.plain)
+                .padding(2)
+                .background(ColorTheme.inputBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(ColorTheme.inputBorder, lineWidth: 1)
+                )
+                .cornerRadius(8)
             }
-            .padding(2)
-            .background(ColorTheme.inputBackground)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(ColorTheme.inputBorder, lineWidth: 1)
-            )
-            .cornerRadius(8)
             
             // Search Bar Pill
             HStack(spacing: 8) {
@@ -136,5 +182,14 @@ struct HeaderBarView: View {
     private var itemCountLabel: String {
         let count = viewModel.albums.count
         return "\(count) albums"
+    }
+    
+    private func destinationTitle(_ dest: NavigationDestination) -> String {
+        switch dest {
+        case .album(let album):
+            return album.displayTitle
+        case .artist(let artist):
+            return artist.name
+        }
     }
 }

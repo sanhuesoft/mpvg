@@ -1,77 +1,120 @@
 //
-//  AlbumDetailSheet.swift
+//  AlbumDetailView.swift
 //  mpvg
 //
-//  Detailed album sheet with tracklist, metadata, and direct playback.
+//  Full-page inline album detail view with tracklist, metadata,
+//  hero header, and direct playback controls.
 //
 
 import SwiftUI
 
-struct AlbumDetailSheet: View {
+struct AlbumDetailView: View {
     let album: AlbumItem
     @ObservedObject var viewModel: PlayerViewModel
-    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            HStack(alignment: .top, spacing: 20) {
-                // Large Cover Art
-                artworkView
-                    .frame(width: 120, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(ColorTheme.cardBorder, lineWidth: 1.5)
-                    )
-                    .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(alignment: .leading, spacing: 0) {
+                // Hero Header Section
+                heroHeaderView
+                    .padding(.horizontal, 28)
+                    .padding(.top, 20)
+                    .padding(.bottom, 24)
                 
-                // Metadata
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text(album.displayTitle)
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(ColorTheme.textPrimary)
-                        
-                        Spacer()
-                        
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 18))
-                                .foregroundColor(ColorTheme.textTertiary)
-                        }
-                        .buttonStyle(.plain)
+                Divider()
+                    .background(ColorTheme.cardBorder)
+                    .padding(.horizontal, 28)
+                
+                // Tracklist Header & Songs
+                tracklistSection
+                    .padding(.horizontal, 28)
+                    .padding(.top, 16)
+                    .padding(.bottom, 90) // Clear space for the floating player bar
+            }
+        }
+        .background(ColorTheme.windowBackground)
+        .task {
+            if viewModel.selectedAlbumTracks.isEmpty || viewModel.selectedAlbumForDetail?.id != album.id {
+                viewModel.selectAlbumForDetail(album)
+            }
+        }
+    }
+    
+    // MARK: - Hero Header View
+    private var heroHeaderView: some View {
+        HStack(alignment: .bottom, spacing: 24) {
+            // Large Cover Artwork
+            artworkView
+                .frame(width: 170, height: 170)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(ColorTheme.cardBorder, lineWidth: 1.5)
+                )
+                .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 6)
+            
+            // Metadata & Controls
+            VStack(alignment: .leading, spacing: 8) {
+                // Type badge
+                Text("ALBUM")
+                    .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                    .foregroundColor(ColorTheme.terracotta)
+                
+                // Album Title
+                Text(album.displayTitle)
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .lineLimit(2)
+                
+                // Artist Name (Clickable to navigate to artist page)
+                Button(action: {
+                    if let artistItem = viewModel.artists.first(where: { $0.id == album.artistId || $0.name == album.artist }) {
+                        viewModel.navigateToArtist(artistItem)
+                    } else {
+                        let tempArtist = ArtistItem(
+                            id: album.artistId ?? "art-\(album.displayArtist.hashValue)",
+                            name: album.displayArtist,
+                            albumCount: 1,
+                            artistImageUrl: nil
+                        )
+                        viewModel.navigateToArtist(tempArtist)
                     }
-                    
+                }) {
                     Text(album.displayArtist)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(ColorTheme.terracotta)
-                    
-                    HStack(spacing: 8) {
-                        if !album.displayYear.isEmpty {
-                            Text(album.displayYear)
-                        }
-                        if let genre = album.genre {
-                            Text("•")
-                            Text(genre)
-                        }
-                        if let count = album.songCount {
-                            Text("•")
-                            Text("\(count) tracks")
-                        }
-                        if !album.formattedDuration.isEmpty {
-                            Text("•")
-                            Text(album.formattedDuration)
-                        }
+                        .underline(false)
+                }
+                .buttonStyle(.plain)
+                .pointingHandOnHover()
+                
+                // Specs & Metadata row
+                HStack(spacing: 8) {
+                    if !album.displayYear.isEmpty {
+                        Text(album.displayYear)
                     }
-                    .font(.system(size: 12))
-                    .foregroundColor(ColorTheme.textSecondary)
-                    
-                    // Album Star Rating
+                    if let genre = album.genre, !genre.isEmpty {
+                        Text("•")
+                        Text(genre)
+                    }
+                    if let count = album.songCount {
+                        Text("•")
+                        Text("\(count) tracks")
+                    }
+                    if !album.formattedDuration.isEmpty {
+                        Text("•")
+                        Text(album.formattedDuration)
+                    }
+                }
+                .font(.system(size: 13))
+                .foregroundColor(ColorTheme.textSecondary)
+                
+                // Star Rating & Hi-Res Badge
+                HStack(spacing: 10) {
                     HStack(spacing: 6) {
                         StarRatingView(
                             rating: viewModel.selectedAlbumForDetail?.rating ?? album.rating,
-                            size: 13,
+                            size: 14,
                             spacing: 3,
                             interactive: true
                         ) { newRating in
@@ -81,105 +124,154 @@ struct AlbumDetailSheet: View {
                         let curRating = viewModel.selectedAlbumForDetail?.rating ?? album.rating
                         if curRating > 0 {
                             Text("\(curRating)/5")
-                                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
                                 .foregroundColor(ColorTheme.terracotta)
                         }
                     }
-                    .padding(.top, 2)
+                    
+                    if let spec = album.suffix, !spec.isEmpty {
+                        Text(spec)
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(ColorTheme.sageGreen)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(ColorTheme.sageGreenBg)
+                            .cornerRadius(6)
+                    }
+                }
+                .padding(.top, 2)
+                
+                // Play & Queue Action Buttons
+                HStack(spacing: 12) {
+                    Button(action: {
+                        viewModel.playAlbum(album)
+                    }) {
+                        HStack(spacing: 7) {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 13, weight: .bold))
+                            Text("Play Album")
+                                .font(.system(size: 13, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 9)
+                        .background(ColorTheme.terracotta)
+                        .cornerRadius(9)
+                        .shadow(color: ColorTheme.terracotta.opacity(0.35), radius: 6, x: 0, y: 2)
+                    }
+                    .buttonStyle(.plain)
+                    .pointingHandOnHover()
+                    
+                    Button(action: {
+                        viewModel.addAlbumToQueue(album)
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "text.badge.plus")
+                                .font(.system(size: 13, weight: .semibold))
+                            Text("Add to Queue")
+                                .font(.system(size: 13, weight: .semibold))
+                        }
+                        .foregroundColor(ColorTheme.textPrimary)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 9)
+                        .background(ColorTheme.inputBackground)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 9)
+                                .stroke(ColorTheme.cardBorder, lineWidth: 1)
+                        )
+                        .cornerRadius(9)
+                    }
+                    .buttonStyle(.plain)
+                    .pointingHandOnHover()
+                }
+                .padding(.top, 4)
+            }
+            
+            Spacer()
+        }
+    }
+    
+    // MARK: - Tracklist Section
+    @ViewBuilder
+    private var tracklistSection: some View {
+        if viewModel.isLoadingTracks {
+            VStack(spacing: 14) {
+                ProgressView()
+                    .scaleEffect(1.1)
+                Text("Loading tracks...")
+                    .font(.system(size: 14))
+                    .foregroundColor(ColorTheme.textSecondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 50)
+        } else if viewModel.selectedAlbumTracks.isEmpty {
+            VStack(spacing: 10) {
+                Image(systemName: "music.note.list")
+                    .font(.system(size: 32))
+                    .foregroundColor(ColorTheme.textTertiary)
+                Text("No tracks found for this album")
+                    .font(.system(size: 14))
+                    .foregroundColor(ColorTheme.textSecondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 50)
+        } else {
+            VStack(alignment: .leading, spacing: 6) {
+                // Table Columns Header
+                HStack(spacing: 12) {
+                    Text("#")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .frame(width: 24, alignment: .center)
+                    
+                    Text("TITLE")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
                     
                     Spacer()
                     
-                    // Buttons
-                    HStack(spacing: 12) {
-                        Button(action: {
-                            viewModel.playAlbum(album)
-                            dismiss()
-                        }) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "play.fill")
-                                    .font(.system(size: 12))
-                                Text("Play Album")
-                                    .font(.system(size: 13, weight: .bold))
-                            }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(ColorTheme.terracotta)
-                            .cornerRadius(10)
-                        }
-                        .buttonStyle(.plain)
-                        
-                        if let spec = album.suffix, !spec.isEmpty {
-                            Text(spec)
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(ColorTheme.sageGreen)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 6)
-                                .background(ColorTheme.sageGreenBg)
-                                .cornerRadius(6)
-                        }
-                    }
-                }
-            }
-            .padding(24)
-            .background(ColorTheme.sidebarBackground)
-            
-            Divider()
-                .background(ColorTheme.cardBorder)
-            
-            // Tracklist
-            if viewModel.isLoadingTracks {
-                VStack(spacing: 12) {
-                    ProgressView()
-                    Text("Loading tracks...")
-                        .font(.system(size: 13))
-                        .foregroundColor(ColorTheme.textSecondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if viewModel.selectedAlbumTracks.isEmpty {
-                VStack(spacing: 8) {
-                    Image(systemName: "music.note.list")
-                        .font(.system(size: 28))
+                    Text("FORMAT")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .foregroundColor(ColorTheme.textTertiary)
-                    Text("No tracks found for this album")
-                        .font(.system(size: 13))
-                        .foregroundColor(ColorTheme.textSecondary)
+                        .frame(width: 70, alignment: .center)
+                    
+                    Text("RATING")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .frame(width: 75, alignment: .trailing)
+                    
+                    Text("TIME")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .frame(width: 44, alignment: .trailing)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollView(.vertical, showsIndicators: true) {
-                    VStack(spacing: 2) {
-                        ForEach(viewModel.selectedAlbumTracks) { song in
-                            SongRowView(
-                                song: song,
-                                isPlaying: viewModel.currentSong?.id == song.id && !viewModel.mpv.isPaused,
-                                onRate: { newRating in
-                                    viewModel.rateSong(song, rating: newRating)
-                                },
-                                onPlay: {
-                                    viewModel.playSong(song, inAlbum: album, queue: viewModel.selectedAlbumTracks)
-                                }
-                            )
-                        }
+                .padding(.horizontal, 12)
+                .padding(.bottom, 4)
+                
+                Divider()
+                    .background(ColorTheme.cardBorder.opacity(0.6))
+                    .padding(.bottom, 4)
+                
+                // Track Rows
+                VStack(spacing: 2) {
+                    ForEach(viewModel.selectedAlbumTracks) { song in
+                        SongRowView(
+                            song: song,
+                            isPlaying: viewModel.currentSong?.id == song.id && !viewModel.mpv.isPaused,
+                            onRate: { newRating in
+                                viewModel.rateSong(song, rating: newRating)
+                            },
+                            onPlay: {
+                                viewModel.playSong(song, inAlbum: album, queue: viewModel.selectedAlbumTracks)
+                            }
+                        )
                     }
-                    .padding(16)
                 }
-            }
-        }
-        #if os(macOS)
-        .frame(width: 580, height: 480)
-        #else
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
-        #endif
-        .background(ColorTheme.cardBackground)
-        .task {
-            if viewModel.selectedAlbumTracks.isEmpty || viewModel.selectedAlbumForDetail?.id != album.id {
-                viewModel.selectAlbumForDetail(album)
             }
         }
     }
     
+    // MARK: - Artwork Helpers
     @ViewBuilder
     private var artworkView: some View {
         let artURL: URL? = {
@@ -194,7 +286,7 @@ struct AlbumDetailSheet: View {
         CachedAsyncImage(url: artURL) {
             placeholderArtwork
         }
-        .aspectRatio(contentMode: .fill)
+        .aspectRatio(1.0, contentMode: .fill)
     }
     
     private var placeholderArtwork: some View {
@@ -205,8 +297,11 @@ struct AlbumDetailSheet: View {
                 endPoint: .bottomTrailing
             )
             Image(systemName: "opticaldisc")
-                .font(.system(size: 40))
+                .font(.system(size: 54))
                 .foregroundColor(ColorTheme.terracotta)
         }
     }
 }
+
+// Backward-compatibility alias
+typealias AlbumDetailSheet = AlbumDetailView

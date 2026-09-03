@@ -1,115 +1,42 @@
 //
-//  ArtistDetailSheet.swift
+//  ArtistDetailView.swift
 //  mpvg
 //
-//  Detailed artist sheet with artist profile, discography albums grid, and quick playback.
+//  Full-page inline artist profile view with discography grid
+//  and seamless navigation to albums.
 //
 
 import SwiftUI
 
-struct ArtistDetailSheet: View {
+struct ArtistDetailView: View {
     let artist: ArtistItem
     @ObservedObject var viewModel: PlayerViewModel
-    @Environment(\.dismiss) private var dismiss
     
     private let columns = [
-        GridItem(.adaptive(minimum: 145, maximum: 190), spacing: 14)
+        GridItem(.adaptive(minimum: 165, maximum: 220), spacing: 14)
     ]
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            HStack(alignment: .center, spacing: 18) {
-                // Circular Avatar
-                avatarView
-                    .frame(width: 80, height: 80)
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(ColorTheme.cardBorder, lineWidth: 1.5)
-                    )
-                    .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(alignment: .leading, spacing: 0) {
+                // Hero Header Section
+                heroHeaderView
+                    .padding(.horizontal, 28)
+                    .padding(.top, 20)
+                    .padding(.bottom, 24)
                 
-                // Metadata
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(artist.name)
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(ColorTheme.textPrimary)
-                            .lineLimit(1)
-                        
-                        Spacer()
-                        
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 18))
-                                .foregroundColor(ColorTheme.textTertiary)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    
-                    Text("Artist")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(ColorTheme.terracotta)
-                    
-                    let albumCount = viewModel.selectedArtistAlbums.isEmpty ? (artist.albumCount ?? 0) : viewModel.selectedArtistAlbums.count
-                    Text("\(albumCount) \(albumCount == 1 ? "album" : "albums") in library")
-                        .font(.system(size: 12))
-                        .foregroundColor(ColorTheme.textSecondary)
-                }
-            }
-            .padding(20)
-            .background(ColorTheme.sidebarBackground)
-            
-            Divider()
-                .background(ColorTheme.cardBorder)
-            
-            // Albums Content
-            if viewModel.isLoadingArtistAlbums {
-                VStack(spacing: 12) {
-                    ProgressView()
-                    Text("Loading albums...")
-                        .font(.system(size: 13))
-                        .foregroundColor(ColorTheme.textSecondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if viewModel.selectedArtistAlbums.isEmpty {
-                VStack(spacing: 8) {
-                    Image(systemName: "opticaldisc")
-                        .font(.system(size: 28))
-                        .foregroundColor(ColorTheme.textTertiary)
-                    Text("No albums found for this artist")
-                        .font(.system(size: 13))
-                        .foregroundColor(ColorTheme.textSecondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollView(.vertical, showsIndicators: true) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("DISCOGRAPHY")
-                            .font(.system(size: 11, weight: .heavy, design: .monospaced))
-                            .foregroundColor(ColorTheme.textTertiary)
-                            .padding(.horizontal, 16)
-                            .padding(.top, 14)
-                        
-                        LazyVGrid(columns: columns, spacing: 14) {
-                            ForEach(viewModel.selectedArtistAlbums) { album in
-                                AlbumCardView(album: album, viewModel: viewModel)
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 24)
-                    }
-                }
+                Divider()
+                    .background(ColorTheme.cardBorder)
+                    .padding(.horizontal, 28)
+                
+                // Discography Grid Section
+                discographySection
+                    .padding(.horizontal, 28)
+                    .padding(.top, 20)
+                    .padding(.bottom, 90) // Clear space for the floating player bar
             }
         }
-        #if os(macOS)
-        .frame(width: 580, height: 480)
-        #else
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
-        #endif
-        .background(ColorTheme.cardBackground)
+        .background(ColorTheme.windowBackground)
         .task {
             if viewModel.selectedArtistAlbums.isEmpty || viewModel.selectedArtistForDetail?.id != artist.id {
                 viewModel.selectArtistForDetail(artist)
@@ -117,6 +44,104 @@ struct ArtistDetailSheet: View {
         }
     }
     
+    // MARK: - Hero Header View
+    private var heroHeaderView: some View {
+        HStack(alignment: .center, spacing: 24) {
+            // Circular Avatar
+            avatarView
+                .frame(width: 110, height: 110)
+                .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke(ColorTheme.cardBorder, lineWidth: 1.5)
+                )
+                .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 5)
+            
+            // Metadata & Controls
+            VStack(alignment: .leading, spacing: 8) {
+                Text("ARTIST")
+                    .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                    .foregroundColor(ColorTheme.terracotta)
+                
+                Text(artist.name)
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .lineLimit(1)
+                
+                let albumCount = viewModel.selectedArtistAlbums.isEmpty ? (artist.albumCount ?? 0) : viewModel.selectedArtistAlbums.count
+                Text("\(albumCount) \(albumCount == 1 ? "album" : "albums") in library")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(ColorTheme.textSecondary)
+                
+                if let firstAlbum = viewModel.selectedArtistAlbums.first {
+                    HStack(spacing: 12) {
+                        Button(action: {
+                            viewModel.playAlbum(firstAlbum)
+                        }) {
+                            HStack(spacing: 7) {
+                                Image(systemName: "play.fill")
+                                    .font(.system(size: 12, weight: .bold))
+                                Text("Play Artist")
+                                    .font(.system(size: 13, weight: .bold))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(ColorTheme.terracotta)
+                            .cornerRadius(9)
+                            .shadow(color: ColorTheme.terracotta.opacity(0.35), radius: 6, x: 0, y: 2)
+                        }
+                        .buttonStyle(.plain)
+                        .pointingHandOnHover()
+                    }
+                    .padding(.top, 4)
+                }
+            }
+            
+            Spacer()
+        }
+    }
+    
+    // MARK: - Discography Section
+    @ViewBuilder
+    private var discographySection: some View {
+        if viewModel.isLoadingArtistAlbums {
+            VStack(spacing: 14) {
+                ProgressView()
+                    .scaleEffect(1.1)
+                Text("Loading albums...")
+                    .font(.system(size: 14))
+                    .foregroundColor(ColorTheme.textSecondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 50)
+        } else if viewModel.selectedArtistAlbums.isEmpty {
+            VStack(spacing: 10) {
+                Image(systemName: "opticaldisc")
+                    .font(.system(size: 32))
+                    .foregroundColor(ColorTheme.textTertiary)
+                Text("No albums found for this artist")
+                    .font(.system(size: 14))
+                    .foregroundColor(ColorTheme.textSecondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 50)
+        } else {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("DISCOGRAPHY")
+                    .font(.system(size: 12, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                
+                LazyVGrid(columns: columns, spacing: 14) {
+                    ForEach(viewModel.selectedArtistAlbums) { album in
+                        AlbumCardView(album: album, viewModel: viewModel)
+                    }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Avatar View
     @ViewBuilder
     private var avatarView: some View {
         let avatarURL = artist.artistImageUrl.flatMap { URL(string: $0) }
@@ -128,10 +153,13 @@ struct ArtistDetailSheet: View {
                     endPoint: .bottomTrailing
                 )
                 Image(systemName: "person.fill")
-                    .font(.system(size: 32))
+                    .font(.system(size: 44))
                     .foregroundColor(ColorTheme.terracotta)
             }
         }
         .aspectRatio(contentMode: .fill)
     }
 }
+
+// Backward-compatibility alias
+typealias ArtistDetailSheet = ArtistDetailView

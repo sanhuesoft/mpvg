@@ -67,8 +67,18 @@ struct MainView: View {
                     ZStack {
                         if viewModel.activeTab == .settings {
                             SettingsView(viewModel: viewModel)
+                        } else if let destination = viewModel.navigationStack.last {
+                            switch destination {
+                            case .album(let album):
+                                AlbumDetailView(album: album, viewModel: viewModel)
+                                    .transition(.opacity)
+                            case .artist(let artist):
+                                ArtistDetailView(artist: artist, viewModel: viewModel)
+                                    .transition(.opacity)
+                            }
                         } else {
                             BrowseView(viewModel: viewModel)
+                                .transition(.opacity)
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -107,12 +117,6 @@ struct MainView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorTheme.windowBackground)
-        .sheet(item: $viewModel.selectedAlbumForDetail) { album in
-            AlbumDetailSheet(album: album, viewModel: viewModel)
-        }
-        .sheet(item: $viewModel.selectedArtistForDetail) { artist in
-            ArtistDetailSheet(artist: artist, viewModel: viewModel)
-        }
     }
     #endif
     
@@ -135,6 +139,13 @@ struct MainView: View {
                 ZStack {
                     if viewModel.activeTab == .settings {
                         SettingsView(viewModel: viewModel)
+                    } else if let destination = viewModel.navigationStack.last {
+                        switch destination {
+                        case .album(let album):
+                            AlbumDetailView(album: album, viewModel: viewModel)
+                        case .artist(let artist):
+                            ArtistDetailView(artist: artist, viewModel: viewModel)
+                        }
                     } else {
                         BrowseView(viewModel: viewModel)
                     }
@@ -145,12 +156,6 @@ struct MainView: View {
             }
         }
         .background(ColorTheme.windowBackground)
-        .sheet(item: $viewModel.selectedAlbumForDetail) { album in
-            AlbumDetailSheet(album: album, viewModel: viewModel)
-        }
-        .sheet(item: $viewModel.selectedArtistForDetail) { artist in
-            ArtistDetailSheet(artist: artist, viewModel: viewModel)
-        }
     }
     #endif
 }

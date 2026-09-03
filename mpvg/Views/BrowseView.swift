@@ -204,6 +204,7 @@ struct BrowseView: View {
                     .foregroundColor(ColorTheme.terracotta)
             }
             .buttonStyle(.plain)
+            .pointingHandOnHover()
         }
     }
     
@@ -236,6 +237,7 @@ struct BrowseView: View {
                     .cornerRadius(6)
             }
             .buttonStyle(.plain)
+            .pointingHandOnHover()
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -245,5 +247,10 @@ struct BrowseView: View {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(ColorTheme.cardBorder, lineWidth: 1)
         )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.navigateToAlbum(album)
+        }
+        .pointingHandOnHover()
     }
 }

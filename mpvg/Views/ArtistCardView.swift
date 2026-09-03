@@ -65,13 +65,14 @@ struct ArtistCardView: View {
         )
         .cornerRadius(14)
         .shadow(color: Color.black.opacity(isHovered ? 0.06 : 0.02), radius: isHovered ? 8 : 3, x: 0, y: isHovered ? 3 : 1)
+        .contentShape(RoundedRectangle(cornerRadius: 14))
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 self.isHovered = hovering
             }
         }
         .onTapGesture {
-            viewModel.selectArtistForDetail(artist)
+            viewModel.navigateToArtist(artist)
         }
         .pointingHandOnHover()
     }
