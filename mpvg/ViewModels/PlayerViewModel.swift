@@ -206,14 +206,14 @@ final class PlayerViewModel: ObservableObject {
         
         async let recent = navidrome.getAlbums(type: "recent", size: 30)
         async let frequent = navidrome.getAlbums(type: "frequent", size: 24)
-        async let newest = navidrome.getAlbums(type: "newest", size: 40)
+        async let allAlb = navidrome.getAllAlbums(type: "alphabeticalByArtist")
         async let arts = navidrome.getArtists()
         
-        let (rec, freq, new, artList) = await (recent, frequent, newest, arts)
+        let (rec, freq, allA, artList) = await (recent, frequent, allAlb, arts)
         
         self.recentAlbums = rec
         self.featuredAlbums = freq
-        self.albums = new
+        self.albums = allA
         self.artists = artList
     }
     

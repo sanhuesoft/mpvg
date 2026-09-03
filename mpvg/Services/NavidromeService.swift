@@ -125,6 +125,67 @@ actor NavidromeService {
         }
     }
     
+    // MARK: - Get All Albums (Paginated to fetch entire collection)
+    func getAllAlbums(type: String = "alphabeticalByArtist", maxLimit: Int = 5000) async -> [AlbumItem] {
+        var allAlbums: [AlbumItem] = []
+        var offset = 0
+        let pageSize = 500
+        
+        while offset < maxLimit {
+            let params: [String: String] = [
+                "type": type,
+                "size": "\(pageSize)",
+                "offset": "\(offset)"
+            ]
+            
+            guard let url = buildURL(endpoint: "getAlbumList2.view", extraParams: params) else { break }
+            
+            do {
+                let (data, _) = try await URLSession.shared.data(from: url)
+                guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let sub = json["subsonic-response"] as? [String: Any],
+                      let listWrapper = sub["albumList2"] as? [String: Any],
+                      let rawAlbums = listWrapper["album"] as? [[String: Any]],
+                      !rawAlbums.isEmpty else {
+                    break
+                }
+                
+                for item in rawAlbums {
+                    if let id = item["id"] as? String,
+                       let name = (item["name"] as? String) ?? (item["title"] as? String) {
+                        let album = AlbumItem(
+                            id: id,
+                            name: name,
+                            title: item["title"] as? String,
+                            artist: item["artist"] as? String,
+                            artistId: item["artistId"] as? String,
+                            coverArt: item["coverArt"] as? String,
+                            songCount: item["songCount"] as? Int,
+                            duration: item["duration"] as? Double,
+                            year: item["year"] as? Int,
+                            genre: item["genre"] as? String,
+                            bitRate: item["bitRate"] as? Int,
+                            suffix: item["suffix"] as? String,
+                            playCount: item["playCount"] as? Int
+                        )
+                        if !allAlbums.contains(where: { $0.id == album.id }) {
+                            allAlbums.append(album)
+                        }
+                    }
+                }
+                
+                if rawAlbums.count < pageSize {
+                    break
+                }
+                offset += pageSize
+            } catch {
+                break
+            }
+        }
+        
+        return allAlbums
+    }
+    
     // MARK: - Get Artists
     func getArtists() async -> [ArtistItem] {
         guard let url = buildURL(endpoint: "getArtists.view") else {

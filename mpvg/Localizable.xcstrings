@@ -59,7 +59,20 @@
 
     },
     "• Supports Direct Hardware Hog Mode" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Supports Direct Hardware Hog Mode"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Compatible con Modo Exclusivo Directo (Hog Mode)"
+          }
+        }
+      }
     },
     "••••••••" : {
 
@@ -101,6 +114,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "24"
+          }
+        }
+      }
+    },
+    "Active Output Device" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active Output Device"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispositivo de salida activo"
           }
         }
       }
@@ -179,6 +209,23 @@
         }
       }
     },
+    "Audio & Output" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio & Output"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio y Salida"
+          }
+        }
+      }
+    },
     "Audio Engine & Bit-Perfect" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -192,6 +239,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Motor de Audio y Bit-Perfect"
+          }
+        }
+      }
+    },
+    "Audio Engine & Exclusive Mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Engine & Exclusive Mode"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motor de Audio y Modo Exclusivo"
+          }
+        }
+      }
+    },
+    "Authentication token or password" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication token or password"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Token de autenticación o contraseña"
+          }
+        }
+      }
+    },
+    "Auto-Connect" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-Connect"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conexión automática"
           }
         }
       }
@@ -263,6 +358,22 @@
         }
       }
     },
+    "Bit-Perfect Sample Rate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bit-Perfect Sample Rate"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frecuencia de Muestreo Bit-Perfect"
+          }
+        }
+      }
+    },
     "Bit-Perfect Sample Rate Switching" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -291,7 +402,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Explorar"
+            "value" : "Inicio"
           }
         }
       }
@@ -367,7 +478,36 @@
       }
     },
     "Configure your Navidrome server connection and audiophile CoreAudio playback." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configure your Navidrome server connection and audiophile CoreAudio playback."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configura la conexión con tu servidor Navidrome y la reproducción audiófila CoreAudio."
+          }
+        }
+      }
+    },
+    "Connect automatically when mpvg launches" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect automatically when mpvg launches"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectar automáticamente al iniciar mpvg"
+          }
+        }
+      }
     },
     "connected" : {
 
@@ -402,6 +542,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Conectado con éxito"
+          }
+        }
+      }
+    },
+    "CoreAudio Exclusive Mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CoreAudio Exclusive Mode"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo Exclusivo CoreAudio"
           }
         }
       }
@@ -528,7 +684,20 @@
       }
     },
     "Done" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo"
+          }
+        }
+      }
     },
     "Enable Exclusive Mode" : {
       "localizations" : {
@@ -635,6 +804,22 @@
         }
       }
     },
+    "Gapless Playback" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gapless Playback"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducción Sin Pausas (Gapless)"
+          }
+        }
+      }
+    },
     "Genres" : {
       "localizations" : {
         "en" : {
@@ -694,7 +879,37 @@
       }
     },
     "Load Demo" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load Demo"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargar Demo"
+          }
+        }
+      }
+    },
+    "Load Demo Catalog" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load Demo Catalog"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargar Catálogo Demo"
+          }
+        }
+      }
     },
     "Loading albums..." : {
 
@@ -720,6 +935,22 @@
     },
     "LOSSLESS" : {
 
+    },
+    "Matches DAC hardware sample rate dynamically to source track (44.1kHz, 96kHz, 192kHz) without resampling." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matches DAC hardware sample rate dynamically to source track (44.1kHz, 96kHz, 192kHz) without resampling."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajusta dinámicamente la frecuencia de muestreo del DAC a la pista fuente (44.1kHz, 96kHz, 192kHz) sin remuestreo."
+          }
+        }
+      }
     },
     "Most Popular" : {
       "localizations" : {
@@ -813,8 +1044,37 @@
         }
       }
     },
+    "Output Device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Output Device"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispositivo de Salida"
+          }
+        }
+      }
+    },
     "Output device:" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Output device:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispositivo de salida:"
+          }
+        }
+      }
     },
     "Password" : {
       "localizations" : {
@@ -916,13 +1176,72 @@
       }
     },
     "Restart Engine" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart Engine"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar Motor"
+          }
+        }
+      }
     },
     "Results for \"%@\"" : {
 
     },
     "Save & Test Connection" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save & Test Connection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar y Probar Conexión"
+          }
+        }
+      }
+    },
+    "Save Connection" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Connection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar Conexión"
+          }
+        }
+      }
+    },
+    "Seamless transition between consecutive tracks for live and continuous albums." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seamless transition between consecutive tracks for live and continuous albums."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transición fluida y sin silencios entre pistas consecutivas para álbumes continuos o en vivo."
+          }
+        }
+      }
     },
     "Search" : {
 
@@ -958,6 +1277,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buscar..."
+          }
+        }
+      }
+    },
+    "Select physical DAC or CoreAudio endpoint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select physical DAC or CoreAudio endpoint"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona el DAC físico o salida CoreAudio"
           }
         }
       }
@@ -1046,6 +1381,22 @@
         }
       }
     },
+    "Subsonic API user" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subsonic API user"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuario de API Subsonic"
+          }
+        }
+      }
+    },
     "SYSTEM" : {
       "localizations" : {
         "en" : {
@@ -1058,6 +1409,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "SISTEMA"
+          }
+        }
+      }
+    },
+    "Takes exclusive direct hardware control of the connected DAC, bypassing macOS system mixer and alerts (--audio-exclusive=yes)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Takes exclusive direct hardware control of the connected DAC, bypassing macOS system mixer and alerts (--audio-exclusive=yes)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toma el control directo por hardware del DAC conectado, omitiendo el mezclador del sistema macOS y alertas (--audio-exclusive=yes)."
           }
         }
       }
@@ -1147,6 +1514,22 @@
     },
     "UP NEXT (%lld)" : {
 
+    },
+    "URL to your Navidrome instance" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL to your Navidrome instance"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL de tu instancia de Navidrome"
+          }
+        }
+      }
     },
     "username" : {
 

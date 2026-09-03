@@ -22,10 +22,10 @@ struct SettingsView: View {
                 #if os(macOS)
                 // macOS Native Header
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Settings")
+                    Text(LocalizedStringKey("Settings"))
                         .font(.system(size: 24, weight: .bold))
                         .foregroundColor(ColorTheme.textPrimary)
-                    Text("Configure your Navidrome server connection and audiophile CoreAudio playback.")
+                    Text(LocalizedStringKey("Configure your Navidrome server connection and audiophile CoreAudio playback."))
                         .font(.system(size: 13))
                         .foregroundColor(ColorTheme.textTertiary)
                 }
@@ -51,8 +51,8 @@ struct SettingsView: View {
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
-                Button("Done") {
-                    hideKeyboard()
+                Button(action: { hideKeyboard() }) {
+                    Text(LocalizedStringKey("Done"))
                 }
                 .font(.system(size: 15, weight: .bold))
                 .foregroundColor(ColorTheme.terracotta)
@@ -121,7 +121,7 @@ struct SettingsView: View {
                         Circle()
                             .fill(viewModel.isConnected ? ColorTheme.sageGreen : ColorTheme.amber)
                             .frame(width: 8, height: 8)
-                        Text(viewModel.connectionStatusMessage)
+                        Text(LocalizedStringKey(viewModel.connectionStatusMessage))
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(viewModel.isConnected ? ColorTheme.sageGreen : ColorTheme.textSecondary)
                     }
@@ -129,7 +129,7 @@ struct SettingsView: View {
                     Spacer()
                     
                     Button(action: { viewModel.loadSampleCatalog() }) {
-                        Text("Load Demo")
+                        Text(LocalizedStringKey("Load Demo"))
                             .font(.system(size: 12, weight: .medium))
                     }
                     .buttonStyle(.bordered)
@@ -142,7 +142,7 @@ struct SettingsView: View {
                             } else {
                                 Image(systemName: "bolt.horizontal.fill")
                             }
-                            Text("Save & Test Connection")
+                            Text(LocalizedStringKey("Save & Test Connection"))
                                 .font(.system(size: 12, weight: .bold))
                         }
                     }
@@ -182,12 +182,12 @@ struct SettingsView: View {
                 if let activeDev = viewModel.mpv.availableDevices.first(where: { $0.id == viewModel.mpv.currentDevice }) {
                     HStack(spacing: 8) {
                         Circle().fill(ColorTheme.sageGreen).frame(width: 6, height: 6)
-                        Text("Active: \(activeDev.displayName)")
+                        Text(LocalizedStringKey("Active: \(activeDev.displayName)"))
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(ColorTheme.sageGreen)
                         
                         if activeDev.isExclusiveCapable {
-                            Text("• Supports Direct Hardware Hog Mode")
+                            Text(LocalizedStringKey("• Supports Direct Hardware Hog Mode"))
                                 .font(.system(size: 11))
                                 .foregroundColor(ColorTheme.textTertiary)
                         }
@@ -261,7 +261,7 @@ struct SettingsView: View {
                     Button(action: { viewModel.mpv.restart() }) {
                         HStack(spacing: 5) {
                             Image(systemName: "arrow.clockwise")
-                            Text("Restart Engine")
+                            Text(LocalizedStringKey("Restart Engine"))
                         }
                         .font(.system(size: 12, weight: .medium))
                     }
@@ -281,12 +281,12 @@ struct SettingsView: View {
     ) -> some View {
         HStack(alignment: .center, spacing: 16) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(label)
+                Text(LocalizedStringKey(label))
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(ColorTheme.textPrimary)
                 
                 if let sub = subtitle {
-                    Text(sub)
+                    Text(LocalizedStringKey(sub))
                         .font(.system(size: 11))
                         .foregroundColor(ColorTheme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -308,7 +308,7 @@ struct SettingsView: View {
         settingsCard(title: "Navidrome Server", icon: "server.rack", iconColor: ColorTheme.terracotta) {
             VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Server URL")
+                    Text(LocalizedStringKey("Server URL"))
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(ColorTheme.textSecondary)
                     
@@ -329,7 +329,7 @@ struct SettingsView: View {
                 
                 VStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Username")
+                        Text(LocalizedStringKey("Username"))
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundColor(ColorTheme.textSecondary)
                         
@@ -348,7 +348,7 @@ struct SettingsView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Password")
+                        Text(LocalizedStringKey("Password"))
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundColor(ColorTheme.textSecondary)
                         
@@ -369,10 +369,12 @@ struct SettingsView: View {
                     }
                 }
                 
-                Toggle("Connect automatically at launch", isOn: $autoConnect)
-                    .platformCheckbox()
-                    .font(.system(size: 13))
-                    .foregroundColor(ColorTheme.textSecondary)
+                Toggle(isOn: $autoConnect) {
+                    Text(LocalizedStringKey("Auto-Connect"))
+                }
+                .platformCheckbox()
+                .font(.system(size: 13))
+                .foregroundColor(ColorTheme.textSecondary)
                 
                 Divider()
                     .background(ColorTheme.cardBorder)
@@ -383,7 +385,7 @@ struct SettingsView: View {
                         Circle()
                             .fill(viewModel.isConnected ? ColorTheme.sageGreen : ColorTheme.amber)
                             .frame(width: 8, height: 8)
-                        Text(viewModel.connectionStatusMessage)
+                        Text(LocalizedStringKey(viewModel.connectionStatusMessage))
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(viewModel.isConnected ? ColorTheme.sageGreen : ColorTheme.textSecondary)
                         
@@ -398,7 +400,7 @@ struct SettingsView: View {
                             } else {
                                 Image(systemName: "bolt.horizontal.fill")
                             }
-                            Text("Save Connection")
+                            Text(LocalizedStringKey("Save & Test Connection"))
                                 .font(.system(size: 14, weight: .bold))
                         }
                         .frame(maxWidth: .infinity)
@@ -411,7 +413,7 @@ struct SettingsView: View {
                     .disabled(viewModel.isTestingConnection)
                     
                     Button(action: { viewModel.loadSampleCatalog() }) {
-                        Text("Load Demo Catalog")
+                        Text(LocalizedStringKey("Load Demo"))
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(ColorTheme.terracotta)
                             .frame(maxWidth: .infinity)
@@ -428,11 +430,11 @@ struct SettingsView: View {
     
     // MARK: - iOS Native Audio Section
     private var iOSAudioSection: some View {
-        settingsCard(title: "Audio & Output", icon: "waveform.circle.fill", iconColor: ColorTheme.terracotta) {
+        settingsCard(title: "Audio Engine & Exclusive Mode", icon: "waveform.circle.fill", iconColor: ColorTheme.terracotta) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Active Output Device")
+                        Text(LocalizedStringKey("Output Device"))
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundColor(ColorTheme.textSecondary)
                         
@@ -448,7 +450,7 @@ struct SettingsView: View {
                     Spacer()
                     
                     if viewModel.mpv.isExclusive {
-                        Text("HI-RES DAC")
+                        Text(LocalizedStringKey("EXCLUSIVE"))
                             .font(.system(size: 10, weight: .heavy, design: .monospaced))
                             .foregroundColor(ColorTheme.terracotta)
                             .padding(.horizontal, 8)
@@ -465,12 +467,12 @@ struct SettingsView: View {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(ColorTheme.sageGreen)
                             .font(.system(size: 13))
-                        Text("Native CoreAudio Bit-Perfect Output")
+                        Text(LocalizedStringKey("Native CoreAudio Bit-Perfect Output"))
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(ColorTheme.textPrimary)
                     }
                     
-                    Text("Automatically requests high sample rate (up to 96kHz) when a USB DAC like HiBy FC1 is connected.")
+                    Text(LocalizedStringKey("Automatically requests high sample rate (up to 96kHz) when a USB DAC like HiBy FC1 is connected."))
                         .font(.system(size: 11))
                         .foregroundColor(ColorTheme.textSecondary)
                 }
@@ -510,7 +512,7 @@ struct SettingsView: View {
                         .foregroundColor(iconColor)
                 }
                 
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(ColorTheme.textPrimary)
                 

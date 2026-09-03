@@ -171,13 +171,16 @@ final class MPVProcessManager: ObservableObject {
                         }
                         
                         let isCoreAudio = id.hasPrefix("coreaudio/")
-                        let isExclusive = isCoreAudio && id != "coreaudio/BuiltInSpeakerDevice"
+                        // Only add CoreAudio endpoints to avoid duplicates with AVFoundation
+                        guard isCoreAudio else { continue }
                         
-                        if !devices.contains(where: { $0.id == id }) {
+                        let isExclusive = id != "coreaudio/BuiltInSpeakerDevice"
+                        
+                        if !devices.contains(where: { $0.displayName == name || $0.id == id }) {
                             devices.append(AudioDeviceInfo(
                                 id: id,
                                 name: name,
-                                driver: isCoreAudio ? "coreaudio" : "avfoundation",
+                                driver: "coreaudio",
                                 isExclusiveCapable: isExclusive
                             ))
                         }
