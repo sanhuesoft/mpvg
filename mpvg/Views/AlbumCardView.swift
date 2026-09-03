@@ -154,7 +154,7 @@ struct AlbumCardView: View {
             }
         }
         .onTapGesture {
-            viewModel.selectedAlbumForDetail = album
+            viewModel.selectAlbumForDetail(album)
         }
     }
     

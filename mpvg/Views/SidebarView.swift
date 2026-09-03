@@ -73,7 +73,7 @@ struct SidebarView: View {
                     
                     // AUDIO & SYSTEM
                     sidebarSection(title: "AUDIO & SETUP") {
-                        sidebarRow(tab: .settings, label: "Settings & MPV", count: viewModel.mpv.isExclusive ? "⚡" : nil)
+                        sidebarRow(tab: .settings, label: "Settings", count: viewModel.mpv.isExclusive ? "⚡" : nil)
                     }
                 }
                 .padding(.horizontal, 10)

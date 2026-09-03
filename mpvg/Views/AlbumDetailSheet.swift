@@ -143,8 +143,18 @@ struct AlbumDetailSheet: View {
                 }
             }
         }
+        #if os(macOS)
         .frame(width: 580, height: 480)
+        #else
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+        #endif
         .background(ColorTheme.cardBackground)
+        .task {
+            if viewModel.selectedAlbumTracks.isEmpty || viewModel.selectedAlbumForDetail?.id != album.id {
+                viewModel.selectAlbumForDetail(album)
+            }
+        }
     }
     
     @ViewBuilder
