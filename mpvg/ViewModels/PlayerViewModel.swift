@@ -13,14 +13,14 @@ import CryptoKit
 
 enum SidebarTab: String, CaseIterable, Identifiable {
     case browse = "Browse"
-    case featured = "Destacados"
-    case topCharts = "Más Escuchados"
-    case recentlyAdded = "Agregados Recientes"
-    case albums = "Álbumes"
-    case artists = "Artistas"
-    case playlists = "Listas"
-    case genres = "Géneros"
-    case settings = "Configuración"
+    case featured = "Featured"
+    case topCharts = "Top Charts"
+    case recentlyAdded = "Recently Added"
+    case albums = "Albums"
+    case artists = "Artists"
+    case playlists = "Playlists"
+    case genres = "Genres"
+    case settings = "Settings"
     
     var id: String { rawValue }
     
@@ -63,7 +63,7 @@ final class PlayerViewModel: ObservableObject {
         }
     }
     @Published var isConnected: Bool = false
-    @Published var connectionStatusMessage: String = "No conectado"
+    @Published var connectionStatusMessage: String = "Not connected"
     @Published var isTestingConnection: Bool = false
     
     // Catalogs

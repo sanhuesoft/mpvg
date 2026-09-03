@@ -25,7 +25,7 @@ final class IOSAudioEngine: ObservableObject {
     @Published var duration: Double = 0.0
     @Published var volume: Double = 100.0
     
-    @Published var currentDevice: String = "Altavoz del iPhone"
+    @Published var currentDevice: String = "iPhone Speaker"
     @Published var preferredDeviceName: String = ""
     @Published var availableDevices: [AudioDeviceInfo] = []
     @Published var isDeviceConnected: Bool = true
@@ -62,7 +62,7 @@ final class IOSAudioEngine: ObservableObject {
             try session.setPreferredSampleRate(96000.0)
             try session.setActive(true)
         } catch {
-            print("Error configurando AVAudioSession: \(error.localizedDescription)")
+            print("Error configuring AVAudioSession: \(error.localizedDescription)")
         }
     }
     
@@ -109,7 +109,7 @@ final class IOSAudioEngine: ObservableObject {
         
         var detected: [AudioDeviceInfo] = []
         var hasUsbDAC = false
-        var activeName = "Altavoz"
+        var activeName = "Speaker"
         
         for out in currentOutputs {
             activeName = out.portName
@@ -136,7 +136,7 @@ final class IOSAudioEngine: ObservableObject {
             self.deviceWarning = nil
         } else if !preferredDeviceName.isEmpty && preferredDeviceName.localizedCaseInsensitiveContains("HiBy") {
             self.isDeviceConnected = false
-            self.deviceWarning = "\(preferredDeviceName) desconectado. Usando altavoz."
+            self.deviceWarning = "\(preferredDeviceName) disconnected. Using device speaker."
         } else {
             self.isDeviceConnected = true
             self.deviceWarning = nil

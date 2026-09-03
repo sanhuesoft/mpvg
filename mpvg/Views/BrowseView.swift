@@ -103,11 +103,11 @@ struct BrowseView: View {
     private var artistsGridSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("Artistas")
+                Text("Artists")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(ColorTheme.textPrimary)
                 Spacer()
-                Text("\(viewModel.artists.count) artistas")
+                Text("\(viewModel.artists.count) artists")
                     .font(.system(size: 12))
                     .foregroundColor(ColorTheme.textTertiary)
             }
@@ -149,7 +149,7 @@ struct BrowseView: View {
     // MARK: - Search Section
     private var searchSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Resultados para \"\(viewModel.searchQuery)\"")
+            Text("Results for \"\(viewModel.searchQuery)\"")
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(ColorTheme.textPrimary)
             
@@ -158,7 +158,7 @@ struct BrowseView: View {
                     Image(systemName: "magnifyingglass")
                         .font(.system(size: 32))
                         .foregroundColor(ColorTheme.textTertiary)
-                    Text("No se encontraron álbumes o canciones")
+                    Text("No albums or songs found")
                         .font(.system(size: 14))
                         .foregroundColor(ColorTheme.textSecondary)
                 }

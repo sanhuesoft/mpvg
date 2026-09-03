@@ -63,7 +63,7 @@ struct HeaderBarView: View {
                     .font(.system(size: 13))
                     .foregroundColor(ColorTheme.textTertiary)
                 
-                TextField("Buscar álbumes, pistas...", text: $viewModel.searchQuery)
+                TextField("Search albums, tracks...", text: $viewModel.searchQuery)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13))
                     .foregroundColor(ColorTheme.textPrimary)
@@ -106,6 +106,6 @@ struct HeaderBarView: View {
     
     private var itemCountLabel: String {
         let count = viewModel.albums.count
-        return "\(count) álbumes"
+        return "\(count) albums"
     }
 }

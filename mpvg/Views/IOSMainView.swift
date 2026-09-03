@@ -19,46 +19,46 @@ struct IOSMainView: View {
             TabView(selection: $selectedTab) {
                 NavigationStack {
                     BrowseView(viewModel: viewModel)
-                        .navigationTitle("Explorar")
+                        .navigationTitle("Browse")
                 }
                 .tabItem {
-                    Label("Explorar", systemImage: "sparkles")
+                    Label("Browse", systemImage: "sparkles")
                 }
                 .tag(0)
                 
                 NavigationStack {
                     AlbumsGridView(viewModel: viewModel)
-                        .navigationTitle("Álbumes")
+                        .navigationTitle("Albums")
                 }
                 .tabItem {
-                    Label("Álbumes", systemImage: "opticaldisc")
+                    Label("Albums", systemImage: "opticaldisc")
                 }
                 .tag(1)
                 
                 NavigationStack {
                     ArtistsGridView(viewModel: viewModel)
-                        .navigationTitle("Artistas")
+                        .navigationTitle("Artists")
                 }
                 .tabItem {
-                    Label("Artistas", systemImage: "music.mic")
+                    Label("Artists", systemImage: "music.mic")
                 }
                 .tag(2)
                 
                 NavigationStack {
                     IOSSearchView(viewModel: viewModel)
-                        .navigationTitle("Buscar")
+                        .navigationTitle("Search")
                 }
                 .tabItem {
-                    Label("Buscar", systemImage: "magnifyingglass")
+                    Label("Search", systemImage: "magnifyingglass")
                 }
                 .tag(3)
                 
                 NavigationStack {
                     SettingsView(viewModel: viewModel)
-                        .navigationTitle("Ajustes")
+                        .navigationTitle("Settings")
                 }
                 .tabItem {
-                    Label("Ajustes", systemImage: "gearshape")
+                    Label("Settings", systemImage: "gearshape")
                 }
                 .tag(4)
             }
@@ -221,7 +221,7 @@ struct IOSSearchView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(ColorTheme.textSecondary)
                 
-                TextField("Canciones, álbumes, artistas...", text: $viewModel.searchQuery)
+                TextField("Songs, albums, artists...", text: $viewModel.searchQuery)
                     .textFieldStyle(.plain)
                 
                 if !viewModel.searchQuery.isEmpty {
@@ -248,7 +248,7 @@ struct IOSSearchView: View {
                             .foregroundColor(ColorTheme.textTertiary)
                             .padding(.top, 60)
                         
-                        Text("Busca en tu biblioteca de Navidrome")
+                        Text("Search your Navidrome library")
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(ColorTheme.textSecondary)
                     }
@@ -256,7 +256,7 @@ struct IOSSearchView: View {
                 } else {
                     VStack(alignment: .leading, spacing: 16) {
                         if !viewModel.searchAlbums.isEmpty {
-                            Text("ÁLBUMES")
+                            Text("ALBUMS")
                                 .font(.system(size: 11, weight: .heavy, design: .monospaced))
                                 .foregroundColor(ColorTheme.textTertiary)
                                 .padding(.horizontal, 16)
@@ -273,7 +273,7 @@ struct IOSSearchView: View {
                         }
                         
                         if !viewModel.searchSongs.isEmpty {
-                            Text("CANCIONES")
+                            Text("SONGS")
                                 .font(.system(size: 11, weight: .heavy, design: .monospaced))
                                 .foregroundColor(ColorTheme.textTertiary)
                                 .padding(.horizontal, 16)

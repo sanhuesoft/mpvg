@@ -73,7 +73,7 @@ struct PlayerBarView: View {
                 // Track Info & Progress Bar
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 8) {
-                        Text(viewModel.currentSong?.title ?? "Sin reproducción")
+                        Text(viewModel.currentSong?.title ?? "No track playing")
                             .font(.system(size: 12, weight: .bold))
                             .foregroundColor(ColorTheme.textPrimary)
                             .lineLimit(1)
@@ -136,14 +136,14 @@ struct PlayerBarView: View {
                     
                     Button(action: { viewModel.mpv.toggleExclusive() }) {
                         Label(
-                            viewModel.mpv.isExclusive ? "Desactivar Modo Exclusivo" : "Activar Modo Exclusivo",
+                            viewModel.mpv.isExclusive ? "Disable Exclusive Mode" : "Enable Exclusive Mode",
                             systemImage: viewModel.mpv.isExclusive ? "bolt.slash" : "bolt.fill"
                         )
                     }
                     
                     Divider()
                     
-                    Text("Dispositivo de salida:")
+                    Text("Output device:")
                     ForEach(viewModel.mpv.availableDevices) { dev in
                         Button(action: { viewModel.mpv.setDevice(dev.id) }) {
                             HStack {

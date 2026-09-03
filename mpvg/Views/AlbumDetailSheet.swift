@@ -57,7 +57,7 @@ struct AlbumDetailSheet: View {
                         }
                         if let count = album.songCount {
                             Text("•")
-                            Text("\(count) pistas")
+                            Text("\(count) tracks")
                         }
                         if !album.formattedDuration.isEmpty {
                             Text("•")
@@ -78,7 +78,7 @@ struct AlbumDetailSheet: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "play.fill")
                                     .font(.system(size: 12))
-                                Text("Reproducir Álbum")
+                                Text("Play Album")
                                     .font(.system(size: 13, weight: .bold))
                             }
                             .foregroundColor(.white)
@@ -111,7 +111,7 @@ struct AlbumDetailSheet: View {
             if viewModel.isLoadingTracks {
                 VStack(spacing: 12) {
                     ProgressView()
-                    Text("Cargando pistas...")
+                    Text("Loading tracks...")
                         .font(.system(size: 13))
                         .foregroundColor(ColorTheme.textSecondary)
                 }
@@ -121,7 +121,7 @@ struct AlbumDetailSheet: View {
                     Image(systemName: "music.note.list")
                         .font(.system(size: 28))
                         .foregroundColor(ColorTheme.textTertiary)
-                    Text("No se encontraron pistas para este álbum")
+                    Text("No tracks found for this album")
                         .font(.system(size: 13))
                         .foregroundColor(ColorTheme.textSecondary)
                 }

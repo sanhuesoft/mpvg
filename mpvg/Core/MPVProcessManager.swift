@@ -134,7 +134,7 @@ final class MPVProcessManager: ObservableObject {
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             if let output = String(data: data, encoding: .utf8) {
                 var devices: [AudioDeviceInfo] = [
-                    AudioDeviceInfo(id: "auto", name: "Dispositivo Automático (Sistema)", driver: "auto", isExclusiveCapable: false)
+                    AudioDeviceInfo(id: "auto", name: "Default System Device", driver: "auto", isExclusiveCapable: false)
                 ]
                 
                 let lines = output.components(separatedBy: .newlines)
@@ -172,7 +172,7 @@ final class MPVProcessManager: ObservableObject {
                 resolveActiveDevice(from: devices)
             }
         } catch {
-            print("Error detectando dispositivos de audio: \(error)")
+            print("Error detecting audio devices: \(error)")
         }
     }
     
@@ -213,7 +213,7 @@ final class MPVProcessManager: ObservableObject {
         // 4. Device is definitely disconnected or missing from CoreAudio!
         self.isDeviceConnected = false
         let missingName = !preferredDeviceName.isEmpty ? preferredDeviceName : "HiBy FC1"
-        self.deviceWarning = "\(missingName) desconectado. Usando salida del sistema."
+        self.deviceWarning = "\(missingName) disconnected. Using system output."
     }
     
     // MARK: - Process Management

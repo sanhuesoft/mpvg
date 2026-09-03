@@ -41,7 +41,7 @@ struct NowPlayingSheetView: View {
                     Spacer()
                     
                     VStack(spacing: 2) {
-                        Text("REPRODUCIENDO")
+                        Text("NOW PLAYING")
                             .font(.system(size: 10, weight: .heavy, design: .monospaced))
                             .foregroundColor(ColorTheme.textTertiary)
                             .tracking(1.5)
@@ -105,12 +105,12 @@ struct NowPlayingSheetView: View {
                 VStack(spacing: 8) {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(viewModel.currentSong?.title ?? "Sin reproducción")
+                            Text(viewModel.currentSong?.title ?? "Not playing")
                                 .font(.system(size: 22, weight: .bold))
                                 .foregroundColor(ColorTheme.textPrimary)
                                 .lineLimit(1)
                             
-                            Text(viewModel.currentSong?.displayArtist ?? "Seleccione una canción")
+                            Text(viewModel.currentSong?.displayArtist ?? "Select a track")
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundColor(ColorTheme.textSecondary)
                                 .lineLimit(1)
