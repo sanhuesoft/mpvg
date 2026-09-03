@@ -3,7 +3,7 @@
 //  mpvg
 //
 //  Main browse view displaying grouped sections ("Most Popular", "Recently Added")
-//  with CaskHub square album cards and circular artist cards.
+//  with CaskHub square album cards, circular artist cards, and unified table list views.
 //
 
 import SwiftUI
@@ -29,13 +29,13 @@ struct BrowseView: View {
                     case .browse:
                         defaultBrowseContent
                     case .recentlyAdded:
-                        albumGridSection(title: "Recently Added", albums: viewModel.recentAlbums)
+                        albumSection(title: "Recently Added", albums: viewModel.recentAlbums)
                     case .albums:
-                        albumGridSection(title: "All Albums", albums: viewModel.albums)
+                        albumSection(title: "All Albums", albums: viewModel.albums)
                     case .artists:
                         artistsGridSection
                     case .playlists, .genres:
-                        albumGridSection(title: viewModel.activeTab.rawValue, albums: viewModel.albums)
+                        albumSection(title: viewModel.activeTab.rawValue, albums: viewModel.albums)
                     case .settings:
                         EmptyView()
                     }
@@ -64,11 +64,7 @@ struct BrowseView: View {
                         }
                     }
                 } else {
-                    VStack(spacing: 4) {
-                        ForEach(viewModel.featuredAlbums) { album in
-                            albumListRow(album: album)
-                        }
-                    }
+                    albumTableView(albums: viewModel.featuredAlbums)
                 }
             }
             
@@ -85,11 +81,7 @@ struct BrowseView: View {
                         }
                     }
                 } else {
-                    VStack(spacing: 4) {
-                        ForEach(viewModel.recentAlbums) { album in
-                            albumListRow(album: album)
-                        }
-                    }
+                    albumTableView(albums: viewModel.recentAlbums)
                 }
             }
         }
@@ -117,7 +109,7 @@ struct BrowseView: View {
     }
     
     // MARK: - Generic Album Section
-    private func albumGridSection(title: String, albums: [AlbumItem]) -> some View {
+    private func albumSection(title: String, albums: [AlbumItem]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(LocalizedStringKey(title))
@@ -133,10 +125,68 @@ struct BrowseView: View {
                     }
                 }
             } else {
-                VStack(spacing: 4) {
-                    ForEach(albums) { album in
-                        albumListRow(album: album)
-                    }
+                albumTableView(albums: albums)
+            }
+        }
+    }
+    
+    // MARK: - Unified Album Table View (List Mode)
+    private func albumTableView(albums: [AlbumItem]) -> some View {
+        VStack(spacing: 0) {
+            // Table Header
+            HStack(spacing: 12) {
+                Text("#")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 24, alignment: .center)
+                
+                Text("ALBUM")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(minWidth: 160, alignment: .leading)
+                
+                Text("ARTIST")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(minWidth: 120, alignment: .leading)
+                
+                Text("YEAR / GENRE")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 120, alignment: .leading)
+                
+                Spacer()
+                
+                Text("FORMAT")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 70, alignment: .center)
+                
+                Text("TRACKS")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 60, alignment: .trailing)
+                
+                Text("PLAY")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 44, alignment: .trailing)
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 6)
+            
+            Divider()
+                .background(ColorTheme.cardBorder.opacity(0.6))
+                .padding(.bottom, 2)
+            
+            // Table Rows
+            VStack(spacing: 2) {
+                ForEach(Array(albums.enumerated()), id: \.element.id) { index, album in
+                    AlbumTableRowView(
+                        index: index + 1,
+                        album: album,
+                        viewModel: viewModel
+                    )
                 }
             }
         }
@@ -162,10 +212,14 @@ struct BrowseView: View {
                 .padding(.vertical, 40)
             } else {
                 if !viewModel.searchAlbums.isEmpty {
-                    LazyVGrid(columns: albumColumns, spacing: 14) {
-                        ForEach(viewModel.searchAlbums) { album in
-                            AlbumCardView(album: album, viewModel: viewModel)
+                    if viewModel.viewMode == .grid {
+                        LazyVGrid(columns: albumColumns, spacing: 14) {
+                            ForEach(viewModel.searchAlbums) { album in
+                                AlbumCardView(album: album, viewModel: viewModel)
+                            }
                         }
+                    } else {
+                        albumTableView(albums: viewModel.searchAlbums)
                     }
                 }
                 
@@ -207,47 +261,159 @@ struct BrowseView: View {
             .pointingHandOnHover()
         }
     }
+}
+
+// MARK: - Unified Album Table Row View
+struct AlbumTableRowView: View {
+    let index: Int
+    let album: AlbumItem
+    @ObservedObject var viewModel: PlayerViewModel
+    @State private var isHovered: Bool = false
     
-    // MARK: - List Mode Row
-    private func albumListRow(album: AlbumItem) -> some View {
+    var isCurrentlyPlaying: Bool {
+        viewModel.currentAlbum?.id == album.id && !viewModel.mpv.isPaused
+    }
+    
+    var isThisAlbumLoaded: Bool {
+        viewModel.currentAlbum?.id == album.id
+    }
+    
+    var body: some View {
         HStack(spacing: 12) {
-            Text(album.displayTitle)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(ColorTheme.textPrimary)
+            // Index # or Waveform
+            ZStack {
+                if isCurrentlyPlaying {
+                    Image(systemName: "waveform")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(ColorTheme.terracotta)
+                } else if isHovered {
+                    Button(action: {
+                        if isThisAlbumLoaded {
+                            viewModel.togglePlayPause()
+                        } else {
+                            viewModel.playAlbum(album)
+                        }
+                    }) {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(ColorTheme.terracotta)
+                    }
+                    .buttonStyle(.plain)
+                    .pointingHandOnHover()
+                } else {
+                    Text("\(index)")
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                }
+            }
+            .frame(width: 24, alignment: .center)
             
+            // Mini Cover Thumbnail + Title
+            HStack(spacing: 10) {
+                let artURL: URL? = {
+                    if let coverId = album.coverArt, let url = viewModel.coverArtURL(for: coverId) {
+                        return url
+                    } else if let cover = album.coverArt, cover.hasPrefix("http"), let url = URL(string: cover) {
+                        return url
+                    }
+                    return nil
+                }()
+                
+                CachedAsyncImage(url: artURL) {
+                    ZStack {
+                        ColorTheme.cardBorder.opacity(0.5)
+                        Image(systemName: "opticaldisc")
+                            .font(.system(size: 13))
+                            .foregroundColor(ColorTheme.terracotta)
+                    }
+                }
+                .frame(width: 32, height: 32)
+                .cornerRadius(5)
+                .overlay(RoundedRectangle(cornerRadius: 5).stroke(ColorTheme.cardBorder, lineWidth: 0.8))
+                
+                Text(album.displayTitle)
+                    .font(.system(size: 13, weight: isCurrentlyPlaying ? .bold : .semibold))
+                    .foregroundColor(isCurrentlyPlaying ? ColorTheme.terracotta : ColorTheme.textPrimary)
+                    .lineLimit(1)
+            }
+            .frame(minWidth: 160, alignment: .leading)
+            
+            // Artist
             Text(album.displayArtist)
                 .font(.system(size: 12))
                 .foregroundColor(ColorTheme.textSecondary)
+                .lineLimit(1)
+                .frame(minWidth: 120, alignment: .leading)
+            
+            // Year & Genre
+            HStack(spacing: 4) {
+                if !album.displayYear.isEmpty {
+                    Text(album.displayYear)
+                }
+                if let genre = album.genre, !genre.isEmpty {
+                    Text("•")
+                    Text(genre)
+                        .lineLimit(1)
+                }
+            }
+            .font(.system(size: 11))
+            .foregroundColor(ColorTheme.textTertiary)
+            .frame(width: 120, alignment: .leading)
             
             Spacer()
             
-            Text(album.displaySpecs)
-                .font(.system(size: 11))
-                .foregroundColor(ColorTheme.textTertiary)
+            // Format Badge
+            if let spec = album.suffix, !spec.isEmpty {
+                Text(spec)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(ColorTheme.sageGreen)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(ColorTheme.sageGreenBg)
+                    .cornerRadius(4)
+                    .frame(width: 70, alignment: .center)
+            } else {
+                Spacer().frame(width: 70)
+            }
             
+            // Track Count
+            Text("\(album.songCount ?? 0) tracks")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundColor(ColorTheme.textTertiary)
+                .frame(width: 60, alignment: .trailing)
+            
+            // Quick Play Button
             Button(action: {
-                viewModel.playAlbum(album)
+                if isThisAlbumLoaded {
+                    viewModel.togglePlayPause()
+                } else {
+                    viewModel.playAlbum(album)
+                }
             }) {
-                Text("▶ Play")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(ColorTheme.terracotta)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(ColorTheme.terracottaLight.opacity(0.4))
+                Image(systemName: isCurrentlyPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(isCurrentlyPlaying ? ColorTheme.sageGreen : ColorTheme.terracotta)
+                    .frame(width: 26, height: 24)
+                    .background(isCurrentlyPlaying ? ColorTheme.sageGreenBg : ColorTheme.terracottaLight.opacity(0.5))
                     .cornerRadius(6)
             }
             .buttonStyle(.plain)
             .pointingHandOnHover()
+            .frame(width: 44, alignment: .trailing)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(ColorTheme.cardBackground)
-        .cornerRadius(8)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(ColorTheme.cardBorder, lineWidth: 1)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            isCurrentlyPlaying ? ColorTheme.terracottaLight.opacity(0.35) :
+                (isHovered ? ColorTheme.cardBorder.opacity(0.35) : Color.clear)
         )
+        .cornerRadius(6)
         .contentShape(Rectangle())
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.1)) {
+                self.isHovered = hovering
+            }
+        }
         .onTapGesture {
             viewModel.navigateToAlbum(album)
         }

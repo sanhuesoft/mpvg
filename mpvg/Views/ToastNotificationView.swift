@@ -59,17 +59,47 @@ struct ToastNotificationView: View {
     }
 }
 
+#if os(macOS)
+import AppKit
+
+struct PointingHandCursorHelper: NSViewRepresentable {
+    func makeNSView(context: Context) -> PointingHandNSView {
+        let view = PointingHandNSView()
+        return view
+    }
+    
+    func updateNSView(_ nsView: PointingHandNSView, context: Context) {
+        DispatchQueue.main.async {
+            nsView.window?.invalidateCursorRects(for: nsView)
+        }
+    }
+}
+
+final class PointingHandNSView: NSView {
+    override func resetCursorRects() {
+        super.resetCursorRects()
+        addCursorRect(bounds, cursor: .pointingHand)
+    }
+    
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        return nil
+    }
+}
+#endif
+
 // MARK: - Pointing Hand Cursor Extension
 extension View {
     func pointingHandOnHover() -> some View {
         #if os(macOS)
-        self.onHover { hovering in
-            if hovering {
-                NSCursor.pointingHand.push()
-            } else {
-                NSCursor.pop()
+        self
+            .overlay(PointingHandCursorHelper().allowsHitTesting(false))
+            .onHover { hovering in
+                if hovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
             }
-        }
         #else
         self
         #endif

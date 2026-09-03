@@ -38,10 +38,6 @@ struct AlbumCardView: View {
                     ZStack {
                         Color.black.opacity(isHovered ? 0.35 : 0.15)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                viewModel.navigateToAlbum(album)
-                            }
                         
                         // Center Play / Pause Button
                         Button(action: {
@@ -69,10 +65,6 @@ struct AlbumCardView: View {
                     }
                     .transition(.opacity)
                 }
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                viewModel.navigateToAlbum(album)
             }
             .frame(maxWidth: .infinity)
             
@@ -146,10 +138,6 @@ struct AlbumCardView: View {
                 .padding(.top, 1)
             }
             .padding(.horizontal, 2)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                viewModel.navigateToAlbum(album)
-            }
         }
         .padding(10)
         .background(ColorTheme.cardBackground)
@@ -164,6 +152,9 @@ struct AlbumCardView: View {
             withAnimation(.easeInOut(duration: 0.15)) {
                 self.isHovered = hovering
             }
+        }
+        .onTapGesture {
+            viewModel.navigateToAlbum(album)
         }
         .pointingHandOnHover()
     }
