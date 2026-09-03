@@ -157,8 +157,58 @@ actor NavidromeService {
             }
             return artists
         } catch {
-            print("Error cargando artistas: \(error)")
+            print("Error loading artists: \(error)")
             return []
+        }
+    }
+    
+    // MARK: - Get Artist Details & Albums
+    func getArtist(id: String) async -> (ArtistItem?, [AlbumItem]) {
+        guard let url = buildURL(endpoint: "getArtist.view", extraParams: ["id": id]) else {
+            return (nil, [])
+        }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let sub = json["subsonic-response"] as? [String: Any],
+                  let artistDict = sub["artist"] as? [String: Any] else {
+                return (nil, [])
+            }
+            
+            let artist = ArtistItem(
+                id: artistDict["id"] as? String ?? id,
+                name: artistDict["name"] as? String ?? "Artist",
+                albumCount: artistDict["albumCount"] as? Int,
+                artistImageUrl: artistDict["artistImageUrl"] as? String
+            )
+            
+            var albums: [AlbumItem] = []
+            if let rawAlbums = artistDict["album"] as? [[String: Any]] {
+                for a in rawAlbums {
+                    if let aid = a["id"] as? String, let title = a["title"] as? String ?? a["name"] as? String {
+                        albums.append(AlbumItem(
+                            id: aid,
+                            name: title,
+                            title: title,
+                            artist: a["artist"] as? String ?? artist.name,
+                            artistId: a["artistId"] as? String ?? id,
+                            coverArt: a["coverArt"] as? String,
+                            songCount: a["songCount"] as? Int,
+                            duration: a["duration"] as? Double,
+                            year: a["year"] as? Int,
+                            genre: a["genre"] as? String,
+                            bitRate: a["bitRate"] as? Int,
+                            suffix: a["suffix"] as? String,
+                            playCount: a["playCount"] as? Int
+                        ))
+                    }
+                }
+            }
+            return (artist, albums)
+        } catch {
+            print("Error loading artist details: \(error)")
+            return (nil, [])
         }
     }
     

@@ -75,6 +75,9 @@ struct MainView: View {
         .sheet(item: $viewModel.selectedAlbumForDetail) { album in
             AlbumDetailSheet(album: album, viewModel: viewModel)
         }
+        .sheet(item: $viewModel.selectedArtistForDetail) { artist in
+            ArtistDetailSheet(artist: artist, viewModel: viewModel)
+        }
     }
     
     // MARK: - Tablet Layout (iPadOS Regular)
@@ -108,6 +111,9 @@ struct MainView: View {
         .background(ColorTheme.windowBackground)
         .sheet(item: $viewModel.selectedAlbumForDetail) { album in
             AlbumDetailSheet(album: album, viewModel: viewModel)
+        }
+        .sheet(item: $viewModel.selectedArtistForDetail) { artist in
+            ArtistDetailSheet(artist: artist, viewModel: viewModel)
         }
     }
     #endif

@@ -71,8 +71,7 @@ struct ArtistCardView: View {
             }
         }
         .onTapGesture {
-            // Filter search by artist name
-            viewModel.searchQuery = artist.name
+            viewModel.selectArtistForDetail(artist)
         }
     }
     

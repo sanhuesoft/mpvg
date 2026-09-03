@@ -67,8 +67,8 @@ struct IOSMainView: View {
             // Docked Mini Player (Visible when a song is loaded)
             if viewModel.currentSong != nil {
                 miniPlayerBar
-                    .padding(.horizontal, 8)
-                    .padding(.bottom, 54) // Sits neatly above the iOS TabBar
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 58) // Floating seamlessly above the iOS TabBar with matching margins
             }
         }
         .sheet(isPresented: $showNowPlayingSheet) {
@@ -77,9 +77,12 @@ struct IOSMainView: View {
         .sheet(item: $viewModel.selectedAlbumForDetail) { album in
             AlbumDetailSheet(album: album, viewModel: viewModel)
         }
+        .sheet(item: $viewModel.selectedArtistForDetail) { artist in
+            ArtistDetailSheet(artist: artist, viewModel: viewModel)
+        }
     }
     
-    // MARK: - Mini Player Bar
+    // MARK: - Mini Player Bar (Liquid Glass Aesthetic)
     private var miniPlayerBar: some View {
         Button(action: { showNowPlayingSheet = true }) {
             VStack(spacing: 0) {
@@ -88,15 +91,15 @@ struct IOSMainView: View {
                     let progress = viewModel.mpv.duration > 0 ? (viewModel.mpv.currentTime / viewModel.mpv.duration) : 0.0
                     ZStack(alignment: .leading) {
                         Rectangle()
-                            .fill(ColorTheme.cardBorder)
-                            .frame(height: 2)
+                            .fill(ColorTheme.cardBorder.opacity(0.4))
+                            .frame(height: 2.5)
                         
                         Rectangle()
                             .fill(ColorTheme.terracotta)
-                            .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 2)
+                            .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 2.5)
                     }
                 }
-                .frame(height: 2)
+                .frame(height: 2.5)
                 
                 HStack(spacing: 12) {
                     // Mini Album Cover
@@ -109,25 +112,25 @@ struct IOSMainView: View {
                     
                     CachedAsyncImage(url: artURL) {
                         ZStack {
-                            ColorTheme.cardBorder
+                            ColorTheme.cardBorder.opacity(0.5)
                             Image(systemName: "opticaldisc")
                                 .font(.system(size: 16))
                                 .foregroundColor(ColorTheme.terracotta)
                         }
                     }
                     .frame(width: 42, height: 42)
-                    .cornerRadius(8)
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(ColorTheme.cardBorder, lineWidth: 1))
+                    .cornerRadius(10)
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.3), lineWidth: 0.8))
                     
                     // Metadata
                     VStack(alignment: .leading, spacing: 2) {
                         Text(viewModel.currentSong?.title ?? "")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.system(size: 13, weight: .bold))
                             .foregroundColor(ColorTheme.textPrimary)
                             .lineLimit(1)
                         
                         Text(viewModel.currentSong?.displayArtist ?? "")
-                            .font(.system(size: 11))
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundColor(ColorTheme.textSecondary)
                             .lineLimit(1)
                     }
@@ -137,7 +140,7 @@ struct IOSMainView: View {
                     // Mini Controls
                     Button(action: { viewModel.togglePlayPause() }) {
                         Image(systemName: viewModel.mpv.isPaused ? "play.fill" : "pause.fill")
-                            .font(.system(size: 18))
+                            .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(ColorTheme.textPrimary)
                             .frame(width: 36, height: 36)
                     }
@@ -151,18 +154,23 @@ struct IOSMainView: View {
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
             }
             .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(ColorTheme.cardBackground)
-                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 3)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(ColorTheme.cardBackground.opacity(0.35))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(ColorTheme.cardBorder, lineWidth: 1)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 0.8)
             )
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .shadow(color: Color.black.opacity(0.12), radius: 14, x: 0, y: 5)
         }
         .buttonStyle(.plain)
     }

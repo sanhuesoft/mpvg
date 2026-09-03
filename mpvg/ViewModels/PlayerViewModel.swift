@@ -89,6 +89,10 @@ final class PlayerViewModel: ObservableObject {
     @Published var selectedAlbumTracks: [SongItem] = []
     @Published var isLoadingTracks: Bool = false
     
+    @Published var selectedArtistForDetail: ArtistItem?
+    @Published var selectedArtistAlbums: [AlbumItem] = []
+    @Published var isLoadingArtistAlbums: Bool = false
+    
     // Dependencies
     @Published var mpv: AudioEngine
     private var navidrome: NavidromeService
@@ -236,6 +240,32 @@ final class PlayerViewModel: ObservableObject {
                 self.selectedAlbumTracks = generateSampleTracks(for: album)
             }
             self.isLoadingTracks = false
+        }
+    }
+    
+    // MARK: - Artist Details
+    func selectArtistForDetail(_ artist: ArtistItem) {
+        self.selectedArtistForDetail = artist
+        self.selectedArtistAlbums = []
+        self.isLoadingArtistAlbums = true
+        
+        Task {
+            if isConnected {
+                let (_, albs) = await navidrome.getArtist(id: artist.id)
+                if !albs.isEmpty {
+                    self.selectedArtistAlbums = albs
+                } else {
+                    // Fallback to local catalog match
+                    self.selectedArtistAlbums = self.albums.filter {
+                        $0.artistId == artist.id || $0.displayArtist.localizedCaseInsensitiveContains(artist.name)
+                    }
+                }
+            } else {
+                self.selectedArtistAlbums = self.albums.filter {
+                    $0.artistId == artist.id || $0.displayArtist.localizedCaseInsensitiveContains(artist.name)
+                }
+            }
+            self.isLoadingArtistAlbums = false
         }
     }
     
