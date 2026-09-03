@@ -42,12 +42,16 @@ struct ServerConfig: Codable, Equatable, Sendable {
 struct AudioDeviceInfo: Identifiable, Hashable {
     let id: String         // e.g. "coreaudio/AppleUSBAudioEngine:..."
     let name: String       // e.g. "HiBy FC1"
-    let driver: String     // "coreaudio"
+    let driver: String     // "coreaudio", "avfoundation", or "auto"
     let isExclusiveCapable: Bool
     
     var displayName: String {
-        if name.isEmpty { return id }
-        return name
+        if id == "auto" { return "Default System Device" }
+        if driver.isEmpty || driver == "auto" {
+            return name
+        }
+        let driverLabel = driver == "coreaudio" ? "CoreAudio" : (driver == "avfoundation" ? "AVFoundation" : driver.capitalized)
+        return "\(name) (\(driverLabel))"
     }
 }
 

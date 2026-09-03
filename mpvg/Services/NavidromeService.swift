@@ -441,7 +441,7 @@ actor NavidromeService {
     
     // MARK: - Stream & Cover Art URLs
     func streamURL(for songId: String) -> URL? {
-        buildURL(endpoint: "stream.view", extraParams: ["id": songId])
+        buildURL(endpoint: "stream.view", extraParams: ["id": songId, "format": "raw"])
     }
     
     func coverArtURL(for id: String, size: Int = 300) -> URL? {

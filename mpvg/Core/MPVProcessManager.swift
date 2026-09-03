@@ -162,8 +162,9 @@ final class MPVProcessManager: ObservableObject {
                     
                     if let endQuote = trimmed.dropFirst().firstIndex(of: "'") {
                         let id = String(trimmed[trimmed.index(after: trimmed.startIndex)..<endQuote])
-                        var name = id
+                        guard id != "auto" else { continue }
                         
+                        var name = id
                         if let openParen = trimmed.firstIndex(of: "("),
                            let closeParen = trimmed.lastIndex(of: ")"),
                            openParen < closeParen {
@@ -171,16 +172,15 @@ final class MPVProcessManager: ObservableObject {
                         }
                         
                         let isCoreAudio = id.hasPrefix("coreaudio/")
-                        // Only add CoreAudio endpoints to avoid duplicates with AVFoundation
-                        guard isCoreAudio else { continue }
+                        let isAVFoundation = id.hasPrefix("avfoundation/")
+                        let driver = isCoreAudio ? "coreaudio" : (isAVFoundation ? "avfoundation" : "other")
+                        let isExclusive = isCoreAudio && !id.contains("BuiltInSpeakerDevice")
                         
-                        let isExclusive = id != "coreaudio/BuiltInSpeakerDevice"
-                        
-                        if !devices.contains(where: { $0.displayName == name || $0.id == id }) {
+                        if !devices.contains(where: { $0.id == id }) {
                             devices.append(AudioDeviceInfo(
                                 id: id,
                                 name: name,
-                                driver: "coreaudio",
+                                driver: driver,
                                 isExclusiveCapable: isExclusive
                             ))
                         }
@@ -188,8 +188,6 @@ final class MPVProcessManager: ObservableObject {
                 }
                 
                 self.availableDevices = devices
-                
-                // Validate if currentDevice exists in currently available devices
                 resolveActiveDevice(from: devices)
             }
         } catch {
@@ -198,29 +196,71 @@ final class MPVProcessManager: ObservableObject {
     }
     
     private func resolveActiveDevice(from devices: [AudioDeviceInfo]) {
-        // Find if an external USB DAC is currently connected to CoreAudio
-        let detectedDAC = devices.first(where: {
-            $0.id != "auto" &&
-            $0.id != "coreaudio/BuiltInSpeakerDevice" &&
-            $0.id != "coreaudio/BuiltInHeadphoneDevice" &&
-            ($0.displayName.localizedCaseInsensitiveContains("DAC") ||
-             $0.displayName.localizedCaseInsensitiveContains("HiBy") ||
-             $0.displayName.localizedCaseInsensitiveContains("FC1") ||
-             $0.displayName.localizedCaseInsensitiveContains("USB") ||
-             $0.isExclusiveCapable)
-        })
+        // 1. If user previously selected a specific device ID that is currently connected, respect it!
+        if let savedId = UserDefaults.standard.string(forKey: Self.selectedDeviceKey),
+           savedId != "auto",
+           let exactMatch = devices.first(where: { $0.id == savedId }) {
+            self.currentDevice = exactMatch.id
+            self.preferredDeviceName = exactMatch.name
+            self.isDeviceConnected = true
+            self.deviceWarning = nil
+            return
+        }
         
-        if let dac = detectedDAC {
-            // DAC detected: Adopt automatically in Exclusive Mode
+        // 2. If user had a preferred device name (e.g. "HiBy FC1") and it reconnected:
+        if !preferredDeviceName.isEmpty {
+            if let nameMatch = devices.first(where: {
+                $0.id.hasPrefix("coreaudio/") &&
+                ($0.name.localizedCaseInsensitiveContains(preferredDeviceName) ||
+                 preferredDeviceName.localizedCaseInsensitiveContains($0.name))
+            }) ?? devices.first(where: {
+                $0.name.localizedCaseInsensitiveContains(preferredDeviceName) ||
+                preferredDeviceName.localizedCaseInsensitiveContains($0.name)
+            }) {
+                self.currentDevice = nameMatch.id
+                self.preferredDeviceName = nameMatch.name
+                self.isDeviceConnected = true
+                self.deviceWarning = nil
+                UserDefaults.standard.set(nameMatch.id, forKey: Self.selectedDeviceKey)
+                return
+            }
+        }
+        
+        // 3. Auto-detect if an external USB DAC is connected (prefer CoreAudio driver)
+        let isDAC = { (dev: AudioDeviceInfo) -> Bool in
+            let lower = dev.name.lowercased()
+            let idLower = dev.id.lowercased()
+            return lower.contains("dac") ||
+                   lower.contains("hiby") ||
+                   lower.contains("fc1") ||
+                   lower.contains("fiio") ||
+                   lower.contains("ifi") ||
+                   lower.contains("dragonfly") ||
+                   lower.contains("qudelix") ||
+                   lower.contains("topping") ||
+                   lower.contains("smsl") ||
+                   lower.contains("schiit") ||
+                   lower.contains("moondrop") ||
+                   idLower.contains("appleusbaudioengine")
+        }
+        
+        if let dac = devices.first(where: { $0.id.hasPrefix("coreaudio/") && isDAC($0) }) ??
+                     devices.first(where: { isDAC($0) }) {
             self.currentDevice = dac.id
-            self.preferredDeviceName = dac.displayName
+            self.preferredDeviceName = dac.name
             self.isExclusive = true
+            self.changePhysicalFormat = true
             self.isDeviceConnected = true
             self.deviceWarning = nil
             UserDefaults.standard.set(dac.id, forKey: Self.selectedDeviceKey)
-            UserDefaults.standard.set(dac.displayName, forKey: Self.selectedDeviceNameKey)
-        } else {
-            // No DAC connected: Default to system output in Shared Mode
+            UserDefaults.standard.set(dac.name, forKey: Self.selectedDeviceNameKey)
+            UserDefaults.standard.set(true, forKey: Self.exclusiveModeKey)
+            UserDefaults.standard.set(true, forKey: Self.physicalFormatKey)
+            return
+        }
+        
+        // 4. Default to system output in shared mode if no DAC is selected
+        if currentDevice.isEmpty || !devices.contains(where: { $0.id == currentDevice }) {
             self.currentDevice = "auto"
             self.isExclusive = false
             self.isDeviceConnected = true
@@ -247,11 +287,10 @@ final class MPVProcessManager: ObservableObject {
             "--no-video",
             "--keep-open=always",
             "--volume-max=100",
-            "--ao=coreaudio",
             "--audio-samplerate=0"
         ]
         
-        // Only force device if it is ACTUALLY present right now in CoreAudio
+        // Only force device if it is ACTUALLY present right now in the detected list
         let effectiveDevice = (isDeviceConnected && currentDevice != "auto") ? currentDevice : "auto"
         if effectiveDevice != "auto" {
             args.append("--audio-device=\(effectiveDevice)")
@@ -259,10 +298,10 @@ final class MPVProcessManager: ObservableObject {
             args.append("--audio-device=auto")
         }
         
-        if isExclusive {
+        if isExclusive && (effectiveDevice.hasPrefix("coreaudio/") || effectiveDevice == "auto") {
             args.append("--audio-exclusive=yes")
         }
-        if changePhysicalFormat {
+        if changePhysicalFormat && (effectiveDevice.hasPrefix("coreaudio/") || effectiveDevice == "auto") {
             args.append("--coreaudio-change-physical-format=yes")
         }
         if isGapless {
@@ -371,14 +410,14 @@ final class MPVProcessManager: ObservableObject {
     func setDevice(_ deviceId: String) {
         self.currentDevice = deviceId
         if let dev = availableDevices.first(where: { $0.id == deviceId }) {
-            self.preferredDeviceName = dev.displayName
-            UserDefaults.standard.set(dev.displayName, forKey: Self.selectedDeviceNameKey)
+            self.preferredDeviceName = dev.name
+            UserDefaults.standard.set(dev.name, forKey: Self.selectedDeviceNameKey)
             if dev.isExclusiveCapable {
                 self.isExclusive = true
                 self.changePhysicalFormat = true
                 UserDefaults.standard.set(true, forKey: Self.exclusiveModeKey)
                 UserDefaults.standard.set(true, forKey: Self.physicalFormatKey)
-            } else if dev.id == "coreaudio/BuiltInSpeakerDevice" || dev.id == "auto" {
+            } else if dev.id.contains("BuiltInSpeakerDevice") || dev.id == "auto" {
                 self.isExclusive = false
                 UserDefaults.standard.set(false, forKey: Self.exclusiveModeKey)
             }
