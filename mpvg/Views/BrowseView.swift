@@ -120,7 +120,7 @@ struct BrowseView: View {
     private func albumGridSection(title: String, albums: [AlbumItem]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(ColorTheme.textPrimary)
                 Spacer()
@@ -189,7 +189,7 @@ struct BrowseView: View {
     // MARK: - Section Header with "View All"
     private func sectionHeader(title: String, onViewAll: @escaping () -> Void) -> some View {
         HStack {
-            Text(title)
+            Text(LocalizedStringKey(title))
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(ColorTheme.textPrimary)
             

@@ -195,43 +195,34 @@ final class MPVProcessManager: ObservableObject {
     }
     
     private func resolveActiveDevice(from devices: [AudioDeviceInfo]) {
-        // 1. If currentDevice is "auto", no verification needed
-        if currentDevice == "auto" {
+        // Find if an external USB DAC is currently connected to CoreAudio
+        let detectedDAC = devices.first(where: {
+            $0.id != "auto" &&
+            $0.id != "coreaudio/BuiltInSpeakerDevice" &&
+            $0.id != "coreaudio/BuiltInHeadphoneDevice" &&
+            ($0.displayName.localizedCaseInsensitiveContains("DAC") ||
+             $0.displayName.localizedCaseInsensitiveContains("HiBy") ||
+             $0.displayName.localizedCaseInsensitiveContains("FC1") ||
+             $0.displayName.localizedCaseInsensitiveContains("USB") ||
+             $0.isExclusiveCapable)
+        })
+        
+        if let dac = detectedDAC {
+            // DAC detected: Adopt automatically in Exclusive Mode
+            self.currentDevice = dac.id
+            self.preferredDeviceName = dac.displayName
+            self.isExclusive = true
             self.isDeviceConnected = true
             self.deviceWarning = nil
-            return
-        }
-        
-        // 2. Check if currentDevice exists directly in currently detected devices
-        if devices.contains(where: { $0.id == currentDevice }) {
-            if let dev = devices.first(where: { $0.id == currentDevice }) {
-                self.preferredDeviceName = dev.displayName
-                UserDefaults.standard.set(dev.displayName, forKey: Self.selectedDeviceNameKey)
-            }
+            UserDefaults.standard.set(dac.id, forKey: Self.selectedDeviceKey)
+            UserDefaults.standard.set(dac.displayName, forKey: Self.selectedDeviceNameKey)
+        } else {
+            // No DAC connected: Default to system output in Shared Mode
+            self.currentDevice = "auto"
+            self.isExclusive = false
             self.isDeviceConnected = true
             self.deviceWarning = nil
-            return
         }
-        
-        // 3. Check if preferred device is available by matching name (e.g. "HiBy FC1" plugged into a different USB port)
-        let nameToMatch = !preferredDeviceName.isEmpty ? preferredDeviceName : "HiBy"
-        if let match = devices.first(where: {
-            $0.displayName.localizedCaseInsensitiveContains(nameToMatch) ||
-            nameToMatch.localizedCaseInsensitiveContains($0.displayName)
-        }) {
-            self.currentDevice = match.id
-            self.preferredDeviceName = match.displayName
-            self.isDeviceConnected = true
-            self.deviceWarning = nil
-            UserDefaults.standard.set(match.id, forKey: Self.selectedDeviceKey)
-            UserDefaults.standard.set(match.displayName, forKey: Self.selectedDeviceNameKey)
-            return
-        }
-        
-        // 4. Device is definitely disconnected or missing from CoreAudio!
-        self.isDeviceConnected = false
-        let missingName = !preferredDeviceName.isEmpty ? preferredDeviceName : "HiBy FC1"
-        self.deviceWarning = "\(missingName) disconnected. Using system output."
     }
     
     // MARK: - Process Management

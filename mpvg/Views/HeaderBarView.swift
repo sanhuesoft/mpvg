@@ -39,7 +39,7 @@ struct HeaderBarView: View {
             
             // Title & Count
             HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text(viewModel.activeTab.rawValue)
+                Text(LocalizedStringKey(viewModel.activeTab.rawValue))
                     .font(.system(size: 22, weight: .bold))
                     .foregroundColor(ColorTheme.textPrimary)
                 

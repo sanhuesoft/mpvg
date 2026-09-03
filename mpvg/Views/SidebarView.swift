@@ -236,7 +236,7 @@ struct SidebarView: View {
     // MARK: - Section Header Helper
     private func sidebarSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(title)
+            Text(LocalizedStringKey(title))
                 .font(.system(size: 10, weight: .bold))
                 .foregroundColor(ColorTheme.textTertiary)
                 .tracking(0.6)
@@ -267,7 +267,7 @@ private struct SidebarRowItem: View {
                     .foregroundColor(isSelected ? ColorTheme.terracotta : ColorTheme.textSecondary)
                     .frame(width: 18, alignment: .center)
                 
-                Text(label)
+                Text(LocalizedStringKey(label))
                     .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
                     .foregroundColor(isSelected ? ColorTheme.terracotta : ColorTheme.textPrimary)
                 
