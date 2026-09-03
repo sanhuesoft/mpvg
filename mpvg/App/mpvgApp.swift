@@ -9,10 +9,21 @@ import SwiftUI
 import Darwin
 #if os(macOS)
 import AppKit
+
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationWillTerminate(_ notification: Notification) {
+        // Broadcast termination to ensure audio engine terminates immediately
+        NotificationCenter.default.post(name: NSApplication.willTerminateNotification, object: nil)
+    }
+}
 #endif
 
 @main
 struct mpvgApp: App {
+    #if os(macOS)
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    #endif
+    
     init() {
         signal(SIGPIPE, SIG_IGN)
         #if os(macOS)

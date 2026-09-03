@@ -2,8 +2,8 @@
 //  MainView.swift
 //  mpvg
 //
-//  Main application container with adaptive layout:
-//  - macOS: Desktop CaskHub layout with Sidebar, Header, and Bottom Player
+//  Main application container with modern Apple Music / CaskHub layout:
+//  - macOS: Left integrated sidebar, elevated rounded content canvas, and floating crystal player bar
 //  - iPadOS: Split layout for regular size class
 //  - iOS: Native TabView + Mini Player for compact iPhone screens
 //
@@ -45,21 +45,24 @@ struct MainView: View {
     }
     
     // MARK: - Desktop Layout (macOS)
+    #if os(macOS)
     private var desktopLayout: some View {
-        ZStack(alignment: .bottom) {
-            HStack(spacing: 12) {
-                if viewModel.isSidebarVisible {
-                    SidebarView(viewModel: viewModel)
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .leading).combined(with: .opacity),
-                            removal: .move(edge: .leading).combined(with: .opacity)
-                        ))
-                }
-                
+        HStack(spacing: 0) {
+            // Left Sidebar — Unobstructed, full vertical height
+            if viewModel.isSidebarVisible {
+                SidebarView(viewModel: viewModel)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal:   .move(edge: .leading).combined(with: .opacity)
+                    ))
+            }
+            
+            // Main Content Island Card containing the Floating Player Bar inside
+            ZStack(alignment: .bottom) {
                 VStack(spacing: 0) {
                     HeaderBarView(viewModel: viewModel)
                     
-                    Divider().background(ColorTheme.cardBorder)
+                    Divider().background(ColorTheme.cardBorder.opacity(0.6))
                     
                     ZStack {
                         if viewModel.activeTab == .settings {
@@ -70,24 +73,25 @@ struct MainView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .background(ColorTheme.cardBackground)
-                .cornerRadius(16)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(ColorTheme.cardBorder, lineWidth: 1.2)
-                )
-                .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 2)
-                .padding(.trailing, 12)
-                .padding(.top, 10)
-                .padding(.bottom, 10)
-                .padding(.leading, viewModel.isSidebarVisible ? 0 : 12)
+                
+                // Floating Crystal (Liquid Glass) Player Bar — ONLY over the content!
+                PlayerBarView(viewModel: viewModel)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 14)
             }
-            
-            // Floating Crystal Player Bar (Liquid Glass Apple Music style)
-            PlayerBarView(viewModel: viewModel)
-                .padding(.horizontal, 20)
-                .padding(.bottom, 16)
+            .background(ColorTheme.cardBackground)
+            .cornerRadius(18)
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(ColorTheme.cardBorder, lineWidth: 1.2)
+            )
+            .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 2)
+            .padding(.trailing, 12)
+            .padding(.top, 10)
+            .padding(.bottom, 12)
+            .padding(.leading, viewModel.isSidebarVisible ? 10 : 12)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorTheme.windowBackground)
         .sheet(item: $viewModel.selectedAlbumForDetail) { album in
             AlbumDetailSheet(album: album, viewModel: viewModel)
@@ -95,10 +99,8 @@ struct MainView: View {
         .sheet(item: $viewModel.selectedArtistForDetail) { artist in
             ArtistDetailSheet(artist: artist, viewModel: viewModel)
         }
-        .sheet(isPresented: $viewModel.showQueueSheet) {
-            QueueView(viewModel: viewModel)
-        }
     }
+    #endif
     
     // MARK: - Tablet Layout (iPadOS Regular)
     #if os(iOS)

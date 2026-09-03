@@ -10,6 +10,7 @@
 import Foundation
 import Combine
 import CoreAudio
+import AppKit
 
 @MainActor
 final class MPVProcessManager: ObservableObject {
@@ -67,11 +68,25 @@ final class MPVProcessManager: ObservableObject {
         findMpvBinary()
         detectAudioDevices()
         setupCoreAudioListener()
+        
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.stop()
+        }
     }
     
     deinit {
         pollTimer?.invalidate()
-        process?.terminate()
+        if let proc = process, proc.isRunning {
+            let pid = proc.processIdentifier
+            proc.terminate()
+            if kill(pid, 0) == 0 {
+                kill(pid, SIGKILL)
+            }
+        }
         try? FileManager.default.removeItem(atPath: socketPath)
     }
     
@@ -275,7 +290,16 @@ final class MPVProcessManager: ObservableObject {
     func stop() {
         pollTimer?.invalidate()
         pollTimer = nil
-        process?.terminate()
+        if let proc = process, proc.isRunning {
+            let pid = proc.processIdentifier
+            sendCommand(["quit"])
+            proc.terminate()
+            DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.1) {
+                if kill(pid, 0) == 0 {
+                    kill(pid, SIGKILL)
+                }
+            }
+        }
         process = nil
         self.isRunning = false
         try? FileManager.default.removeItem(atPath: socketPath)

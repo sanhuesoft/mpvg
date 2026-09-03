@@ -72,7 +72,7 @@ struct AlbumItem: Identifiable, Hashable, Codable {
     }
     
     var displayArtist: String {
-        artist ?? "Artista desconocido"
+        artist ?? "Unknown Artist"
     }
     
     var displayYear: String {
@@ -89,7 +89,7 @@ struct AlbumItem: Identifiable, Hashable, Codable {
             parts.append("\(b) kbps")
         }
         if let count = songCount, count > 0 {
-            parts.append("\(count) pistas")
+            parts.append("\(count) tracks")
         }
         return parts.joined(separator: " • ")
     }
@@ -121,11 +121,11 @@ struct SongItem: Identifiable, Hashable, Codable {
     let path: String?
     
     var displayArtist: String {
-        artist ?? "Artista desconocido"
+        artist ?? "Unknown Artist"
     }
     
     var displayAlbum: String {
-        album ?? "Álbum desconocido"
+        album ?? "Unknown Album"
     }
     
     var displayTrackNumber: String {

@@ -2,9 +2,9 @@
 //  PlayerBarView.swift
 //  mpvg
 //
-//  Floating crystal (liquid glass) player bar inspired by modern Apple Music.
+//  Floating crystal (liquid glass) player bar inspired by Apple Music macOS.
 //  Features frosted glass translucency, live track artwork, scrub controls,
-//  and CoreAudio Exclusive Mode indicator.
+//  elapsed/remaining time counters, CoreAudio Exclusive Mode indicator, and queue access.
 //
 
 import SwiftUI
@@ -16,25 +16,27 @@ struct PlayerBarView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Subtle Progress Bar on top edge of crystal bar
+            // Subtle progress bar on top edge of crystal bar
             GeometryReader { geo in
-                let progress = viewModel.mpv.duration > 0 ? (viewModel.mpv.currentTime / viewModel.mpv.duration) : 0.0
+                let current = isDraggingSlider ? dragValue : viewModel.mpv.currentTime
+                let total = viewModel.mpv.duration
+                let progress = total > 0 ? max(0.0, min(1.0, current / total)) : 0.0
+                
                 ZStack(alignment: .leading) {
                     Rectangle()
-                        .fill(ColorTheme.cardBorder.opacity(0.35))
-                        .frame(height: 2.5)
+                        .fill(ColorTheme.cardBorder.opacity(0.3))
+                        .frame(height: 2)
                     
                     Rectangle()
                         .fill(ColorTheme.terracotta)
-                        .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 2.5)
+                        .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 2)
                 }
             }
-            .frame(height: 2.5)
+            .frame(height: 2)
             
             HStack(spacing: 16) {
-                // Left: Album Artwork Thumbnail & Track Metadata
+                // ── Left: Mini Artwork & Track Metadata ──
                 HStack(spacing: 10) {
-                    // Mini Album Artwork
                     let artURL: URL? = {
                         if let coverId = viewModel.currentSong?.coverArt ?? viewModel.currentAlbum?.coverArt {
                             return viewModel.coverArtURL(for: coverId)
@@ -46,16 +48,17 @@ struct PlayerBarView: View {
                         ZStack {
                             ColorTheme.cardBorder.opacity(0.5)
                             Image(systemName: "opticaldisc")
-                                .font(.system(size: 15))
+                                .font(.system(size: 14))
                                 .foregroundColor(ColorTheme.terracotta)
                         }
                     }
-                    .frame(width: 38, height: 38)
-                    .cornerRadius(8)
+                    .frame(width: 36, height: 36)
+                    .cornerRadius(7)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: 7)
                             .stroke(Color.white.opacity(0.3), lineWidth: 0.8)
                     )
+                    .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text(viewModel.currentSong?.title ?? "No track playing")
@@ -78,34 +81,35 @@ struct PlayerBarView: View {
                                 .frame(width: 5, height: 5)
                             
                             Text(viewModel.isConnected ? "connected" : "demo")
-                                .font(.system(size: 10, design: .monospaced))
+                                .font(.system(size: 9, design: .monospaced))
                                 .foregroundColor(ColorTheme.textTertiary)
                         }
                     }
                 }
-                .frame(minWidth: 220, alignment: .leading)
+                .frame(minWidth: 200, alignment: .leading)
                 
-                Spacer(minLength: 8)
+                Spacer(minLength: 6)
                 
-                // Center: Playback Controls & Track Scrubber
-                HStack(spacing: 14) {
-                    // Controls
+                // ── Center: Transport Controls & Scrubber ──
+                HStack(spacing: 12) {
+                    // Transport Buttons
                     HStack(spacing: 10) {
                         Button(action: { viewModel.previousTrack() }) {
                             Image(systemName: "backward.fill")
                                 .font(.system(size: 12))
                                 .foregroundColor(ColorTheme.textSecondary)
+                                .frame(width: 26, height: 26)
                         }
                         .buttonStyle(.plain)
                         
                         Button(action: { viewModel.togglePlayPause() }) {
                             Image(systemName: viewModel.mpv.isPaused ? "play.fill" : "pause.fill")
-                                .font(.system(size: 14, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .foregroundColor(.white)
                                 .frame(width: 28, height: 28)
                                 .background(ColorTheme.terracotta)
                                 .clipShape(Circle())
-                                .shadow(color: ColorTheme.terracotta.opacity(0.3), radius: 4, x: 0, y: 1.5)
+                                .shadow(color: ColorTheme.terracotta.opacity(0.35), radius: 4, x: 0, y: 1.5)
                         }
                         .buttonStyle(.plain)
                         .keyboardShortcut(.space, modifiers: [])
@@ -114,16 +118,20 @@ struct PlayerBarView: View {
                             Image(systemName: "forward.fill")
                                 .font(.system(size: 12))
                                 .foregroundColor(ColorTheme.textSecondary)
+                                .frame(width: 26, height: 26)
                         }
                         .buttonStyle(.plain)
                     }
                     
-                    // Scrubber with Elapsed / Remaining Times
-                    HStack(spacing: 8) {
-                        Text(formatTime(isDraggingSlider ? dragValue : viewModel.mpv.currentTime))
+                    // Track Scrubber with Live Elapsed & Duration counters
+                    HStack(spacing: 6) {
+                        let displayedTime = isDraggingSlider ? dragValue : viewModel.mpv.currentTime
+                        
+                        Text(formatTime(displayedTime))
                             .font(.system(size: 10, weight: .medium, design: .monospaced))
                             .foregroundColor(ColorTheme.textTertiary)
                             .frame(width: 32, alignment: .trailing)
+                            .monospacedDigit()
                         
                         Slider(
                             value: Binding(
@@ -144,20 +152,22 @@ struct PlayerBarView: View {
                             }
                         )
                         .accentColor(ColorTheme.terracotta)
-                        .frame(width: 150)
+                        .tint(ColorTheme.terracotta)
+                        .frame(width: 140)
                         
                         Text(formatTime(viewModel.mpv.duration))
                             .font(.system(size: 10, weight: .medium, design: .monospaced))
                             .foregroundColor(ColorTheme.textTertiary)
                             .frame(width: 32, alignment: .leading)
+                            .monospacedDigit()
                     }
                 }
                 
-                Spacer(minLength: 8)
+                Spacer(minLength: 6)
                 
-                // Right: CoreAudio Exclusive Mode & Volume
-                HStack(spacing: 12) {
-                    // Exclusive Audio Badge / Dropdown Menu
+                // ── Right: CoreAudio Exclusive / DAC & Volume & Queue ──
+                HStack(spacing: 10) {
+                    // Exclusive Audio Status / Device Menu
                     Menu {
                         if let warning = viewModel.mpv.deviceWarning {
                             Text("⚠️ \(warning)")
@@ -186,7 +196,7 @@ struct PlayerBarView: View {
                             }
                         }
                     } label: {
-                        HStack(spacing: 5) {
+                        HStack(spacing: 4) {
                             if !viewModel.mpv.isDeviceConnected && !viewModel.mpv.preferredDeviceName.isEmpty {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.system(size: 9))
@@ -213,22 +223,17 @@ struct PlayerBarView: View {
                                 Text("• \(rate / 1000)kHz")
                                     .font(.system(size: 9, weight: .semibold, design: .monospaced))
                                     .foregroundColor(ColorTheme.textSecondary)
-                            } else if !viewModel.mpv.preferredDeviceName.isEmpty && viewModel.mpv.isDeviceConnected {
-                                Text("• \(viewModel.mpv.preferredDeviceName)")
-                                    .font(.system(size: 9, weight: .semibold))
-                                    .foregroundColor(ColorTheme.textSecondary)
-                                    .lineLimit(1)
                             }
                         }
-                        .padding(.horizontal, 8)
+                        .padding(.horizontal, 7)
                         .padding(.vertical, 4)
-                        .background(viewModel.mpv.isExclusive ? ColorTheme.terracottaLight.opacity(0.8) : ColorTheme.cardBorder.opacity(0.5))
+                        .background(viewModel.mpv.isExclusive ? ColorTheme.terracottaLight.opacity(0.8) : ColorTheme.cardBorder.opacity(0.4))
                         .cornerRadius(6)
                     }
                     .menuStyle(.borderlessButton)
                     
-                    // Volume Slider
-                    HStack(spacing: 5) {
+                    // Volume Control with Terracotta Accent
+                    HStack(spacing: 4) {
                         Image(systemName: viewModel.mpv.volume == 0 ? "speaker.slash.fill" : "speaker.wave.2.fill")
                             .font(.system(size: 11))
                             .foregroundColor(ColorTheme.textSecondary)
@@ -241,7 +246,8 @@ struct PlayerBarView: View {
                             in: 0...100
                         )
                         .accentColor(ColorTheme.terracotta)
-                        .frame(width: 65)
+                        .tint(ColorTheme.terracotta)
+                        .frame(width: 60)
                     }
                     
                     // Queue Button (Opens Playing Queue Popover)
@@ -267,7 +273,7 @@ struct PlayerBarView: View {
                         QueueView(viewModel: viewModel)
                     }
                 }
-                .frame(minWidth: 240, alignment: .trailing)
+                .frame(minWidth: 220, alignment: .trailing)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)

@@ -150,7 +150,11 @@ struct QueueView: View {
                 .padding(.vertical, 12)
             }
         }
-        .frame(minWidth: 320, idealWidth: 360, maxWidth: 420, minHeight: 380, idealHeight: 460)
+        #if os(macOS)
+        .frame(width: 380, height: 480)
+        #else
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        #endif
         .background(ColorTheme.windowBackground)
     }
     

@@ -2,8 +2,11 @@
 //  SidebarView.swift
 //  mpvg
 //
-//  CaskHub-styled native sidebar with translucent warm latte background,
-//  category groupings, right-aligned count metrics, and terracotta pill selection states.
+//  macOS Music-styled sidebar featuring:
+//  - Translucent material background with warm ambient tint
+//  - Top traffic-light spacing with sidebar collapse toggle
+//  - Navigation items with refined icons and terracotta pill selection
+//  - User profile badge at the bottom
 //
 
 import SwiftUI
@@ -35,127 +38,204 @@ struct SidebarView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Window Header: Traffic Lights spacing & Sidebar collapse icon
+            #if os(macOS)
+            // Top Window Spacing with Sidebar Toggle
             HStack(alignment: .center) {
                 Spacer()
                 
-                // Sidebar Collapse / Toggle Icon Button (CaskHub Style)
                 Button(action: {
                     withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
                         viewModel.isSidebarVisible.toggle()
                     }
                 }) {
                     Image(systemName: "sidebar.leading")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundColor(ColorTheme.textSecondary)
-                        .frame(width: 26, height: 22)
-                        .background(ColorTheme.cardBackground.opacity(0.8))
+                        .frame(width: 26, height: 24)
+                        .background(ColorTheme.cardBackground.opacity(0.7))
+                        .cornerRadius(6)
                         .overlay(
                             RoundedRectangle(cornerRadius: 6)
-                                .stroke(ColorTheme.cardBorder, lineWidth: 1)
+                                .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
                         )
-                        .cornerRadius(6)
                 }
                 .buttonStyle(.plain)
             }
-            .frame(height: 32)
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
+            .frame(height: 38)
+            .padding(.horizontal, 14)
+            .padding(.top, 6)
+            #endif
             
-            // App Branding (CaskHub Keg / Vinyl Record Branding)
-            HStack(spacing: 10) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(hex: "A35133"), ColorTheme.terracotta],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 32, height: 32)
-                        .shadow(color: Color.black.opacity(0.12), radius: 3, x: 0, y: 1.5)
-                    
-                    Image(systemName: "opticaldisc.fill")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
-                }
+            // Search field shortcut in sidebar (Apple Music style)
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 12))
+                    .foregroundColor(ColorTheme.textTertiary)
                 
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("CaskHub")
-                        .font(.system(size: 17, weight: .heavy, design: .rounded))
-                        .foregroundColor(ColorTheme.textPrimary)
-                }
+                TextField("Search...", text: $viewModel.searchQuery)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 12))
+                    .foregroundColor(ColorTheme.textPrimary)
                 
-                Spacer()
+                if !viewModel.searchQuery.isEmpty {
+                    Button(action: { viewModel.searchQuery = "" }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(ColorTheme.textTertiary)
+                    }
+                    .buttonStyle(.plain)
+                }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 4)
-            .padding(.bottom, 16)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(ColorTheme.cardBackground.opacity(0.8))
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
+            )
+            .padding(.horizontal, 12)
+            .padding(.bottom, 12)
             
             // Navigation Sections
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 18) {
                     // DISCOVER
                     sidebarSection(title: "DISCOVER") {
-                        SidebarRowItem(tab: .browse, label: "Browse", count: nil, isSelected: viewModel.activeTab == .browse) {
+                        SidebarRowItem(
+                            iconName: "house.fill",
+                            label: "Browse",
+                            isSelected: viewModel.activeTab == .browse
+                        ) {
                             viewModel.activeTab = .browse
                         }
-                        SidebarRowItem(tab: .featured, label: "Featured", count: nil, isSelected: viewModel.activeTab == .featured) {
+                        
+                        SidebarRowItem(
+                            iconName: "sparkles",
+                            label: "Featured",
+                            isSelected: viewModel.activeTab == .featured
+                        ) {
                             viewModel.activeTab = .featured
                         }
-                        SidebarRowItem(tab: .recentlyAdded, label: "Recently Added", count: nil, isSelected: viewModel.activeTab == .recentlyAdded) {
+                        
+                        SidebarRowItem(
+                            iconName: "clock.arrow.circlepath",
+                            label: "Recently Added",
+                            isSelected: viewModel.activeTab == .recentlyAdded
+                        ) {
                             viewModel.activeTab = .recentlyAdded
                         }
                     }
                     
                     // LIBRARY
                     sidebarSection(title: "LIBRARY") {
-                        SidebarRowItem(tab: .albums, label: "Albums", count: "\(viewModel.albums.count)", isSelected: viewModel.activeTab == .albums) {
+                        SidebarRowItem(
+                            iconName: "square.stack",
+                            label: "Albums",
+                            count: "\(viewModel.albums.count)",
+                            isSelected: viewModel.activeTab == .albums
+                        ) {
                             viewModel.activeTab = .albums
                         }
-                        SidebarRowItem(tab: .artists, label: "Artists", count: "\(viewModel.artists.count)", isSelected: viewModel.activeTab == .artists) {
+                        
+                        SidebarRowItem(
+                            iconName: "music.mic",
+                            label: "Artists",
+                            count: "\(viewModel.artists.count)",
+                            isSelected: viewModel.activeTab == .artists
+                        ) {
                             viewModel.activeTab = .artists
                         }
-                        SidebarRowItem(tab: .playlists, label: "Playlists", count: "12", isSelected: viewModel.activeTab == .playlists) {
+                        
+                        SidebarRowItem(
+                            iconName: "music.note.list",
+                            label: "Playlists",
+                            count: "12",
+                            isSelected: viewModel.activeTab == .playlists
+                        ) {
                             viewModel.activeTab = .playlists
                         }
-                        SidebarRowItem(tab: .genres, label: "Genres", count: "24", isSelected: viewModel.activeTab == .genres) {
+                        
+                        SidebarRowItem(
+                            iconName: "guitars",
+                            label: "Genres",
+                            count: "24",
+                            isSelected: viewModel.activeTab == .genres
+                        ) {
                             viewModel.activeTab = .genres
                         }
                     }
                     
-                    // SYSTEM & SETUP
-                    sidebarSection(title: "SETTINGS & ENGINE") {
-                        SidebarRowItem(tab: .settings, label: "Settings", count: viewModel.mpv.isExclusive ? "⚡" : nil, isSelected: viewModel.activeTab == .settings) {
+                    // SYSTEM
+                    sidebarSection(title: "SYSTEM") {
+                        SidebarRowItem(
+                            iconName: "gearshape.fill",
+                            label: "Settings",
+                            badge: viewModel.mpv.isExclusive ? "⚡ Hi-Res" : nil,
+                            isSelected: viewModel.activeTab == .settings
+                        ) {
                             viewModel.activeTab = .settings
                         }
                     }
                 }
-                .padding(.horizontal, 10)
-                .padding(.bottom, 20)
+                .padding(.horizontal, 8)
+                .padding(.bottom, 12)
             }
             
             Spacer(minLength: 0)
+            
+            // User profile pill at the bottom (Apple Music style)
+            HStack(spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [Color(hex: "B45309"), ColorTheme.terracotta],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 28, height: 28)
+                    
+                    Text("FS")
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                }
+                
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Fabián Sanhueza")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(ColorTheme.textPrimary)
+                        .lineLimit(1)
+                    
+                    Text(viewModel.isConnected ? "music.ssft.cl" : "Local Library")
+                        .font(.system(size: 10))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .lineLimit(1)
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(ColorTheme.cardBackground.opacity(0.6))
+            .cornerRadius(10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
+            )
+            .padding(.horizontal, 10)
+            .padding(.bottom, 12)
         }
-        .frame(width: 240)
+        .frame(width: 220)
         .background(sidebarBackgroundView)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(ColorTheme.cardBorder, lineWidth: 1.2)
-        )
-        .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 3)
-        .padding(.leading, 12)
-        .padding(.top, 10)
-        .padding(.bottom, 6)
     }
     
     @ViewBuilder
     private var sidebarBackgroundView: some View {
         #if os(macOS)
         VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
-            .overlay(ColorTheme.sidebarBackground.opacity(0.85))
+            .overlay(ColorTheme.sidebarBackground.opacity(0.7))
         #else
         ColorTheme.sidebarBackground
         #endif
@@ -163,24 +243,25 @@ struct SidebarView: View {
     
     // MARK: - Section Header Helper
     private func sidebarSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(.system(size: 10, weight: .bold))
                 .foregroundColor(ColorTheme.textTertiary)
-                .tracking(0.8)
-                .padding(.horizontal, 10)
-                .padding(.bottom, 2)
+                .tracking(0.6)
+                .padding(.horizontal, 12)
+                .padding(.bottom, 3)
             
             content()
         }
     }
 }
 
-// MARK: - Individual Sidebar Row with Hover and Selection
+// MARK: - Individual Sidebar Row
 private struct SidebarRowItem: View {
-    let tab: SidebarTab
+    let iconName: String
     let label: String
-    let count: String?
+    var count: String? = nil
+    var badge: String? = nil
     let isSelected: Bool
     let action: () -> Void
     
@@ -189,18 +270,26 @@ private struct SidebarRowItem: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
-                Image(systemName: tab.iconName)
+                Image(systemName: iconName)
                     .font(.system(size: 13, weight: isSelected ? .bold : .regular))
                     .foregroundColor(isSelected ? ColorTheme.terracotta : ColorTheme.textSecondary)
                     .frame(width: 18, alignment: .center)
                 
                 Text(label)
-                    .font(.system(size: 13, weight: isSelected ? .bold : .medium))
+                    .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
                     .foregroundColor(isSelected ? ColorTheme.terracotta : ColorTheme.textPrimary)
                 
                 Spacer()
                 
-                if let count = count, !count.isEmpty {
+                if let badge = badge {
+                    Text(badge)
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundColor(ColorTheme.terracotta)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 2)
+                        .background(ColorTheme.terracottaLight.opacity(0.7))
+                        .cornerRadius(4)
+                } else if let count = count, !count.isEmpty {
                     Text(count)
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundColor(isSelected ? ColorTheme.terracotta : ColorTheme.textTertiary)
@@ -210,7 +299,9 @@ private struct SidebarRowItem: View {
             .padding(.vertical, 6)
             .background(
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(isSelected ? ColorTheme.terracottaLight.opacity(0.85) : (isHovered ? ColorTheme.cardBorder.opacity(0.4) : Color.clear))
+                    .fill(isSelected
+                          ? ColorTheme.terracottaLight.opacity(0.9)
+                          : (isHovered ? ColorTheme.cardBorder.opacity(0.4) : Color.clear))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 8, style: .continuous)

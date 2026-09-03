@@ -136,6 +136,13 @@ final class PlayerViewModel: ObservableObject {
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
         
+        // Forward currentTime ticks at a throttled rate so the elapsed time
+        // label in PlayerBarView stays in sync without hammering the UI
+        processManager.$currentTime
+            .throttle(for: .milliseconds(250), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+        
         // Configure macOS System Media Keys & Now Playing
         MediaKeyController.shared.configure(with: self)
         

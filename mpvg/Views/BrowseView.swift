@@ -45,7 +45,7 @@ struct BrowseView: View {
             }
             .padding(.horizontal, 24)
             .padding(.top, 10)
-            .padding(.bottom, 78)
+            .padding(.bottom, 80)
         }
         .background(ColorTheme.windowBackground)
     }
