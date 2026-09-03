@@ -10,9 +10,11 @@ import Foundation
 import MediaPlayer
 import CoreGraphics
 
-#if os(macOS)
+#if canImport(AppKit)
 import AppKit
-#elseif os(iOS)
+#endif
+
+#if canImport(UIKit)
 import UIKit
 #endif
 
@@ -123,10 +125,12 @@ final class MediaKeyController {
                 
                 #if os(macOS)
                 guard let img = NSImage(data: data) else { return }
-                let artwork = MPMediaItemArtwork(boundsSize: img.size) { _ in img }
+                let imgSize = img.size
+                let artwork = MPMediaItemArtwork(boundsSize: imgSize) { _ in img }
                 #elseif os(iOS)
                 guard let img = UIImage(data: data) else { return }
-                let artwork = MPMediaItemArtwork(boundsSize: img.size) { _ in img }
+                let imgSize = img.size
+                let artwork = MPMediaItemArtwork(boundsSize: imgSize) { _ in img }
                 #endif
                 
                 Task { @MainActor in
