@@ -246,24 +246,25 @@ final class MPVProcessManager: ObservableObject {
             "--input-ipc-server=\(socketPath)",
             "--no-video",
             "--keep-open=always",
-            "--volume-max=100"
+            "--volume-max=100",
+            "--ao=coreaudio",
+            "--audio-samplerate=0"
         ]
         
         // Only force device if it is ACTUALLY present right now in CoreAudio
         let effectiveDevice = (isDeviceConnected && currentDevice != "auto") ? currentDevice : "auto"
         if effectiveDevice != "auto" {
             args.append("--audio-device=\(effectiveDevice)")
-            if isExclusive {
-                args.append("--audio-exclusive=yes")
-            }
-            if changePhysicalFormat {
-                args.append("--coreaudio-change-physical-format=yes")
-            }
         } else {
-            // Auto fallback - avoids audio initialization failure (!obj)
             args.append("--audio-device=auto")
         }
         
+        if isExclusive {
+            args.append("--audio-exclusive=yes")
+        }
+        if changePhysicalFormat {
+            args.append("--coreaudio-change-physical-format=yes")
+        }
         if isGapless {
             args.append("--gapless-audio=yes")
         }
@@ -372,6 +373,15 @@ final class MPVProcessManager: ObservableObject {
         if let dev = availableDevices.first(where: { $0.id == deviceId }) {
             self.preferredDeviceName = dev.displayName
             UserDefaults.standard.set(dev.displayName, forKey: Self.selectedDeviceNameKey)
+            if dev.isExclusiveCapable {
+                self.isExclusive = true
+                self.changePhysicalFormat = true
+                UserDefaults.standard.set(true, forKey: Self.exclusiveModeKey)
+                UserDefaults.standard.set(true, forKey: Self.physicalFormatKey)
+            } else if dev.id == "coreaudio/BuiltInSpeakerDevice" || dev.id == "auto" {
+                self.isExclusive = false
+                UserDefaults.standard.set(false, forKey: Self.exclusiveModeKey)
+            }
         }
         UserDefaults.standard.set(deviceId, forKey: Self.selectedDeviceKey)
         self.isDeviceConnected = true

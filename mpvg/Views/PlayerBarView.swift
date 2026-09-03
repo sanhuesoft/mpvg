@@ -27,9 +27,16 @@ struct PlayerBarView: View {
                         .fill(ColorTheme.cardBorder.opacity(0.3))
                         .frame(height: 2)
                     
-                    Rectangle()
-                        .fill(ColorTheme.terracotta)
-                        .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 2)
+                    if viewModel.isLoadingTrack {
+                        ProgressView()
+                            .progressViewStyle(.linear)
+                            .tint(ColorTheme.terracotta)
+                            .frame(height: 2)
+                    } else {
+                        Rectangle()
+                            .fill(ColorTheme.terracotta)
+                            .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 2)
+                    }
                 }
             }
             .frame(height: 2)
@@ -44,12 +51,20 @@ struct PlayerBarView: View {
                         return nil
                     }()
                     
-                    CachedAsyncImage(url: artURL) {
-                        ZStack {
-                            ColorTheme.cardBorder.opacity(0.5)
-                            Image(systemName: "opticaldisc")
-                                .font(.system(size: 14))
-                                .foregroundColor(ColorTheme.terracotta)
+                    ZStack {
+                        CachedAsyncImage(url: artURL) {
+                            ZStack {
+                                ColorTheme.cardBorder.opacity(0.5)
+                                Image(systemName: "opticaldisc")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(ColorTheme.terracotta)
+                            }
+                        }
+                        
+                        if viewModel.isLoadingTrack {
+                            Color.black.opacity(0.4)
+                            ProgressView()
+                                .scaleEffect(0.6)
                         }
                     }
                     .frame(width: 36, height: 36)
@@ -104,6 +119,7 @@ struct PlayerBarView: View {
                                 .frame(width: 26, height: 26)
                         }
                         .buttonStyle(.plain)
+                        .pointingHandOnHover()
                         
                         Button(action: { viewModel.togglePlayPause() }) {
                             Image(systemName: viewModel.mpv.isPaused ? "play.fill" : "pause.fill")
@@ -116,6 +132,7 @@ struct PlayerBarView: View {
                         }
                         .buttonStyle(.plain)
                         .keyboardShortcut(.space, modifiers: [])
+                        .pointingHandOnHover()
                         
                         Button(action: { viewModel.nextTrack() }) {
                             Image(systemName: "forward.fill")
@@ -124,6 +141,7 @@ struct PlayerBarView: View {
                                 .frame(width: 26, height: 26)
                         }
                         .buttonStyle(.plain)
+                        .pointingHandOnHover()
                     }
                     
                     // Track Scrubber with Live Elapsed & Duration counters

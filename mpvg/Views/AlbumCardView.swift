@@ -171,6 +171,7 @@ struct AlbumCardView: View {
         .onTapGesture {
             viewModel.selectAlbumForDetail(album)
         }
+        .pointingHandOnHover()
     }
     
     @ViewBuilder

@@ -49,19 +49,7 @@ struct SongRowView: View {
             
             Spacer()
             
-            // 5-Star Rating (Visible if rated or hovered)
-            if song.rating > 0 || isHovered {
-                StarRatingView(
-                    rating: song.rating,
-                    size: 10,
-                    spacing: 2,
-                    interactive: true,
-                    onRate: onRate
-                )
-                .transition(.opacity)
-            }
-            
-            // Format Badge
+            // Format Badge (FLAC, FLAC Hi-Res, etc.)
             Text(song.formatBadge)
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundColor(ColorTheme.textSecondary)
@@ -69,6 +57,21 @@ struct SongRowView: View {
                 .padding(.vertical, 2)
                 .background(ColorTheme.cardBorder.opacity(0.5))
                 .cornerRadius(4)
+            
+            // 5-Star Rating (Positioned strictly between format badge and duration)
+            ZStack(alignment: .trailing) {
+                if song.rating > 0 || isHovered {
+                    StarRatingView(
+                        rating: song.rating,
+                        size: 11,
+                        spacing: 2,
+                        interactive: true,
+                        onRate: onRate
+                    )
+                    .transition(.opacity)
+                }
+            }
+            .frame(width: 75, alignment: .trailing)
             
             // Duration
             Text(song.formattedDuration)
@@ -92,5 +95,6 @@ struct SongRowView: View {
         .onTapGesture {
             onPlay()
         }
+        .pointingHandOnHover()
     }
 }

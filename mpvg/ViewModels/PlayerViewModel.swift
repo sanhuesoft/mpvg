@@ -91,6 +91,11 @@ final class PlayerViewModel: ObservableObject {
     @Published var selectedArtistAlbums: [AlbumItem] = []
     @Published var isLoadingArtistAlbums: Bool = false
     
+    // Track loading & Toast
+    @Published var isLoadingTrack: Bool = false
+    @Published var toastMessage: String? = nil
+    private var toastTimer: Task<Void, Never>? = nil
+    
     // Dependencies
     @Published var mpv: AudioEngine
     private var navidrome: NavidromeService
@@ -321,12 +326,18 @@ final class PlayerViewModel: ObservableObject {
             }
         }
         
+        self.isLoadingTrack = true
+        
         if isConnected {
             Task {
                 if let streamURL = await navidrome.streamURL(for: song.id) {
                     mpv.play(url: streamURL.absoluteString)
                     await navidrome.scrobble(songId: song.id, submission: false)
                     syncNowPlaying()
+                    self.isLoadingTrack = false
+                } else {
+                    self.isLoadingTrack = false
+                    self.showToast("No se pudo obtener el audio de \"\(song.title)\". Revisa la conexión al servidor.")
                 }
             }
         } else {
@@ -336,8 +347,26 @@ final class PlayerViewModel: ObservableObject {
                 let demoStream = "https://archive.org/download/test-audio-sample-flac/96k-24bit.flac"
                 mpv.play(url: demoStream)
             }
+            self.isLoadingTrack = false
             syncNowPlaying()
         }
+    }
+    
+    // MARK: - Toast Notifications
+    func showToast(_ message: String) {
+        self.toastMessage = message
+        toastTimer?.cancel()
+        toastTimer = Task {
+            try? await Task.sleep(nanoseconds: 4_000_000_000) // 4 seconds
+            if !Task.isCancelled {
+                self.toastMessage = nil
+            }
+        }
+    }
+    
+    func hideToast() {
+        self.toastMessage = nil
+        toastTimer?.cancel()
     }
     
     func playAlbum(_ album: AlbumItem) {

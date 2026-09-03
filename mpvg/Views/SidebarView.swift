@@ -302,8 +302,11 @@ private struct SidebarRowItem: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .onHover { hovering in
-            isHovered = hovering
+        .pointingHandOnHover()
+        .onHover { isHovering in
+            withAnimation(.easeInOut(duration: 0.12)) {
+                self.isHovered = isHovering
+            }
         }
     }
 }

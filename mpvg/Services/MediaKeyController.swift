@@ -10,11 +10,9 @@ import Foundation
 import MediaPlayer
 import CoreGraphics
 
-#if canImport(AppKit)
+#if os(macOS)
 import AppKit
-#endif
-
-#if canImport(UIKit)
+#elseif os(iOS)
 import UIKit
 #endif
 

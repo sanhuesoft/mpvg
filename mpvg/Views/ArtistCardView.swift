@@ -73,6 +73,7 @@ struct ArtistCardView: View {
         .onTapGesture {
             viewModel.selectArtistForDetail(artist)
         }
+        .pointingHandOnHover()
     }
     
     @ViewBuilder

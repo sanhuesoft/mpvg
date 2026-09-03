@@ -78,6 +78,20 @@ struct MainView: View {
                 PlayerBarView(viewModel: viewModel)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 14)
+                
+                // Toast Notification Overlay
+                if let message = viewModel.toastMessage {
+                    VStack {
+                        ToastNotificationView(message: message, isError: true) {
+                            withAnimation(.spring()) {
+                                viewModel.hideToast()
+                            }
+                        }
+                        Spacer()
+                    }
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .zIndex(100)
+                }
             }
             .background(ColorTheme.cardBackground)
             .cornerRadius(18)
