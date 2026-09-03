@@ -18,6 +18,8 @@ final class IOSAudioEngine: ObservableObject {
     private var player: AVPlayer?
     private var timeObserverToken: Any?
     private var itemStatusObserver: AnyCancellable?
+    private var endObserverToken: Any?
+    var onTrackFinished: (() -> Void)?
     
     @Published var isRunning = true
     @Published var isPaused = true
@@ -50,6 +52,9 @@ final class IOSAudioEngine: ObservableObject {
     deinit {
         if let token = timeObserverToken {
             player?.removeTimeObserver(token)
+        }
+        if let token = endObserverToken {
+            NotificationCenter.default.removeObserver(token)
         }
     }
     
@@ -154,7 +159,20 @@ final class IOSAudioEngine: ObservableObject {
             timeObserverToken = nil
         }
         
+        if let token = endObserverToken {
+            NotificationCenter.default.removeObserver(token)
+            endObserverToken = nil
+        }
+        
         let item = AVPlayerItem(url: streamURL)
+        endObserverToken = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: item,
+            queue: .main
+        ) { [weak self] _ in
+            self?.onTrackFinished?()
+        }
+        
         if player == nil {
             player = AVPlayer(playerItem: item)
         } else {

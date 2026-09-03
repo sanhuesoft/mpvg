@@ -241,10 +241,33 @@ struct PlayerBarView: View {
                             in: 0...100
                         )
                         .accentColor(ColorTheme.terracotta)
-                        .frame(width: 70)
+                        .frame(width: 65)
+                    }
+                    
+                    // Queue Button (Opens Playing Queue Popover)
+                    Button(action: {
+                        viewModel.showQueueSheet.toggle()
+                    }) {
+                        HStack(spacing: 3) {
+                            Image(systemName: "list.bullet")
+                                .font(.system(size: 12, weight: .bold))
+                            if viewModel.queue.count > 1 {
+                                Text("\(viewModel.queue.count)")
+                                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                            }
+                        }
+                        .foregroundColor(viewModel.showQueueSheet ? ColorTheme.terracotta : ColorTheme.textSecondary)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 4)
+                        .background(viewModel.showQueueSheet ? ColorTheme.terracottaLight.opacity(0.8) : ColorTheme.cardBorder.opacity(0.4))
+                        .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .popover(isPresented: $viewModel.showQueueSheet, arrowEdge: .top) {
+                        QueueView(viewModel: viewModel)
                     }
                 }
-                .frame(minWidth: 220, alignment: .trailing)
+                .frame(minWidth: 240, alignment: .trailing)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)

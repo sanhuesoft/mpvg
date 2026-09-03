@@ -44,6 +44,9 @@ final class MPVProcessManager: ObservableObject {
     @Published var audioChannels: String? = nil
     @Published var binaryPath: String = "/opt/homebrew/bin/mpv"
     
+    var onTrackFinished: (() -> Void)?
+    private var hasHandledEOF: Bool = false
+    
     init() {
         if let savedDevice = UserDefaults.standard.string(forKey: Self.selectedDeviceKey) {
             self.currentDevice = savedDevice
@@ -305,6 +308,7 @@ final class MPVProcessManager: ObservableObject {
             return
         }
         
+        hasHandledEOF = false
         self.isPaused = false
         self.objectWillChange.send()
         
@@ -421,6 +425,14 @@ final class MPVProcessManager: ObservableObject {
             if abs(self.duration - dur) > 0.5 {
                 self.duration = dur
                 changed = true
+            }
+        }
+        if let eof = await queryProperty("eof-reached") as? Bool {
+            if eof && !self.hasHandledEOF && !self.isPaused && self.duration > 0 && self.currentTime > 1.0 {
+                self.hasHandledEOF = true
+                self.onTrackFinished?()
+            } else if !eof {
+                self.hasHandledEOF = false
             }
         }
         if let paused = await queryProperty("pause") as? Bool {

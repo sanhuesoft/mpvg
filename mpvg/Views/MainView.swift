@@ -95,6 +95,9 @@ struct MainView: View {
         .sheet(item: $viewModel.selectedArtistForDetail) { artist in
             ArtistDetailSheet(artist: artist, viewModel: viewModel)
         }
+        .sheet(isPresented: $viewModel.showQueueSheet) {
+            QueueView(viewModel: viewModel)
+        }
     }
     
     // MARK: - Tablet Layout (iPadOS Regular)

@@ -82,6 +82,7 @@ final class PlayerViewModel: ObservableObject {
     @Published var currentAlbum: AlbumItem?
     @Published var queue: [SongItem] = []
     @Published var queueIndex: Int = 0
+    @Published var showQueueSheet: Bool = false
     
     // Selection / Sheets
     @Published var selectedAlbumForDetail: AlbumItem?
@@ -106,6 +107,13 @@ final class PlayerViewModel: ObservableObject {
         
         loadSampleCatalog()
         updateSessionAuth()
+        
+        // Continuous playback: automatically play the next track in queue when a song finishes
+        processManager.onTrackFinished = { [weak self] in
+            Task { @MainActor [weak self] in
+                self?.nextTrack()
+            }
+        }
         
         // Forward discrete state changes from mpv (do NOT forward high-frequency currentTime ticks)
         processManager.$isPaused
@@ -272,11 +280,40 @@ final class PlayerViewModel: ObservableObject {
     func playSong(_ song: SongItem, inAlbum album: AlbumItem?, queue: [SongItem]) {
         self.currentSong = song
         self.currentAlbum = album
-        self.queue = queue.isEmpty ? [song] : queue
-        if let idx = self.queue.firstIndex(where: { $0.id == song.id }) {
-            self.queueIndex = idx
+        
+        // If queue is provided with multiple items, use it
+        if !queue.isEmpty {
+            self.queue = queue
+            if let idx = self.queue.firstIndex(where: { $0.id == song.id }) {
+                self.queueIndex = idx
+            } else {
+                self.queueIndex = 0
+            }
         } else {
+            self.queue = [song]
             self.queueIndex = 0
+        }
+        
+        // If queue only has 1 song and an album exists, automatically load and queue the rest of the album
+        if self.queue.count <= 1 {
+            let targetAlbum = album ?? self.albums.first(where: { $0.id == song.parent || (song.album != nil && $0.name == song.album) })
+            if let alb = targetAlbum {
+                Task {
+                    var songs: [SongItem] = []
+                    if self.isConnected {
+                        let (_, fetched) = await self.navidrome.getAlbum(id: alb.id)
+                        songs = fetched
+                    } else {
+                        songs = self.generateSampleTracks(for: alb)
+                    }
+                    if !songs.isEmpty {
+                        self.queue = songs
+                        if let idx = songs.firstIndex(where: { $0.id == song.id }) {
+                            self.queueIndex = idx
+                        }
+                    }
+                }
+            }
         }
         
         if isConnected {
@@ -339,6 +376,69 @@ final class PlayerViewModel: ObservableObject {
             let prev = queue[queueIndex]
             playSong(prev, inAlbum: currentAlbum, queue: queue)
         }
+    }
+    
+    // MARK: - Queue Management
+    func addToQueue(_ song: SongItem) {
+        queue.append(song)
+        if currentSong == nil {
+            playSong(song, inAlbum: currentAlbum, queue: queue)
+        }
+    }
+    
+    func playNext(_ song: SongItem) {
+        if queue.isEmpty {
+            playSong(song, inAlbum: currentAlbum, queue: [song])
+            return
+        }
+        let insertIndex = min(queueIndex + 1, queue.count)
+        queue.insert(song, at: insertIndex)
+    }
+    
+    func addAlbumToQueue(_ album: AlbumItem) {
+        Task {
+            var songs: [SongItem] = []
+            if isConnected {
+                let (_, fetched) = await navidrome.getAlbum(id: album.id)
+                songs = fetched
+            } else {
+                songs = generateSampleTracks(for: album)
+            }
+            if queue.isEmpty {
+                if let first = songs.first {
+                    playSong(first, inAlbum: album, queue: songs)
+                }
+            } else {
+                queue.append(contentsOf: songs)
+            }
+        }
+    }
+    
+    func removeFromQueue(at index: Int) {
+        guard index >= 0 && index < queue.count else { return }
+        if index == queueIndex {
+            nextTrack()
+        }
+        queue.remove(at: index)
+        if index < queueIndex {
+            queueIndex = max(0, queueIndex - 1)
+        }
+    }
+    
+    func clearQueue() {
+        if let current = currentSong {
+            queue = [current]
+            queueIndex = 0
+        } else {
+            queue = []
+            queueIndex = 0
+        }
+    }
+    
+    func playQueueItem(at index: Int) {
+        guard index >= 0 && index < queue.count else { return }
+        let targetSong = queue[index]
+        playSong(targetSong, inAlbum: currentAlbum, queue: queue)
     }
     
     func syncNowPlaying() {
