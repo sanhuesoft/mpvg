@@ -2,7 +2,7 @@
 //  SongRowView.swift
 //  mpvg
 //
-//  List view row item for tracks in Browse or Album view
+//  List view row item for tracks in Browse or Album view with interactive rating.
 //
 
 import SwiftUI
@@ -10,6 +10,7 @@ import SwiftUI
 struct SongRowView: View {
     let song: SongItem
     let isPlaying: Bool
+    var onRate: ((Int) -> Void)? = nil
     let onPlay: () -> Void
     @State private var isHovered: Bool = false
     
@@ -48,6 +49,18 @@ struct SongRowView: View {
             
             Spacer()
             
+            // 5-Star Rating (Visible if rated or hovered)
+            if song.rating > 0 || isHovered {
+                StarRatingView(
+                    rating: song.rating,
+                    size: 10,
+                    spacing: 2,
+                    interactive: true,
+                    onRate: onRate
+                )
+                .transition(.opacity)
+            }
+            
             // Format Badge
             Text(song.formatBadge)
                 .font(.system(size: 10, weight: .semibold))
@@ -72,7 +85,9 @@ struct SongRowView: View {
         .cornerRadius(8)
         .contentShape(Rectangle())
         .onHover { hovering in
-            self.isHovered = hovering
+            withAnimation(.easeInOut(duration: 0.12)) {
+                self.isHovered = hovering
+            }
         }
         .onTapGesture {
             onPlay()

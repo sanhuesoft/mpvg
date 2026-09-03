@@ -113,7 +113,8 @@ actor NavidromeService {
                         genre: item["genre"] as? String,
                         bitRate: item["bitRate"] as? Int,
                         suffix: item["suffix"] as? String,
-                        playCount: item["playCount"] as? Int
+                        playCount: item["playCount"] as? Int,
+                        userRating: (item["userRating"] as? Int) ?? (item["rating"] as? Int)
                     )
                     albums.append(album)
                 }
@@ -166,7 +167,8 @@ actor NavidromeService {
                             genre: item["genre"] as? String,
                             bitRate: item["bitRate"] as? Int,
                             suffix: item["suffix"] as? String,
-                            playCount: item["playCount"] as? Int
+                            playCount: item["playCount"] as? Int,
+                            userRating: (item["userRating"] as? Int) ?? (item["rating"] as? Int)
                         )
                         if !allAlbums.contains(where: { $0.id == album.id }) {
                             allAlbums.append(album)
@@ -261,7 +263,8 @@ actor NavidromeService {
                             genre: a["genre"] as? String,
                             bitRate: a["bitRate"] as? Int,
                             suffix: a["suffix"] as? String,
-                            playCount: a["playCount"] as? Int
+                            playCount: a["playCount"] as? Int,
+                            userRating: (a["userRating"] as? Int) ?? (a["rating"] as? Int)
                         ))
                     }
                 }
@@ -300,7 +303,8 @@ actor NavidromeService {
                 genre: albumDict["genre"] as? String,
                 bitRate: albumDict["bitRate"] as? Int,
                 suffix: albumDict["suffix"] as? String,
-                playCount: albumDict["playCount"] as? Int
+                playCount: albumDict["playCount"] as? Int,
+                userRating: (albumDict["userRating"] as? Int) ?? (albumDict["rating"] as? Int)
             )
             
             var songs: [SongItem] = []
@@ -322,7 +326,8 @@ actor NavidromeService {
                             suffix: s["suffix"] as? String,
                             duration: s["duration"] as? Double,
                             bitRate: s["bitRate"] as? Int,
-                            path: s["path"] as? String
+                            path: s["path"] as? String,
+                            userRating: (s["userRating"] as? Int) ?? (s["rating"] as? Int)
                         )
                         songs.append(song)
                     }
@@ -375,7 +380,8 @@ actor NavidromeService {
                             genre: a["genre"] as? String,
                             bitRate: a["bitRate"] as? Int,
                             suffix: a["suffix"] as? String,
-                            playCount: a["playCount"] as? Int
+                            playCount: a["playCount"] as? Int,
+                            userRating: (a["userRating"] as? Int) ?? (a["rating"] as? Int)
                         ))
                     }
                 }
@@ -400,7 +406,8 @@ actor NavidromeService {
                             suffix: s["suffix"] as? String,
                             duration: s["duration"] as? Double,
                             bitRate: s["bitRate"] as? Int,
-                            path: s["path"] as? String
+                            path: s["path"] as? String,
+                            userRating: (s["userRating"] as? Int) ?? (s["rating"] as? Int)
                         ))
                     }
                 }
@@ -409,6 +416,26 @@ actor NavidromeService {
             return (artists, albums, songs)
         } catch {
             return ([], [], [])
+        }
+    }
+    
+    // MARK: - Set Rating (0-5 stars)
+    func setRating(id: String, rating: Int) async -> Bool {
+        let clamped = max(0, min(5, rating))
+        guard let url = buildURL(endpoint: "setRating.view", extraParams: ["id": id, "rating": "\(clamped)"]) else {
+            return false
+        }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let sub = json["subsonic-response"] as? [String: Any],
+                  let status = sub["status"] as? String else {
+                return false
+            }
+            return status == "ok"
+        } catch {
+            print("Error setting rating: \(error)")
+            return false
         }
     }
     

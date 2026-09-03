@@ -175,6 +175,9 @@ struct BrowseView: View {
                             SongRowView(
                                 song: song,
                                 isPlaying: viewModel.currentSong?.id == song.id && !viewModel.mpv.isPaused,
+                                onRate: { newRating in
+                                    viewModel.rateSong(song, rating: newRating)
+                                },
                                 onPlay: {
                                     viewModel.playSong(song, inAlbum: nil, queue: viewModel.searchSongs)
                                 }

@@ -66,6 +66,7 @@ struct AlbumItem: Identifiable, Hashable, Codable {
     let bitRate: Int?
     let suffix: String?
     let playCount: Int?
+    var userRating: Int?
     
     var displayTitle: String {
         title ?? name
@@ -78,6 +79,10 @@ struct AlbumItem: Identifiable, Hashable, Codable {
     var displayYear: String {
         if let y = year, y > 0 { return "\(y)" }
         return ""
+    }
+    
+    var rating: Int {
+        userRating ?? 0
     }
     
     var displaySpecs: String {
@@ -119,6 +124,11 @@ struct SongItem: Identifiable, Hashable, Codable {
     let duration: Double?
     let bitRate: Int?
     let path: String?
+    var userRating: Int?
+    
+    var rating: Int {
+        userRating ?? 0
+    }
     
     var displayArtist: String {
         artist ?? "Unknown Artist"

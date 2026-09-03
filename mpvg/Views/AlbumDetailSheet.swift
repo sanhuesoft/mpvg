@@ -67,6 +67,26 @@ struct AlbumDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(ColorTheme.textSecondary)
                     
+                    // Album Star Rating
+                    HStack(spacing: 6) {
+                        StarRatingView(
+                            rating: viewModel.selectedAlbumForDetail?.rating ?? album.rating,
+                            size: 13,
+                            spacing: 3,
+                            interactive: true
+                        ) { newRating in
+                            viewModel.rateAlbum(album, rating: newRating)
+                        }
+                        
+                        let curRating = viewModel.selectedAlbumForDetail?.rating ?? album.rating
+                        if curRating > 0 {
+                            Text("\(curRating)/5")
+                                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                                .foregroundColor(ColorTheme.terracotta)
+                        }
+                    }
+                    .padding(.top, 2)
+                    
                     Spacer()
                     
                     // Buttons
@@ -133,6 +153,9 @@ struct AlbumDetailSheet: View {
                             SongRowView(
                                 song: song,
                                 isPlaying: viewModel.currentSong?.id == song.id && !viewModel.mpv.isPaused,
+                                onRate: { newRating in
+                                    viewModel.rateSong(song, rating: newRating)
+                                },
                                 onPlay: {
                                     viewModel.playSong(song, inAlbum: album, queue: viewModel.selectedAlbumTracks)
                                 }

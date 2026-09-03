@@ -72,17 +72,20 @@ struct PlayerBarView: View {
                                 .foregroundColor(ColorTheme.textSecondary)
                                 .lineLimit(1)
                             
-                            Text("•")
-                                .font(.system(size: 8))
-                                .foregroundColor(ColorTheme.textTertiary)
-                            
-                            Circle()
-                                .fill(viewModel.isConnected ? ColorTheme.sageGreen : ColorTheme.amber)
-                                .frame(width: 5, height: 5)
-                            
-                            Text(viewModel.isConnected ? "connected" : "demo")
-                                .font(.system(size: 9, design: .monospaced))
-                                .foregroundColor(ColorTheme.textTertiary)
+                            if let song = viewModel.currentSong {
+                                Text("•")
+                                    .font(.system(size: 8))
+                                    .foregroundColor(ColorTheme.textTertiary)
+                                
+                                StarRatingView(
+                                    rating: song.rating,
+                                    size: 9,
+                                    spacing: 2,
+                                    interactive: true
+                                ) { newRating in
+                                    viewModel.rateSong(song, rating: newRating)
+                                }
+                            }
                         }
                     }
                 }

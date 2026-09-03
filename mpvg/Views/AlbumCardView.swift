@@ -115,6 +115,21 @@ struct AlbumCardView: View {
                     
                     Spacer()
                     
+                    if album.rating > 0 {
+                        HStack(spacing: 2) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 8))
+                                .foregroundColor(ColorTheme.terracotta)
+                            Text("\(album.rating)")
+                                .font(.system(size: 9, weight: .bold, design: .monospaced))
+                                .foregroundColor(ColorTheme.terracotta)
+                        }
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1.5)
+                        .background(ColorTheme.terracottaLight.opacity(0.6))
+                        .cornerRadius(4)
+                    }
+                    
                     if isCurrentlyPlaying {
                         HStack(spacing: 3) {
                             Circle().fill(ColorTheme.sageGreen).frame(width: 5, height: 5)

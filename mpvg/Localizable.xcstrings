@@ -49,6 +49,9 @@
     "%lld tracks in queue" : {
 
     },
+    "%lld/5" : {
+
+    },
     "•" : {
 
     },
@@ -509,9 +512,6 @@
         }
       }
     },
-    "connected" : {
-
-    },
     "Connected" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -627,9 +627,6 @@
           }
         }
       }
-    },
-    "demo" : {
-
     },
     "Disable Exclusive Mode" : {
       "localizations" : {

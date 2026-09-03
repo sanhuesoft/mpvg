@@ -103,7 +103,7 @@ struct NowPlayingSheetView: View {
                 
                 // Song Metadata & Audiophile Badge
                 VStack(spacing: 8) {
-                    HStack(alignment: .top) {
+                    HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(viewModel.currentSong?.title ?? "Not playing")
                                 .font(.system(size: 22, weight: .bold))
@@ -117,6 +117,17 @@ struct NowPlayingSheetView: View {
                         }
                         
                         Spacer()
+                        
+                        if let song = viewModel.currentSong {
+                            StarRatingView(
+                                rating: song.rating,
+                                size: 16,
+                                spacing: 4,
+                                interactive: true
+                            ) { newRating in
+                                viewModel.rateSong(song, rating: newRating)
+                            }
+                        }
                     }
                     
                     // Audio Quality Badge

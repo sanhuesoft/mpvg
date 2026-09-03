@@ -383,6 +383,73 @@ final class PlayerViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Rating System (0-5 Stars)
+    func rateSong(_ song: SongItem, rating: Int) {
+        let clamped = max(0, min(5, rating))
+        
+        // 1. Update current song if matching
+        if currentSong?.id == song.id {
+            currentSong?.userRating = clamped
+        }
+        
+        // 2. Update queue
+        for i in queue.indices where queue[i].id == song.id {
+            queue[i].userRating = clamped
+        }
+        
+        // 3. Update selected album tracks
+        for i in selectedAlbumTracks.indices where selectedAlbumTracks[i].id == song.id {
+            selectedAlbumTracks[i].userRating = clamped
+        }
+        
+        // 4. Update search results
+        for i in searchSongs.indices where searchSongs[i].id == song.id {
+            searchSongs[i].userRating = clamped
+        }
+        
+        // 5. Send to Navidrome server
+        if isConnected {
+            Task {
+                _ = await navidrome.setRating(id: song.id, rating: clamped)
+            }
+        }
+    }
+    
+    func rateAlbum(_ album: AlbumItem, rating: Int) {
+        let clamped = max(0, min(5, rating))
+        
+        // 1. Update current album
+        if currentAlbum?.id == album.id {
+            currentAlbum?.userRating = clamped
+        }
+        
+        // 2. Update selected detail album
+        if selectedAlbumForDetail?.id == album.id {
+            selectedAlbumForDetail?.userRating = clamped
+        }
+        
+        // 3. Update all collections
+        for i in albums.indices where albums[i].id == album.id {
+            albums[i].userRating = clamped
+        }
+        for i in recentAlbums.indices where recentAlbums[i].id == album.id {
+            recentAlbums[i].userRating = clamped
+        }
+        for i in featuredAlbums.indices where featuredAlbums[i].id == album.id {
+            featuredAlbums[i].userRating = clamped
+        }
+        for i in searchAlbums.indices where searchAlbums[i].id == album.id {
+            searchAlbums[i].userRating = clamped
+        }
+        
+        // 4. Send to Navidrome server
+        if isConnected {
+            Task {
+                _ = await navidrome.setRating(id: album.id, rating: clamped)
+            }
+        }
+    }
+    
     // MARK: - Queue Management
     func addToQueue(_ song: SongItem) {
         queue.append(song)
