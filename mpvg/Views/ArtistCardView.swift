@@ -18,7 +18,7 @@ struct ArtistCardView: View {
             // Circular Artist Portrait (Hero Element)
             ZStack {
                 avatarView
-                    .frame(width: 130, height: 130)
+                    .frame(width: 110, height: 110)
                     .clipShape(Circle())
                     .overlay(
                         Circle()
@@ -28,7 +28,7 @@ struct ArtistCardView: View {
                 if isHovered {
                     Circle()
                         .fill(Color.black.opacity(0.3))
-                        .frame(width: 130, height: 130)
+                        .frame(width: 110, height: 110)
                     
                     Image(systemName: "music.mic")
                         .font(.system(size: 28))
@@ -45,11 +45,11 @@ struct ArtistCardView: View {
                     .lineLimit(1)
                 
                 if let count = artist.albumCount, count > 0 {
-                    Text("\(count) \(count == 1 ? "álbum" : "álbumes")")
+                    Text("\(count) \(count == 1 ? "album" : "albums")")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(ColorTheme.textSecondary)
                 } else {
-                    Text("Artista")
+                    Text("Artist")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(ColorTheme.textTertiary)
                 }
@@ -93,7 +93,7 @@ struct ArtistCardView: View {
                 endPoint: .bottomTrailing
             )
             Image(systemName: "person.fill")
-                .font(.system(size: 40))
+                .font(.system(size: 36))
                 .foregroundColor(ColorTheme.terracotta)
         }
     }

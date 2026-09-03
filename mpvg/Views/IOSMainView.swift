@@ -194,7 +194,7 @@ struct ArtistsGridView: View {
     @ObservedObject var viewModel: PlayerViewModel
     
     private let columns = [
-        GridItem(.adaptive(minimum: 100, maximum: 140), spacing: 14)
+        GridItem(.adaptive(minimum: 150, maximum: 200), spacing: 14)
     ]
     
     var body: some View {
