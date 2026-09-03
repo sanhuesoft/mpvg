@@ -6,12 +6,20 @@
 //
 
 import SwiftUI
+import Darwin
 
 @main
 struct mpvgApp: App {
+    init() {
+        signal(SIGPIPE, SIG_IGN)
+    }
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView()
+                .preferredColorScheme(.light)
         }
+        .windowStyle(.hiddenTitleBar)
+        .defaultSize(width: 1120, height: 740)
     }
 }
