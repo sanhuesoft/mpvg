@@ -66,6 +66,7 @@ final class MPVProcessManager: ObservableObject {
         }
         
         findMpvBinary()
+        Self.killStaleMpvProcesses()
         detectAudioDevices()
         setupCoreAudioListener()
         
@@ -87,7 +88,16 @@ final class MPVProcessManager: ObservableObject {
                 kill(pid, SIGKILL)
             }
         }
+        Self.killStaleMpvProcesses()
         try? FileManager.default.removeItem(atPath: socketPath)
+    }
+    
+    nonisolated static func killStaleMpvProcesses() {
+        let pkill = Process()
+        pkill.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
+        pkill.arguments = ["-9", "-f", "mpv_player.sock"]
+        try? pkill.run()
+        pkill.waitUntilExit()
     }
     
     // MARK: - CoreAudio Hotplug Listener
@@ -276,6 +286,7 @@ final class MPVProcessManager: ObservableObject {
             return
         }
         
+        Self.killStaleMpvProcesses()
         try? FileManager.default.removeItem(atPath: socketPath)
         
         let proc = Process()
