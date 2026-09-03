@@ -13,7 +13,6 @@ import CryptoKit
 
 enum SidebarTab: String, CaseIterable, Identifiable {
     case browse = "Browse"
-    case featured = "Featured"
     case recentlyAdded = "Recently Added"
     case albums = "Albums"
     case artists = "Artists"
@@ -26,7 +25,6 @@ enum SidebarTab: String, CaseIterable, Identifiable {
     var iconName: String {
         switch self {
         case .browse: return "square.grid.2x2"
-        case .featured: return "sparkles"
         case .recentlyAdded: return "clock.arrow.circlepath"
         case .albums: return "opticaldisc"
         case .artists: return "music.mic"

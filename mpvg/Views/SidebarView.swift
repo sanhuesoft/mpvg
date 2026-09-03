@@ -111,14 +111,6 @@ struct SidebarView: View {
                         }
                         
                         SidebarRowItem(
-                            iconName: "sparkles",
-                            label: "Featured",
-                            isSelected: viewModel.activeTab == .featured
-                        ) {
-                            viewModel.activeTab = .featured
-                        }
-                        
-                        SidebarRowItem(
                             iconName: "clock.arrow.circlepath",
                             label: "Recently Added",
                             isSelected: viewModel.activeTab == .recentlyAdded

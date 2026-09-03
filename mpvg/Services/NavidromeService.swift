@@ -51,22 +51,22 @@ actor NavidromeService {
     // MARK: - Ping / Test Connection
     func ping() async -> Result<String, Error> {
         guard let url = buildURL(endpoint: "ping.view") else {
-            return .failure(NSError(domain: "Navidrome", code: 400, userInfo: [NSLocalizedDescriptionKey: "URL de servidor inválida"]))
+            return .failure(NSError(domain: "Navidrome", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid server URL"]))
         }
         
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
             guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-                return .failure(NSError(domain: "Navidrome", code: 500, userInfo: [NSLocalizedDescriptionKey: "Error HTTP"]))
+                return .failure(NSError(domain: "Navidrome", code: 500, userInfo: [NSLocalizedDescriptionKey: "HTTP Error"]))
             }
             
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                let sub = json["subsonic-response"] as? [String: Any],
                let status = sub["status"] as? String, status == "ok" {
                 let version = sub["version"] as? String ?? "1.16.1"
-                return .success("Conectado con éxito (Subsonic v\(version))")
+                return .success("Connected successfully (Subsonic v\(version))")
             } else {
-                return .failure(NSError(domain: "Navidrome", code: 401, userInfo: [NSLocalizedDescriptionKey: "Autenticación fallida o respuesta no válida"]))
+                return .failure(NSError(domain: "Navidrome", code: 401, userInfo: [NSLocalizedDescriptionKey: "Authentication failed or invalid response"]))
             }
         } catch {
             return .failure(error)

@@ -28,8 +28,6 @@ struct BrowseView: View {
                     switch viewModel.activeTab {
                     case .browse:
                         defaultBrowseContent
-                    case .featured:
-                        albumGridSection(title: "Featured Albums", albums: viewModel.featuredAlbums)
                     case .recentlyAdded:
                         albumGridSection(title: "Recently Added", albums: viewModel.recentAlbums)
                     case .albums:
@@ -56,7 +54,7 @@ struct BrowseView: View {
             // Section 1: Most Popular
             VStack(alignment: .leading, spacing: 12) {
                 sectionHeader(title: "Most Popular") {
-                    viewModel.activeTab = .featured
+                    viewModel.activeTab = .albums
                 }
                 
                 if viewModel.viewMode == .grid {
