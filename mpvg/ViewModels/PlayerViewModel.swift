@@ -55,6 +55,7 @@ final class PlayerViewModel: ObservableObject {
     @Published var activeTab: SidebarTab = .browse
     @Published var viewMode: ViewMode = .grid
     @Published var searchQuery: String = ""
+    @Published var isSidebarVisible: Bool = true
     
     // Connection
     @Published var serverConfig: ServerConfig {

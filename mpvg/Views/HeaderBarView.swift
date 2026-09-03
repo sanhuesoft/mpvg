@@ -14,6 +14,29 @@ struct HeaderBarView: View {
     
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
+            #if os(macOS)
+            if !viewModel.isSidebarVisible {
+                Button(action: {
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                        viewModel.isSidebarVisible = true
+                    }
+                }) {
+                    Image(systemName: "sidebar.leading")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(ColorTheme.textSecondary)
+                        .frame(width: 28, height: 26)
+                        .background(ColorTheme.inputBackground)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(ColorTheme.inputBorder, lineWidth: 1)
+                        )
+                        .cornerRadius(8)
+                }
+                .buttonStyle(.plain)
+                .transition(.scale.combined(with: .opacity))
+            }
+            #endif
+            
             // Title & Count
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(viewModel.activeTab.rawValue)
@@ -68,6 +91,12 @@ struct HeaderBarView: View {
                     .font(.system(size: 13))
                     .foregroundColor(ColorTheme.textPrimary)
                     .focused($isSearchFocused)
+                    .submitLabel(.search)
+                    .onSubmit {
+                        #if os(iOS)
+                        hideKeyboard()
+                        #endif
+                    }
                     .frame(width: 180)
                 
                 if !viewModel.searchQuery.isEmpty {

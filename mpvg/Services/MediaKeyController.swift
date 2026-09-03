@@ -8,6 +8,7 @@
 
 import Foundation
 import MediaPlayer
+import CoreGraphics
 
 #if os(macOS)
 import AppKit
@@ -104,7 +105,7 @@ final class MediaKeyController {
             return
         }
         
-        var info: [String: Any] = [
+        let info: [String: Any] = [
             MPMediaItemPropertyTitle: song.title,
             MPMediaItemPropertyArtist: song.displayArtist,
             MPMediaItemPropertyAlbumTitle: song.displayAlbum,
@@ -118,14 +119,20 @@ final class MediaKeyController {
         // Load artwork asynchronously
         if let url = artworkURL {
             Task.detached(priority: .utility) {
-                if let data = try? Data(contentsOf: url),
-                   let img = PlatformImage(data: data) {
-                    let artwork = MPMediaItemArtwork(boundsSize: img.size) { _ in img }
-                    Task { @MainActor in
-                        var current = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
-                        current[MPMediaItemPropertyArtwork] = artwork
-                        MPNowPlayingInfoCenter.default().nowPlayingInfo = current
-                    }
+                guard let data = try? Data(contentsOf: url) else { return }
+                
+                #if os(macOS)
+                guard let img = NSImage(data: data) else { return }
+                let artwork = MPMediaItemArtwork(boundsSize: img.size) { _ in img }
+                #elseif os(iOS)
+                guard let img = UIImage(data: data) else { return }
+                let artwork = MPMediaItemArtwork(boundsSize: img.size) { _ in img }
+                #endif
+                
+                Task { @MainActor in
+                    var current = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
+                    current[MPMediaItemPropertyArtwork] = artwork
+                    MPNowPlayingInfoCenter.default().nowPlayingInfo = current
                 }
             }
         }

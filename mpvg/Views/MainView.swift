@@ -46,30 +46,44 @@ struct MainView: View {
     
     // MARK: - Desktop Layout (macOS)
     private var desktopLayout: some View {
-        HStack(spacing: 0) {
-            SidebarView(viewModel: viewModel)
-            
-            Rectangle()
-                .fill(ColorTheme.cardBorder)
-                .frame(width: 1)
-            
-            VStack(spacing: 0) {
-                HeaderBarView(viewModel: viewModel)
-                
-                Divider()
-                    .background(ColorTheme.cardBorder)
-                
-                ZStack {
-                    if viewModel.activeTab == .settings {
-                        SettingsView(viewModel: viewModel)
-                    } else {
-                        BrowseView(viewModel: viewModel)
-                    }
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                if viewModel.isSidebarVisible {
+                    SidebarView(viewModel: viewModel)
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .leading).combined(with: .opacity),
+                            removal: .move(edge: .leading).combined(with: .opacity)
+                        ))
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
-                PlayerBarView(viewModel: viewModel)
+                VStack(spacing: 0) {
+                    HeaderBarView(viewModel: viewModel)
+                    
+                    Divider().background(ColorTheme.cardBorder)
+                    
+                    ZStack {
+                        if viewModel.activeTab == .settings {
+                            SettingsView(viewModel: viewModel)
+                        } else {
+                            BrowseView(viewModel: viewModel)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                .background(ColorTheme.cardBackground)
+                .cornerRadius(16)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(ColorTheme.cardBorder, lineWidth: 1.2)
+                )
+                .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 2)
+                .padding(.trailing, 12)
+                .padding(.top, 10)
+                .padding(.bottom, 6)
+                .padding(.leading, viewModel.isSidebarVisible ? 0 : 12)
             }
+            
+            PlayerBarView(viewModel: viewModel)
         }
         .background(ColorTheme.windowBackground)
         .sheet(item: $viewModel.selectedAlbumForDetail) { album in

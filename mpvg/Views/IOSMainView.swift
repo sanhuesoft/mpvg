@@ -221,29 +221,51 @@ struct ArtistsGridView: View {
 
 struct IOSSearchView: View {
     @ObservedObject var viewModel: PlayerViewModel
+    @FocusState private var isSearchFocused: Bool
     
     var body: some View {
         VStack(spacing: 0) {
-            // Search Input
+            // Search Input Bar
             HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(ColorTheme.textSecondary)
-                
-                TextField("Songs, albums, artists...", text: $viewModel.searchQuery)
-                    .textFieldStyle(.plain)
-                
-                if !viewModel.searchQuery.isEmpty {
-                    Button(action: { viewModel.searchQuery = "" }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(ColorTheme.textTertiary)
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(ColorTheme.textSecondary)
+                    
+                    TextField("Songs, albums, artists...", text: $viewModel.searchQuery)
+                        .textFieldStyle(.plain)
+                        .focused($isSearchFocused)
+                        .submitLabel(.search)
+                        .onSubmit {
+                            hideKeyboard()
+                        }
+                    
+                    if !viewModel.searchQuery.isEmpty {
+                        Button(action: {
+                            viewModel.searchQuery = ""
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(ColorTheme.textTertiary)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
+                }
+                .padding(12)
+                .background(ColorTheme.cardBackground)
+                .cornerRadius(12)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(ColorTheme.cardBorder, lineWidth: 1))
+                
+                if isSearchFocused || !viewModel.searchQuery.isEmpty {
+                    Button("Cancel") {
+                        isSearchFocused = false
+                        viewModel.searchQuery = ""
+                        hideKeyboard()
+                    }
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(ColorTheme.terracotta)
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
             }
-            .padding(12)
-            .background(ColorTheme.cardBackground)
-            .cornerRadius(12)
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(ColorTheme.cardBorder, lineWidth: 1))
+            .animation(.easeInOut(duration: 0.2), value: isSearchFocused)
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             
@@ -303,6 +325,17 @@ struct IOSSearchView: View {
                     .padding(.top, 10)
                     .padding(.bottom, 60)
                 }
+            }
+            .scrollDismissesKeyboard(.interactively)
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") {
+                    hideKeyboard()
+                }
+                .font(.system(size: 15, weight: .bold))
+                .foregroundColor(ColorTheme.terracotta)
             }
         }
         .background(ColorTheme.windowBackground)
