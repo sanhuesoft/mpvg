@@ -6,6 +6,7 @@
 //  Configured with SO_NOSIGPIPE and strict timeouts to prevent debugger traps.
 //
 
+#if os(macOS)
 import Foundation
 import Darwin
 
@@ -73,3 +74,4 @@ enum SocketClient {
         }
     }
 }
+#endif

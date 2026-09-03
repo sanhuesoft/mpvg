@@ -153,8 +153,8 @@ struct AlbumCardView: View {
                 self.isHovered = hovering
             }
         }
-        .onTapGesture(count: 2) {
-            viewModel.playAlbum(album)
+        .onTapGesture {
+            viewModel.selectedAlbumForDetail = album
         }
     }
     

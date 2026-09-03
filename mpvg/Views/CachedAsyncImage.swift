@@ -3,15 +3,14 @@
 //  mpvg
 //
 //  High-performance image loader with in-memory NSCache and URLCache.
-//  Prevents flickering, reloading, and redundant network requests.
+//  Multiplatform support for macOS, iOS, and iPadOS.
 //
 
 import SwiftUI
-import AppKit
 
 final class ImageCacheManager {
     static let shared = ImageCacheManager()
-    private let cache = NSCache<NSURL, NSImage>()
+    private let cache = NSCache<NSURL, PlatformImage>()
     
     init() {
         cache.countLimit = 500
@@ -22,11 +21,11 @@ final class ImageCacheManager {
         URLCache.shared.diskCapacity = 1024 * 1024 * 512   // 512 MB
     }
     
-    func image(for url: URL) -> NSImage? {
+    func image(for url: URL) -> PlatformImage? {
         cache.object(forKey: url as NSURL)
     }
     
-    func setImage(_ image: NSImage, for url: URL) {
+    func setImage(_ image: PlatformImage, for url: URL) {
         cache.setObject(image, forKey: url as NSURL)
     }
 }
@@ -35,12 +34,12 @@ struct CachedAsyncImage<Placeholder: View>: View {
     let url: URL?
     @ViewBuilder let placeholder: () -> Placeholder
     
-    @State private var loadedImage: NSImage?
+    @State private var loadedImage: PlatformImage?
     
     var body: some View {
         Group {
             if let img = loadedImage {
-                Image(nsImage: img)
+                Image(platformImage: img)
                     .resizable()
             } else {
                 placeholder()
@@ -65,9 +64,9 @@ struct CachedAsyncImage<Placeholder: View>: View {
             let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 15)
             let (data, response) = try await URLSession.shared.data(for: request)
             if let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode),
-               let nsImage = NSImage(data: data) {
-                ImageCacheManager.shared.setImage(nsImage, for: url)
-                self.loadedImage = nsImage
+               let img = PlatformImage(data: data) {
+                ImageCacheManager.shared.setImage(img, for: url)
+                self.loadedImage = img
             }
         } catch {
             // Silently handle cancelled requests

@@ -19,7 +19,9 @@ struct mpvgApp: App {
             MainView()
                 .preferredColorScheme(.light)
         }
+        #if os(macOS)
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1120, height: 740)
+        #endif
     }
 }

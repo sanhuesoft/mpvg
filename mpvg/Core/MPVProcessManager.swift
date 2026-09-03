@@ -6,6 +6,7 @@
 //  dynamic USB DAC hotplug detection, and reliable socket IPC.
 //
 
+#if os(macOS)
 import Foundation
 import Combine
 import CoreAudio
@@ -454,3 +455,4 @@ final class MPVProcessManager: ObservableObject {
         }
     }
 }
+#endif

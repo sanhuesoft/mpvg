@@ -44,6 +44,12 @@ enum ViewMode: String {
     case list
 }
 
+#if os(macOS)
+typealias AudioEngine = MPVProcessManager
+#else
+typealias AudioEngine = IOSAudioEngine
+#endif
+
 @MainActor
 final class PlayerViewModel: ObservableObject {
     @Published var activeTab: SidebarTab = .browse
@@ -84,12 +90,12 @@ final class PlayerViewModel: ObservableObject {
     @Published var isLoadingTracks: Bool = false
     
     // Dependencies
-    @Published var mpv: MPVProcessManager
+    @Published var mpv: AudioEngine
     private var navidrome: NavidromeService
     private var cancellables = Set<AnyCancellable>()
     
-    init(mpv: MPVProcessManager? = nil) {
-        let processManager = mpv ?? MPVProcessManager()
+    init(mpv: AudioEngine? = nil) {
+        let processManager = mpv ?? AudioEngine()
         self.mpv = processManager
         let saved = Self.loadConfig()
         self.serverConfig = saved

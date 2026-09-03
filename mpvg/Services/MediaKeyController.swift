@@ -2,13 +2,18 @@
 //  MediaKeyController.swift
 //  mpvg
 //
-//  Integrates macOS System Media Keys (Play/Pause, Next, Previous, Scrubber)
-//  and MPNowPlayingInfoCenter for macOS Control Center & Menu Bar widgets.
+//  Integrates System Media Keys (Play/Pause, Next, Previous, Scrubber)
+//  and MPNowPlayingInfoCenter for macOS Control Center & iOS Lock Screen.
 //
 
 import Foundation
 import MediaPlayer
+
+#if os(macOS)
 import AppKit
+#elseif os(iOS)
+import UIKit
+#endif
 
 @MainActor
 final class MediaKeyController {
@@ -75,13 +80,11 @@ final class MediaKeyController {
             return .success
         }
         
-        // Position Scrubber
+        // Scrubber / Seek
         center.changePlaybackPositionCommand.isEnabled = true
         center.changePlaybackPositionCommand.addTarget { [weak self] event in
-            guard let vm = self?.viewModel,
-                  let posEvent = event as? MPChangePlaybackPositionCommandEvent else {
-                return .commandFailed
-            }
+            guard let posEvent = event as? MPChangePlaybackPositionCommandEvent,
+                  let vm = self?.viewModel else { return .commandFailed }
             Task { @MainActor in
                 vm.mpv.seek(to: posEvent.positionTime)
             }
@@ -116,8 +119,8 @@ final class MediaKeyController {
         if let url = artworkURL {
             Task.detached(priority: .utility) {
                 if let data = try? Data(contentsOf: url),
-                   let nsImage = NSImage(data: data) {
-                    let artwork = MPMediaItemArtwork(boundsSize: nsImage.size) { _ in nsImage }
+                   let img = PlatformImage(data: data) {
+                    let artwork = MPMediaItemArtwork(boundsSize: img.size) { _ in img }
                     Task { @MainActor in
                         var current = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
                         current[MPMediaItemPropertyArtwork] = artwork

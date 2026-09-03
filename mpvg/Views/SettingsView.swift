@@ -84,7 +84,7 @@ struct SettingsView: View {
                         }
                         
                         Toggle("Conectar automáticamente al iniciar", isOn: $autoConnect)
-                            .toggleStyle(.checkbox)
+                            .platformCheckbox()
                             .font(.system(size: 12))
                             .foregroundColor(ColorTheme.textSecondary)
                         
@@ -229,7 +229,7 @@ struct SettingsView: View {
                                         .foregroundColor(ColorTheme.textSecondary)
                                 }
                             }
-                            .toggleStyle(.checkbox)
+                            .platformCheckbox()
                             
                             Toggle(isOn: Binding(
                                 get: { viewModel.mpv.changePhysicalFormat },
@@ -244,7 +244,7 @@ struct SettingsView: View {
                                         .foregroundColor(ColorTheme.textSecondary)
                                 }
                             }
-                            .toggleStyle(.checkbox)
+                            .platformCheckbox()
                             
                             Toggle(isOn: Binding(
                                 get: { viewModel.mpv.isGapless },
@@ -259,7 +259,7 @@ struct SettingsView: View {
                                         .foregroundColor(ColorTheme.textSecondary)
                                 }
                             }
-                            .toggleStyle(.checkbox)
+                            .platformCheckbox()
                         }
                         
                         Divider()
