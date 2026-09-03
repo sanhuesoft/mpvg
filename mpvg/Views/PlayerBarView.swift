@@ -126,8 +126,14 @@ struct PlayerBarView: View {
             
             // Right: CoreAudio Exclusive Mode & Volume
             HStack(spacing: 12) {
-                // Exclusive Audio Badge
+                // Exclusive Audio Badge / Warning
                 Menu {
+                    if let warning = viewModel.mpv.deviceWarning {
+                        Text("⚠️ \(warning)")
+                            .foregroundColor(ColorTheme.terracotta)
+                        Divider()
+                    }
+                    
                     Button(action: { viewModel.mpv.toggleExclusive() }) {
                         Label(
                             viewModel.mpv.isExclusive ? "Desactivar Modo Exclusivo" : "Activar Modo Exclusivo",
@@ -142,7 +148,7 @@ struct PlayerBarView: View {
                         Button(action: { viewModel.mpv.setDevice(dev.id) }) {
                             HStack {
                                 Text(dev.displayName)
-                                if viewModel.mpv.currentDevice == dev.id {
+                                if viewModel.mpv.currentDevice == dev.id && viewModel.mpv.isDeviceConnected {
                                     Image(systemName: "checkmark")
                                 }
                             }
@@ -150,7 +156,15 @@ struct PlayerBarView: View {
                     }
                 } label: {
                     HStack(spacing: 5) {
-                        if viewModel.mpv.isExclusive {
+                        if !viewModel.mpv.isDeviceConnected && !viewModel.mpv.preferredDeviceName.isEmpty {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 9))
+                                .foregroundColor(ColorTheme.terracotta)
+                            
+                            Text("DAC OFF")
+                                .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                                .foregroundColor(ColorTheme.terracotta)
+                        } else if viewModel.mpv.isExclusive {
                             Image(systemName: "bolt.fill")
                                 .font(.system(size: 9))
                                 .foregroundColor(ColorTheme.terracotta)
@@ -168,6 +182,11 @@ struct PlayerBarView: View {
                             Text("• \(rate / 1000)kHz")
                                 .font(.system(size: 9, weight: .semibold, design: .monospaced))
                                 .foregroundColor(ColorTheme.textSecondary)
+                        } else if !viewModel.mpv.preferredDeviceName.isEmpty && viewModel.mpv.isDeviceConnected {
+                            Text("• \(viewModel.mpv.preferredDeviceName)")
+                                .font(.system(size: 9, weight: .semibold))
+                                .foregroundColor(ColorTheme.textSecondary)
+                                .lineLimit(1)
                         }
                     }
                     .padding(.horizontal, 7)

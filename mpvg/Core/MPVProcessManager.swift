@@ -2,12 +2,13 @@
 //  MPVProcessManager.swift
 //  mpvg
 //
-//  Manages the mpv player subprocess with CoreAudio exclusive mode
-//  and native POSIX socket IPC communication.
+//  Manages the mpv player subprocess with CoreAudio exclusive mode,
+//  dynamic USB DAC hotplug detection, and reliable socket IPC.
 //
 
 import Foundation
 import Combine
+import CoreAudio
 
 @MainActor
 final class MPVProcessManager: ObservableObject {
@@ -16,13 +17,18 @@ final class MPVProcessManager: ObservableObject {
     private var pollTimer: Timer?
     
     private static let selectedDeviceKey = "MPVSelectedAudioDevice"
+    private static let selectedDeviceNameKey = "MPVSelectedAudioDeviceName"
     private static let exclusiveModeKey = "MPVExclusiveMode"
     private static let physicalFormatKey = "MPVPhysicalFormat"
     private static let gaplessKey = "MPVGapless"
     
     @Published var isRunning = false
     @Published var currentDevice: String = "auto"
+    @Published var preferredDeviceName: String = ""
     @Published var availableDevices: [AudioDeviceInfo] = []
+    @Published var isDeviceConnected: Bool = true
+    @Published var deviceWarning: String? = nil
+    
     @Published var isExclusive: Bool = true
     @Published var changePhysicalFormat: Bool = true
     @Published var isGapless: Bool = true
@@ -41,6 +47,9 @@ final class MPVProcessManager: ObservableObject {
         if let savedDevice = UserDefaults.standard.string(forKey: Self.selectedDeviceKey) {
             self.currentDevice = savedDevice
         }
+        if let savedName = UserDefaults.standard.string(forKey: Self.selectedDeviceNameKey) {
+            self.preferredDeviceName = savedName
+        }
         if UserDefaults.standard.object(forKey: Self.exclusiveModeKey) != nil {
             self.isExclusive = UserDefaults.standard.bool(forKey: Self.exclusiveModeKey)
         }
@@ -53,12 +62,42 @@ final class MPVProcessManager: ObservableObject {
         
         findMpvBinary()
         detectAudioDevices()
+        setupCoreAudioListener()
     }
     
     deinit {
         pollTimer?.invalidate()
         process?.terminate()
         try? FileManager.default.removeItem(atPath: socketPath)
+    }
+    
+    // MARK: - CoreAudio Hotplug Listener
+    private func setupCoreAudioListener() {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDevices,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        
+        AudioObjectAddPropertyListenerBlock(
+            AudioObjectID(kAudioObjectSystemObject),
+            &address,
+            DispatchQueue.main
+        ) { [weak self] _, _ in
+            Task { @MainActor [weak self] in
+                self?.handleDeviceListChange()
+            }
+        }
+    }
+    
+    private func handleDeviceListChange() {
+        let previousDevice = currentDevice
+        detectAudioDevices()
+        
+        // If device changed or preferred DAC was plugged in, restart mpv
+        if currentDevice != previousDevice {
+            restart()
+        }
     }
     
     // MARK: - Binary Location
@@ -76,7 +115,7 @@ final class MPVProcessManager: ObservableObject {
         }
     }
     
-    // MARK: - Audio Device Detection
+    // MARK: - Audio Device Detection & Resolution
     func detectAudioDevices() {
         guard FileManager.default.fileExists(atPath: binaryPath) else { return }
         
@@ -115,7 +154,6 @@ final class MPVProcessManager: ObservableObject {
                         let isCoreAudio = id.hasPrefix("coreaudio/")
                         let isExclusive = isCoreAudio && id != "coreaudio/BuiltInSpeakerDevice"
                         
-                        // Avoid duplicates
                         if !devices.contains(where: { $0.id == id }) {
                             devices.append(AudioDeviceInfo(
                                 id: id,
@@ -129,19 +167,52 @@ final class MPVProcessManager: ObservableObject {
                 
                 self.availableDevices = devices
                 
-                // If saved device is in list, keep it. Otherwise pick default.
-                if let saved = UserDefaults.standard.string(forKey: Self.selectedDeviceKey),
-                   devices.contains(where: { $0.id == saved }) {
-                    self.currentDevice = saved
-                } else if self.currentDevice == "auto",
-                          let firstCoreAudio = devices.first(where: { $0.id.hasPrefix("coreaudio/") && $0.id != "coreaudio/BuiltInSpeakerDevice" }) {
-                    self.currentDevice = firstCoreAudio.id
-                    UserDefaults.standard.set(firstCoreAudio.id, forKey: Self.selectedDeviceKey)
-                }
+                // Validate if currentDevice exists in currently available devices
+                resolveActiveDevice(from: devices)
             }
         } catch {
             print("Error detectando dispositivos de audio: \(error)")
         }
+    }
+    
+    private func resolveActiveDevice(from devices: [AudioDeviceInfo]) {
+        // 1. If currentDevice is "auto", no verification needed
+        if currentDevice == "auto" {
+            self.isDeviceConnected = true
+            self.deviceWarning = nil
+            return
+        }
+        
+        // 2. Check if currentDevice exists directly in currently detected devices
+        if devices.contains(where: { $0.id == currentDevice }) {
+            if let dev = devices.first(where: { $0.id == currentDevice }) {
+                self.preferredDeviceName = dev.displayName
+                UserDefaults.standard.set(dev.displayName, forKey: Self.selectedDeviceNameKey)
+            }
+            self.isDeviceConnected = true
+            self.deviceWarning = nil
+            return
+        }
+        
+        // 3. Check if preferred device is available by matching name (e.g. "HiBy FC1" plugged into a different USB port)
+        let nameToMatch = !preferredDeviceName.isEmpty ? preferredDeviceName : "HiBy"
+        if let match = devices.first(where: {
+            $0.displayName.localizedCaseInsensitiveContains(nameToMatch) ||
+            nameToMatch.localizedCaseInsensitiveContains($0.displayName)
+        }) {
+            self.currentDevice = match.id
+            self.preferredDeviceName = match.displayName
+            self.isDeviceConnected = true
+            self.deviceWarning = nil
+            UserDefaults.standard.set(match.id, forKey: Self.selectedDeviceKey)
+            UserDefaults.standard.set(match.displayName, forKey: Self.selectedDeviceNameKey)
+            return
+        }
+        
+        // 4. Device is definitely disconnected or missing from CoreAudio!
+        self.isDeviceConnected = false
+        let missingName = !preferredDeviceName.isEmpty ? preferredDeviceName : "HiBy FC1"
+        self.deviceWarning = "\(missingName) desconectado. Usando salida del sistema."
     }
     
     // MARK: - Process Management
@@ -165,15 +236,21 @@ final class MPVProcessManager: ObservableObject {
             "--volume-max=100"
         ]
         
-        if currentDevice != "auto" {
-            args.append("--audio-device=\(currentDevice)")
+        // Only force device if it is ACTUALLY present right now in CoreAudio
+        let effectiveDevice = (isDeviceConnected && currentDevice != "auto") ? currentDevice : "auto"
+        if effectiveDevice != "auto" {
+            args.append("--audio-device=\(effectiveDevice)")
+            if isExclusive {
+                args.append("--audio-exclusive=yes")
+            }
+            if changePhysicalFormat {
+                args.append("--coreaudio-change-physical-format=yes")
+            }
+        } else {
+            // Auto fallback - avoids audio initialization failure (!obj)
+            args.append("--audio-device=auto")
         }
-        if isExclusive {
-            args.append("--audio-exclusive=yes")
-        }
-        if changePhysicalFormat {
-            args.append("--coreaudio-change-physical-format=yes")
-        }
+        
         if isGapless {
             args.append("--gapless-audio=yes")
         }
@@ -209,9 +286,24 @@ final class MPVProcessManager: ObservableObject {
     
     // MARK: - Playback Commands
     func play(url: String) {
-        if !isRunning {
+        // Ensure process and socket are ready before sending loadfile
+        if !isRunning || !FileManager.default.fileExists(atPath: socketPath) {
             start()
+            Task {
+                for _ in 0..<25 {
+                    if FileManager.default.fileExists(atPath: self.socketPath) {
+                        break
+                    }
+                    try? await Task.sleep(nanoseconds: 20_000_000) // 20ms
+                }
+                self.isPaused = false
+                self.objectWillChange.send()
+                self.sendCommand(["loadfile", url, "replace"])
+                self.sendCommand(["set_property", "pause", false])
+            }
+            return
         }
+        
         self.isPaused = false
         self.objectWillChange.send()
         
@@ -254,16 +346,16 @@ final class MPVProcessManager: ObservableObject {
     
     func setDevice(_ deviceId: String) {
         self.currentDevice = deviceId
+        if let dev = availableDevices.first(where: { $0.id == deviceId }) {
+            self.preferredDeviceName = dev.displayName
+            UserDefaults.standard.set(dev.displayName, forKey: Self.selectedDeviceNameKey)
+        }
         UserDefaults.standard.set(deviceId, forKey: Self.selectedDeviceKey)
+        self.isDeviceConnected = true
+        self.deviceWarning = nil
         self.objectWillChange.send()
         
-        if isRunning {
-            sendCommand(["set_property", "audio-device", deviceId])
-            // If exclusive mode is enabled, restarting mpv guarantees clean CoreAudio Hog Mode attachment
-            if isExclusive {
-                restart()
-            }
-        }
+        restart()
     }
     
     func toggleExclusive() {
