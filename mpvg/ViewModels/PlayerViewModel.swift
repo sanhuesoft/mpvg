@@ -129,7 +129,19 @@ final class PlayerViewModel: ObservableObject {
         self.serverConfig = saved
         self.navidrome = NavidromeService(config: saved)
         
-        loadSampleCatalog()
+        // Hydrate library from local disk cache if available to prevent demo content flash
+        if let cached = LibraryCacheManager.shared.loadCache() {
+            self.albums = cached.albums
+            self.featuredAlbums = cached.featuredAlbums
+            self.recentAlbums = cached.recentAlbums
+            self.artists = cached.artists
+            self.playlists = cached.playlists
+            self.genres = cached.genres
+        } else if saved.password.isEmpty {
+            // Only populate sample catalog on a fresh unconfigured installation
+            loadSampleCatalog()
+        }
+        
         updateSessionAuth()
         
         // Continuous playback: automatically play the next track in queue when a song finishes
@@ -245,6 +257,15 @@ final class PlayerViewModel: ObservableObject {
         self.artists = artList
         self.playlists = plList
         self.genres = genList
+        
+        LibraryCacheManager.shared.saveCache(
+            albums: allA,
+            featuredAlbums: freq,
+            recentAlbums: rec,
+            artists: artList,
+            playlists: plList,
+            genres: genList
+        )
     }
     
     // MARK: - Search
@@ -388,6 +409,12 @@ final class PlayerViewModel: ObservableObject {
                         self.queue = songs
                         if let idx = songs.firstIndex(where: { $0.id == song.id }) {
                             self.queueIndex = idx
+                            AudioCacheManager.shared.preloadQueue(
+                                queue: songs,
+                                startingAfter: idx,
+                                count: self.serverConfig.preloadQueueCount,
+                                navidrome: self.navidrome
+                            )
                         }
                     }
                 }
@@ -398,7 +425,12 @@ final class PlayerViewModel: ObservableObject {
         
         if isConnected {
             Task {
-                if let streamURL = await navidrome.streamURL(for: song.id) {
+                if let cachedURL = AudioCacheManager.shared.cachedAudioURL(for: song.id) {
+                    mpv.play(url: cachedURL.path)
+                    await navidrome.scrobble(songId: song.id, submission: false)
+                    syncNowPlaying()
+                    self.isLoadingTrack = false
+                } else if let streamURL = await navidrome.streamURL(for: song.id) {
                     mpv.play(url: streamURL.absoluteString)
                     await navidrome.scrobble(songId: song.id, submission: false)
                     syncNowPlaying()
@@ -407,6 +439,14 @@ final class PlayerViewModel: ObservableObject {
                     self.isLoadingTrack = false
                     self.showToast("No se pudo obtener el audio de \"\(song.title)\". Revisa la conexión al servidor.")
                 }
+                
+                // Preload the next N tracks in the queue in background
+                AudioCacheManager.shared.preloadQueue(
+                    queue: self.queue,
+                    startingAfter: self.queueIndex,
+                    count: self.serverConfig.preloadQueueCount,
+                    navidrome: self.navidrome
+                )
             }
         } else {
             if let path = song.path, FileManager.default.fileExists(atPath: path) {
@@ -461,6 +501,16 @@ final class PlayerViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    // MARK: - Audio Cache Management
+    var formattedAudioCacheSize: String {
+        AudioCacheManager.shared.formattedCacheSize()
+    }
+    
+    func clearAudioCache() {
+        AudioCacheManager.shared.clearAudioCache()
+        self.objectWillChange.send()
     }
     
     func togglePlayPause() {

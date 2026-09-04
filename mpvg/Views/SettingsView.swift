@@ -14,6 +14,7 @@ struct SettingsView: View {
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var autoConnect: Bool = true
+    @State private var preloadQueueCount: Int = 5
     @State private var selectedDeviceId: String = ""
     @State private var isRestartingEngine: Bool = false
     
@@ -37,10 +38,14 @@ struct SettingsView: View {
                 
                 // Section 2: Audio Engine (macOS Form Style)
                 macOSAudioSection
+                
+                // Section 3: Playback & Audio Cache (macOS Form Style)
+                macOSCacheSection
                 #else
                 // iOS Form Card
                 iOSServerCard
                 iOSAudioSection
+                iOSCacheSection
                 #endif
             }
             .padding(.horizontal, 24)
@@ -66,6 +71,7 @@ struct SettingsView: View {
             username = viewModel.serverConfig.username
             password = viewModel.serverConfig.password
             autoConnect = viewModel.serverConfig.autoConnect
+            preloadQueueCount = viewModel.serverConfig.preloadQueueCount
             selectedDeviceId = viewModel.mpv.currentDevice
         }
         .onChange(of: viewModel.mpv.currentDevice) { newDev in
@@ -311,6 +317,49 @@ struct SettingsView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
     }
+    
+    // MARK: - macOS Playback & Audio Cache Card
+    private var macOSCacheSection: some View {
+        settingsCard(title: "Playback & Audio Cache", icon: "arrow.down.circle.fill", iconColor: ColorTheme.terracotta) {
+            VStack(spacing: 0) {
+                // Row 1: Queue Preload Count
+                macOSFormRow(label: "Queue Preload", subtitle: "Preload upcoming tracks in queue for instant start") {
+                    Picker("", selection: $preloadQueueCount) {
+                        Text("Disabled").tag(0)
+                        Text("1 track").tag(1)
+                        Text("3 tracks").tag(3)
+                        Text("5 tracks (Default)").tag(5)
+                        Text("10 tracks").tag(10)
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 170)
+                    .onChange(of: preloadQueueCount) { newVal in
+                        viewModel.serverConfig.preloadQueueCount = newVal
+                    }
+                }
+                
+                Divider().background(ColorTheme.cardBorder)
+                
+                // Row 2: Audio Cache Size & Clear Action
+                macOSFormRow(label: "Audio Cache", subtitle: "Local audio downloaded for seamless playback") {
+                    HStack(spacing: 12) {
+                        Text(viewModel.formattedAudioCacheSize)
+                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                            .foregroundColor(ColorTheme.textSecondary)
+                        
+                        Button(role: .destructive, action: {
+                            viewModel.clearAudioCache()
+                        }) {
+                            Text(LocalizedStringKey("Clear Cache"))
+                                .font(.system(size: 12))
+                        }
+                        .buttonStyle(.bordered)
+                        .pointingHandOnHover()
+                    }
+                }
+            }
+        }
+    }
     #endif
     
     // MARK: - iOS Server Card
@@ -491,6 +540,58 @@ struct SettingsView: View {
             .padding(16)
         }
     }
+    
+    // MARK: - iOS Playback & Audio Cache Card
+    private var iOSCacheSection: some View {
+        settingsCard(title: "Playback & Audio Cache", icon: "arrow.down.circle.fill", iconColor: ColorTheme.terracotta) {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(LocalizedStringKey("Queue Preload"))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(ColorTheme.textPrimary)
+                        Text(LocalizedStringKey("Upcoming tracks to preload in background"))
+                            .font(.system(size: 11))
+                            .foregroundColor(ColorTheme.textTertiary)
+                    }
+                    Spacer()
+                    Picker("", selection: $preloadQueueCount) {
+                        Text("0").tag(0)
+                        Text("1").tag(1)
+                        Text("3").tag(3)
+                        Text("5").tag(5)
+                        Text("10").tag(10)
+                    }
+                    .pickerStyle(.menu)
+                    .onChange(of: preloadQueueCount) { newVal in
+                        viewModel.serverConfig.preloadQueueCount = newVal
+                    }
+                }
+                
+                Divider().background(ColorTheme.cardBorder)
+                
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(LocalizedStringKey("Audio Cache"))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(ColorTheme.textPrimary)
+                        Text(viewModel.formattedAudioCacheSize)
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundColor(ColorTheme.textTertiary)
+                    }
+                    Spacer()
+                    Button(role: .destructive, action: {
+                        viewModel.clearAudioCache()
+                    }) {
+                        Text(LocalizedStringKey("Clear Cache"))
+                            .font(.system(size: 13, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+            .padding(16)
+        }
+    }
     #endif
     
     // MARK: - Shared Helpers
@@ -499,6 +600,7 @@ struct SettingsView: View {
         viewModel.serverConfig.username = username
         viewModel.serverConfig.password = password
         viewModel.serverConfig.autoConnect = autoConnect
+        viewModel.serverConfig.preloadQueueCount = preloadQueueCount
         
         Task {
             await viewModel.testConnection()

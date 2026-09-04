@@ -152,7 +152,14 @@ final class IOSAudioEngine: ObservableObject {
     
     // MARK: - Playback Control
     func play(url: String) {
-        guard let streamURL = URL(string: url) else { return }
+        let streamURL: URL
+        if url.hasPrefix("/") {
+            streamURL = URL(fileURLWithPath: url)
+        } else if let parsed = URL(string: url) {
+            streamURL = parsed
+        } else {
+            return
+        }
         
         if let token = timeObserverToken {
             player?.removeTimeObserver(token)

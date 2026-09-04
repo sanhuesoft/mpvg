@@ -196,6 +196,7 @@
 
     },
     "12" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -212,6 +213,7 @@
       }
     },
     "24" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1148,6 +1150,25 @@
         }
       }
     },
+    "Genre" : {
+
+    },
+    "GENRE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GENRE"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GÉNERO"
+          }
+        }
+      }
+    },
     "Genres" : {
       "localizations" : {
         "en" : {
@@ -1338,6 +1359,22 @@
         }
       }
     },
+    "Music genres defined in your library will appear here." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Music genres defined in your library will appear here."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los géneros musicales de tu biblioteca aparecerán aquí."
+          }
+        }
+      }
+    },
     "music.ssft.cl" : {
 
     },
@@ -1405,6 +1442,38 @@
         }
       }
     },
+    "No genres found" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No genres found"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron géneros"
+          }
+        }
+      }
+    },
+    "No playlists found" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No playlists found"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron listas de reproducción"
+          }
+        }
+      }
+    },
     "No track playing" : {
       "localizations" : {
         "en" : {
@@ -1437,98 +1506,178 @@
         }
       }
     },
-    "No playlists found" : {
+    "Playback & Audio Cache" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No playlists found"
+            "value" : "Playback & Audio Cache"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se encontraron listas de reproducción"
+            "value" : "Reproducción y Caché de Audio"
           }
         }
       }
     },
-    "No genres found" : {
+    "Queue Preload" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No genres found"
+            "value" : "Queue Preload"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se encontraron géneros"
+            "value" : "Precarga de Cola"
           }
         }
       }
     },
-    "Playlists from your server will appear here." : {
+    "Preload upcoming tracks in queue for instant start" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Playlists from your server will appear here."
+            "value" : "Preload upcoming tracks in queue for instant start"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Las listas de reproducción del servidor aparecerán aquí."
+            "value" : "Precarga canciones siguientes para inicio instantáneo"
           }
         }
       }
     },
-    "Music genres defined in your library will appear here." : {
+    "Upcoming tracks to preload in background" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Music genres defined in your library will appear here."
+            "value" : "Upcoming tracks to preload in background"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los géneros musicales de tu biblioteca aparecerán aquí."
+            "value" : "Canciones siguientes a precargar en segundo plano"
           }
         }
       }
     },
-    "PLAYLIST" : {
+    "Audio Cache" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PLAYLIST"
+            "value" : "Audio Cache"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "LISTA DE REPRODUCCIÓN"
+            "value" : "Caché de Audio"
           }
         }
       }
     },
-    "GENRE" : {
+    "Local audio downloaded for seamless playback" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "GENRE"
+            "value" : "Local audio downloaded for seamless playback"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "GÉNERO"
+            "value" : "Audio local descargado para reproducción continua"
+          }
+        }
+      }
+    },
+    "Disabled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabled"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivado"
+          }
+        }
+      }
+    },
+    "1 track" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 track"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 canción"
+          }
+        }
+      }
+    },
+    "3 tracks" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 tracks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 canciones"
+          }
+        }
+      }
+    },
+    "5 tracks (Default)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 tracks (Default)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 canciones (Por defecto)"
+          }
+        }
+      }
+    },
+    "10 tracks" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 tracks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 canciones"
           }
         }
       }
@@ -1693,6 +1842,22 @@
         }
       }
     },
+    "PLAYLIST" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PLAYLIST"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LISTA DE REPRODUCCIÓN"
+          }
+        }
+      }
+    },
     "Playlists" : {
       "localizations" : {
         "en" : {
@@ -1705,6 +1870,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Listas de reproducción"
+          }
+        }
+      }
+    },
+    "Playlists from your server will appear here." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlists from your server will appear here."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las listas de reproducción del servidor aparecerán aquí."
           }
         }
       }
@@ -2130,7 +2311,6 @@
       }
     },
     "tracks" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

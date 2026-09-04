@@ -13,17 +13,33 @@ struct ServerConfig: Codable, Equatable, Sendable {
     var username: String
     var password: String
     var autoConnect: Bool
+    var preloadQueueCount: Int
     
     nonisolated init(
         urlString: String = "http://localhost:4533",
         username: String = "admin",
         password: String = "",
-        autoConnect: Bool = true
+        autoConnect: Bool = true,
+        preloadQueueCount: Int = 5
     ) {
         self.urlString = urlString
         self.username = username
         self.password = password
         self.autoConnect = autoConnect
+        self.preloadQueueCount = preloadQueueCount
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case urlString, username, password, autoConnect, preloadQueueCount
+    }
+    
+    nonisolated init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        urlString = try container.decodeIfPresent(String.self, forKey: .urlString) ?? "http://localhost:4533"
+        username = try container.decodeIfPresent(String.self, forKey: .username) ?? "admin"
+        password = try container.decodeIfPresent(String.self, forKey: .password) ?? ""
+        autoConnect = try container.decodeIfPresent(Bool.self, forKey: .autoConnect) ?? true
+        preloadQueueCount = try container.decodeIfPresent(Int.self, forKey: .preloadQueueCount) ?? 5
     }
     
     var cleanURL: URL? {
