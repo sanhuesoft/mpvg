@@ -34,8 +34,10 @@ struct BrowseView: View {
                         albumSection(title: "All Albums", albums: viewModel.albums)
                     case .artists:
                         artistsSection
-                    case .playlists, .genres:
-                        albumSection(title: viewModel.activeTab.rawValue, albums: viewModel.albums)
+                    case .playlists:
+                        playlistsSection
+                    case .genres:
+                        genresSection
                     case .settings:
                         EmptyView()
                     }
@@ -110,6 +112,97 @@ struct BrowseView: View {
                 artistTableView(artists: viewModel.artists)
             }
         }
+    }
+    
+    // MARK: - Playlists Section
+    private var playlistsSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Text("Playlists")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                Spacer()
+                if !viewModel.playlists.isEmpty {
+                    Text("\(viewModel.playlists.count) playlists")
+                        .font(.system(size: 12))
+                        .foregroundColor(ColorTheme.textTertiary)
+                }
+            }
+            
+            if viewModel.playlists.isEmpty {
+                emptyStateView(
+                    icon: "music.note.list",
+                    title: "No playlists found",
+                    message: "Playlists from your server will appear here."
+                )
+            } else {
+                if viewModel.viewMode == .grid {
+                    LazyVGrid(columns: albumColumns, spacing: 14) {
+                        ForEach(viewModel.playlists) { playlist in
+                            PlaylistCardView(playlist: playlist, viewModel: viewModel)
+                        }
+                    }
+                } else {
+                    playlistTableView(playlists: viewModel.playlists)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Genres Section
+    private var genresSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Text("Genres")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                Spacer()
+                if !viewModel.genres.isEmpty {
+                    Text("\(viewModel.genres.count) genres")
+                        .font(.system(size: 12))
+                        .foregroundColor(ColorTheme.textTertiary)
+                }
+            }
+            
+            if viewModel.genres.isEmpty {
+                emptyStateView(
+                    icon: "tag",
+                    title: "No genres found",
+                    message: "Music genres defined in your library will appear here."
+                )
+            } else {
+                if viewModel.viewMode == .grid {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 14)], spacing: 14) {
+                        ForEach(viewModel.genres) { genre in
+                            GenreCardView(genre: genre, viewModel: viewModel)
+                        }
+                    }
+                } else {
+                    genreTableView(genres: viewModel.genres)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Empty State View
+    private func emptyStateView(icon: String, title: LocalizedStringKey, message: LocalizedStringKey) -> some View {
+        VStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 42))
+                .foregroundColor(ColorTheme.textTertiary.opacity(0.6))
+                .padding(.bottom, 2)
+            
+            Text(title)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(ColorTheme.textPrimary)
+            
+            Text(message)
+                .font(.system(size: 13))
+                .foregroundColor(ColorTheme.textTertiary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 80)
     }
     
     // MARK: - Generic Album Section
@@ -230,6 +323,94 @@ struct BrowseView: View {
                     ArtistTableRowView(
                         index: index + 1,
                         artist: artist,
+                        viewModel: viewModel
+                    )
+                }
+            }
+        }
+    }
+    
+    // MARK: - Playlist Table View (List Mode)
+    private func playlistTableView(playlists: [PlaylistItem]) -> some View {
+        VStack(spacing: 0) {
+            // Table Header
+            HStack(spacing: 12) {
+                Text("#")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 28, alignment: .center)
+                
+                Text("PLAYLIST")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text("TRACKS")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 100, alignment: .trailing)
+                
+                Text("PLAY")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 36, alignment: .trailing)
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 6)
+            
+            Divider()
+                .background(ColorTheme.cardBorder.opacity(0.6))
+                .padding(.bottom, 4)
+            
+            LazyVStack(spacing: 2) {
+                ForEach(Array(playlists.enumerated()), id: \.element.id) { index, playlist in
+                    PlaylistTableRowView(
+                        index: index + 1,
+                        playlist: playlist,
+                        viewModel: viewModel
+                    )
+                }
+            }
+        }
+    }
+    
+    // MARK: - Genre Table View (List Mode)
+    private func genreTableView(genres: [GenreItem]) -> some View {
+        VStack(spacing: 0) {
+            // Table Header
+            HStack(spacing: 12) {
+                Text("#")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 28, alignment: .center)
+                
+                Text("GENRE")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text("ALBUMS")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 100, alignment: .trailing)
+                
+                Text("TRACKS")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 100, alignment: .trailing)
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 6)
+            
+            Divider()
+                .background(ColorTheme.cardBorder.opacity(0.6))
+                .padding(.bottom, 4)
+            
+            LazyVStack(spacing: 2) {
+                ForEach(Array(genres.enumerated()), id: \.element.id) { index, genre in
+                    GenreTableRowView(
+                        index: index + 1,
+                        genre: genre,
                         viewModel: viewModel
                     )
                 }
@@ -550,6 +731,306 @@ struct ArtistTableRowView: View {
         }
         .onTapGesture {
             viewModel.navigateToArtist(artist)
+        }
+        .pointingHandOnHover()
+    }
+}
+
+// MARK: - Playlist Card View
+struct PlaylistCardView: View {
+    let playlist: PlaylistItem
+    @ObservedObject var viewModel: PlayerViewModel
+    @State private var isHovered: Bool = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ZStack {
+                if let coverId = playlist.coverArt, let url = viewModel.coverArtURL(for: coverId) {
+                    CachedAsyncImage(url: url) {
+                        placeholder
+                    }
+                    .aspectRatio(1, contentMode: .fit)
+                    .cornerRadius(10)
+                } else {
+                    placeholder
+                }
+                
+                if isHovered {
+                    Color.black.opacity(0.25)
+                        .cornerRadius(10)
+                    
+                    Button(action: {
+                        viewModel.playPlaylist(playlist)
+                    }) {
+                        Circle()
+                            .fill(ColorTheme.terracotta)
+                            .frame(width: 44, height: 44)
+                            .overlay(
+                                Image(systemName: "play.fill")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(.white)
+                                    .offset(x: 1.5)
+                            )
+                            .shadow(color: Color.black.opacity(0.3), radius: 6, x: 0, y: 3)
+                    }
+                    .buttonStyle(.plain)
+                    .pointingHandOnHover()
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .aspectRatio(1, contentMode: .fit)
+            
+            VStack(alignment: .leading, spacing: 3) {
+                Text(playlist.name)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .lineLimit(1)
+                
+                if let count = playlist.songCount {
+                    Text("\(count) \(count == 1 ? String(localized: "track") : String(localized: "tracks"))")
+                        .font(.system(size: 11))
+                        .foregroundColor(ColorTheme.textTertiary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(10)
+        .background(ColorTheme.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isHovered ? ColorTheme.cardBorderHover : ColorTheme.cardBorder, lineWidth: 1)
+        )
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(isHovered ? 0.06 : 0.02), radius: isHovered ? 8 : 3, x: 0, y: isHovered ? 3 : 1)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                self.isHovered = hovering
+            }
+        }
+        .pointingHandOnHover()
+    }
+    
+    private var placeholder: some View {
+        RoundedRectangle(cornerRadius: 10)
+            .fill(ColorTheme.terracottaLight.opacity(0.35))
+            .aspectRatio(1, contentMode: .fit)
+            .overlay(
+                Image(systemName: "music.note.list")
+                    .font(.system(size: 36))
+                    .foregroundColor(ColorTheme.terracotta.opacity(0.7))
+            )
+    }
+}
+
+// MARK: - Playlist Table Row View
+struct PlaylistTableRowView: View {
+    let index: Int
+    let playlist: PlaylistItem
+    @ObservedObject var viewModel: PlayerViewModel
+    @State private var isHovered: Bool = false
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Text("\(index)")
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundColor(ColorTheme.textTertiary)
+                .frame(width: 28, alignment: .center)
+            
+            HStack(spacing: 10) {
+                let artURL: URL? = {
+                    if let coverId = playlist.coverArt, let url = viewModel.coverArtURL(for: coverId) {
+                        return url
+                    }
+                    return nil
+                }()
+                
+                CachedAsyncImage(url: artURL) {
+                    RoundedRectangle(cornerRadius: 5)
+                        .fill(ColorTheme.terracottaLight.opacity(0.35))
+                        .frame(width: 32, height: 32)
+                        .overlay(
+                            Image(systemName: "music.note.list")
+                                .font(.system(size: 12))
+                                .foregroundColor(ColorTheme.terracotta)
+                        )
+                }
+                .frame(width: 32, height: 32)
+                .cornerRadius(5)
+                
+                Text(playlist.name)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            if let count = playlist.songCount {
+                Text("\(count) \(count == 1 ? String(localized: "track") : String(localized: "tracks"))")
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 100, alignment: .trailing)
+            } else {
+                Text("-")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 100, alignment: .trailing)
+            }
+            
+            Button(action: {
+                viewModel.playPlaylist(playlist)
+            }) {
+                Image(systemName: "play.circle.fill")
+                    .font(.system(size: 18))
+                    .foregroundColor(isHovered ? ColorTheme.terracotta : ColorTheme.textTertiary)
+            }
+            .buttonStyle(.plain)
+            .pointingHandOnHover()
+            .frame(width: 36, alignment: .trailing)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .background(
+            isHovered ? ColorTheme.cardBorder.opacity(0.35) : Color.clear
+        )
+        .cornerRadius(6)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.1)) {
+                self.isHovered = hovering
+            }
+        }
+    }
+}
+
+// MARK: - Genre Card View
+struct GenreCardView: View {
+    let genre: GenreItem
+    @ObservedObject var viewModel: PlayerViewModel
+    @State private var isHovered: Bool = false
+    
+    var body: some View {
+        Button(action: {
+            viewModel.searchQuery = genre.value
+        }) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    ZStack {
+                        Circle()
+                            .fill(ColorTheme.terracottaLight.opacity(0.6))
+                            .frame(width: 36, height: 36)
+                        
+                        Image(systemName: "tag.fill")
+                            .font(.system(size: 15))
+                            .foregroundColor(ColorTheme.terracotta)
+                    }
+                    Spacer()
+                }
+                
+                Text(genre.value)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .lineLimit(1)
+                
+                HStack(spacing: 4) {
+                    if let albums = genre.albumCount, albums > 0 {
+                        Text("\(albums) \(albums == 1 ? String(localized: "album") : String(localized: "albums"))")
+                            .font(.system(size: 11))
+                            .foregroundColor(ColorTheme.textSecondary)
+                    } else if let songs = genre.songCount, songs > 0 {
+                        Text("\(songs) \(songs == 1 ? String(localized: "track") : String(localized: "tracks"))")
+                            .font(.system(size: 11))
+                            .foregroundColor(ColorTheme.textSecondary)
+                    } else {
+                        Text("Genre")
+                            .font(.system(size: 11))
+                            .foregroundColor(ColorTheme.textTertiary)
+                    }
+                }
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(ColorTheme.cardBackground)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isHovered ? ColorTheme.cardBorderHover : ColorTheme.cardBorder, lineWidth: 1)
+            )
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(isHovered ? 0.06 : 0.02), radius: isHovered ? 8 : 3, x: 0, y: isHovered ? 3 : 1)
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                self.isHovered = hovering
+            }
+        }
+        .pointingHandOnHover()
+    }
+}
+
+// MARK: - Genre Table Row View
+struct GenreTableRowView: View {
+    let index: Int
+    let genre: GenreItem
+    @ObservedObject var viewModel: PlayerViewModel
+    @State private var isHovered: Bool = false
+    
+    var body: some View {
+        Button(action: {
+            viewModel.searchQuery = genre.value
+        }) {
+            HStack(spacing: 12) {
+                Text("\(index)")
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 28, alignment: .center)
+                
+                HStack(spacing: 10) {
+                    Image(systemName: "tag.fill")
+                        .font(.system(size: 11))
+                        .foregroundColor(ColorTheme.terracotta)
+                    
+                    Text(genre.value)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(ColorTheme.textPrimary)
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                if let count = genre.albumCount, count > 0 {
+                    Text("\(count) \(count == 1 ? String(localized: "album") : String(localized: "albums"))")
+                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .frame(width: 100, alignment: .trailing)
+                } else {
+                    Text("-")
+                        .font(.system(size: 11, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .frame(width: 100, alignment: .trailing)
+                }
+                
+                if let count = genre.songCount, count > 0 {
+                    Text("\(count) \(count == 1 ? String(localized: "track") : String(localized: "tracks"))")
+                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .frame(width: 100, alignment: .trailing)
+                } else {
+                    Text("-")
+                        .font(.system(size: 11, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .frame(width: 100, alignment: .trailing)
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(
+                isHovered ? ColorTheme.cardBorder.opacity(0.35) : Color.clear
+            )
+            .cornerRadius(6)
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.1)) {
+                self.isHovered = hovering
+            }
         }
         .pointingHandOnHover()
     }

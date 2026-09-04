@@ -439,6 +439,117 @@ actor NavidromeService {
         }
     }
     
+    // MARK: - Playlists & Genres
+    func getPlaylists() async -> [PlaylistItem] {
+        guard let url = buildURL(endpoint: "getPlaylists.view") else { return [] }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let sub = json["subsonic-response"] as? [String: Any],
+                  let listWrapper = sub["playlists"] as? [String: Any],
+                  let rawPlaylists = listWrapper["playlist"] as? [[String: Any]] else {
+                return []
+            }
+            
+            var playlists: [PlaylistItem] = []
+            for item in rawPlaylists {
+                if let id = item["id"] as? String, let name = item["name"] as? String {
+                    playlists.append(PlaylistItem(
+                        id: id,
+                        name: name,
+                        songCount: item["songCount"] as? Int,
+                        duration: item["duration"] as? Double,
+                        comment: item["comment"] as? String,
+                        owner: item["owner"] as? String,
+                        coverArt: item["coverArt"] as? String
+                    ))
+                }
+            }
+            return playlists
+        } catch {
+            return []
+        }
+    }
+    
+    func getPlaylist(id: String) async -> (PlaylistItem?, [SongItem]) {
+        guard let url = buildURL(endpoint: "getPlaylist.view", extraParams: ["id": id]) else {
+            return (nil, [])
+        }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let sub = json["subsonic-response"] as? [String: Any],
+                  let playlistDict = sub["playlist"] as? [String: Any] else {
+                return (nil, [])
+            }
+            let playlist = PlaylistItem(
+                id: playlistDict["id"] as? String ?? id,
+                name: playlistDict["name"] as? String ?? "Playlist",
+                songCount: playlistDict["songCount"] as? Int,
+                duration: playlistDict["duration"] as? Double,
+                comment: playlistDict["comment"] as? String,
+                owner: playlistDict["owner"] as? String,
+                coverArt: playlistDict["coverArt"] as? String
+            )
+            var songs: [SongItem] = []
+            if let songList = (playlistDict["entry"] as? [[String: Any]]) ?? (playlistDict["song"] as? [[String: Any]]) {
+                for s in songList {
+                    if let sid = s["id"] as? String, let title = s["title"] as? String {
+                        let song = SongItem(
+                            id: sid,
+                            parent: s["parent"] as? String,
+                            title: title,
+                            album: s["album"] as? String ?? "",
+                            artist: s["artist"] as? String ?? "",
+                            track: s["track"] as? Int,
+                            year: s["year"] as? Int,
+                            genre: s["genre"] as? String,
+                            coverArt: s["coverArt"] as? String ?? playlist.coverArt,
+                            size: (s["size"] as? NSNumber)?.int64Value,
+                            contentType: s["contentType"] as? String,
+                            suffix: s["suffix"] as? String,
+                            duration: s["duration"] as? Double,
+                            bitRate: s["bitRate"] as? Int,
+                            path: s["path"] as? String,
+                            userRating: (s["userRating"] as? Int) ?? (s["rating"] as? Int)
+                        )
+                        songs.append(song)
+                    }
+                }
+            }
+            return (playlist, songs)
+        } catch {
+            return (nil, [])
+        }
+    }
+    
+    func getGenres() async -> [GenreItem] {
+        guard let url = buildURL(endpoint: "getGenres.view") else { return [] }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let sub = json["subsonic-response"] as? [String: Any],
+                  let listWrapper = sub["genres"] as? [String: Any],
+                  let rawGenres = listWrapper["genre"] as? [[String: Any]] else {
+                return []
+            }
+            
+            var genres: [GenreItem] = []
+            for item in rawGenres {
+                if let value = (item["value"] as? String) ?? (item["name"] as? String), !value.isEmpty {
+                    genres.append(GenreItem(
+                        value: value,
+                        songCount: item["songCount"] as? Int,
+                        albumCount: item["albumCount"] as? Int
+                    ))
+                }
+            }
+            return genres
+        } catch {
+            return []
+        }
+    }
+    
     // MARK: - Stream & Cover Art URLs
     func streamURL(for songId: String) -> URL? {
         buildURL(endpoint: "stream.view", extraParams: ["id": songId, "format": "raw"])

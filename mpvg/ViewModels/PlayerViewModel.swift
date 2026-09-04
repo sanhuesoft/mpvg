@@ -234,13 +234,17 @@ final class PlayerViewModel: ObservableObject {
         async let frequent = navidrome.getAlbums(type: "frequent", size: 24)
         async let allAlb = navidrome.getAllAlbums(type: "alphabeticalByArtist")
         async let arts = navidrome.getArtists()
+        async let pls = navidrome.getPlaylists()
+        async let gen = navidrome.getGenres()
         
-        let (rec, freq, allA, artList) = await (recent, frequent, allAlb, arts)
+        let (rec, freq, allA, artList, plList, genList) = await (recent, frequent, allAlb, arts, pls, gen)
         
         self.recentAlbums = rec
         self.featuredAlbums = freq
         self.albums = allA
         self.artists = artList
+        self.playlists = plList
+        self.genres = genList
     }
     
     // MARK: - Search
@@ -444,6 +448,17 @@ final class PlayerViewModel: ObservableObject {
             }
             if let first = songs.first {
                 playSong(first, inAlbum: album, queue: songs)
+            }
+        }
+    }
+    
+    func playPlaylist(_ playlist: PlaylistItem) {
+        Task {
+            if isConnected {
+                let (_, songs) = await navidrome.getPlaylist(id: playlist.id)
+                if let first = songs.first {
+                    playSong(first, inAlbum: nil, queue: songs)
+                }
             }
         }
     }

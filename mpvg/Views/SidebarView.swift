@@ -142,7 +142,7 @@ struct SidebarView: View {
                         SidebarRowItem(
                             iconName: "music.note.list",
                             label: "Playlists",
-                            count: "12",
+                            count: viewModel.playlists.isEmpty ? nil : "\(viewModel.playlists.count)",
                             isSelected: viewModel.activeTab == .playlists
                         ) {
                             viewModel.activeTab = .playlists
@@ -151,7 +151,7 @@ struct SidebarView: View {
                         SidebarRowItem(
                             iconName: "guitars",
                             label: "Genres",
-                            count: "24",
+                            count: viewModel.genres.isEmpty ? nil : "\(viewModel.genres.count)",
                             isSelected: viewModel.activeTab == .genres
                         ) {
                             viewModel.activeTab = .genres

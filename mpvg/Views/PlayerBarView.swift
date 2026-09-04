@@ -46,10 +46,17 @@ struct PlayerBarView: View {
                     .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
                     
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(viewModel.currentSong?.title ?? "No track playing")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(ColorTheme.textPrimary)
-                            .lineLimit(1)
+                        if let title = viewModel.currentSong?.title {
+                            Text(title)
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(ColorTheme.textPrimary)
+                                .lineLimit(1)
+                        } else {
+                            Text("No track playing")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(ColorTheme.textPrimary)
+                                .lineLimit(1)
+                        }
                         
                         HStack(spacing: 5) {
                             Text(viewModel.currentSong?.displayArtist ?? "mpvg player")

@@ -172,9 +172,17 @@ struct HeaderBarView: View {
     private var itemCountLabel: LocalizedStringKey {
         switch viewModel.activeTab {
         case .artists:
-            return "\(viewModel.artists.count) artists"
-        default:
-            return "\(viewModel.albums.count) albums"
+            return viewModel.artists.isEmpty ? "" : "\(viewModel.artists.count) artists"
+        case .playlists:
+            return viewModel.playlists.isEmpty ? "" : "\(viewModel.playlists.count) playlists"
+        case .genres:
+            return viewModel.genres.isEmpty ? "" : "\(viewModel.genres.count) genres"
+        case .recentlyAdded:
+            return viewModel.recentAlbums.isEmpty ? "" : "\(viewModel.recentAlbums.count) albums"
+        case .albums:
+            return viewModel.albums.isEmpty ? "" : "\(viewModel.albums.count) albums"
+        case .browse, .settings:
+            return ""
         }
     }
     

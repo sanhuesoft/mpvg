@@ -1,2130 +1,2299 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "": {},
-    "-%@": {},
-    "›": {},
-    "#": {},
-    "%@ • %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$@ • %2$@"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "-" : {
+
+    },
+    "-%@" : {
+
+    },
+    "#" : {
+
+    },
+    "%@ • %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ • %2$@"
+          }
+        }
+      }
+    },
+    "%lld" : {
+
+    },
+    "%lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld %2$@"
+          }
+        }
+      }
+    },
+    "%lld %@ in library" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld %2$@ in library"
+          }
+        }
+      }
+    },
+    "%lld albums" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld albums"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld álbumes"
+          }
+        }
+      }
+    },
+    "%lld artists" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld artists"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld artistas"
+          }
+        }
+      }
+    },
+    "%lld genres" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld genres"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld géneros"
+          }
+        }
+      }
+    },
+    "%lld playlists" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld playlists"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld listas de reproducción"
+          }
+        }
+      }
+    },
+    "%lld track" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld track"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld canción"
+          }
+        }
+      }
+    },
+    "%lld tracks" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld tracks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld canciones"
           }
         }
       }
     },
-    "%lld": {},
-    "%lld %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$lld %2$@"
+    "%lld tracks in queue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld tracks in queue"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld canciones en cola"
           }
         }
       }
     },
-    "%lld %@ in library": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$lld %2$@ in library"
+    "%lld/5" : {
+
+    },
+    "•" : {
+
+    },
+    "• %@" : {
+
+    },
+    "• %lldkHz" : {
+
+    },
+    "• Supports Direct Hardware Hog Mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Supports Direct Hardware Hog Mode"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Compatible con Modo Exclusivo Directo (Hog Mode)"
+          }
         }
       }
+    },
+    "••••••••" : {
+
+    },
+    "⌘F" : {
+
     },
-    "%lld artists": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld artists"
+    "⚠️ %@" : {
+
+    },
+    "12" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld artistas"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12"
           }
         }
       }
     },
-    "%lld tracks": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld tracks"
+    "24" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "24"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld canciones"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "24"
           }
         }
       }
     },
-    "%lld tracks in queue": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld tracks in queue"
+    "Active Output Device" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active Output Device"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld canciones en cola"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispositivo de salida activo"
           }
         }
       }
     },
-    "%lld/5": {},
-    "•": {},
-    "• %@": {},
-    "• %lldkHz": {},
-    "• Supports Direct Hardware Hog Mode": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "• Supports Direct Hardware Hog Mode"
+    "Active: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active: %@"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "• Compatible con Modo Exclusivo Directo (Hog Mode)"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activo: %@"
           }
         }
       }
     },
-    "••••••••": {},
-    "⌘F": {},
-    "⚠️ %@": {},
-    "12": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "12"
+    "Add to Queue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Queue"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "12"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a la cola"
           }
         }
       }
     },
-    "24": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "24"
+    "Ajustes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "24"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
           }
         }
       }
     },
-    "Active Output Device": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Active Output Device"
+    "album" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "album"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dispositivo de salida activo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "álbum"
           }
         }
       }
     },
-    "Active: %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Active: %@"
+    "Album" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Album"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activo: %@"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Álbum"
           }
         }
       }
     },
-    "Add to Queue": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add to Queue"
+    "ALBUM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ALBUM"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Añadir a la cola"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ÁLBUM"
           }
         }
       }
     },
-    "Ajustes": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Settings"
+    "albums" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "albums"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajustes"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "álbumes"
           }
         }
       }
     },
-    "ALBUM": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ALBUM"
+    "Albums" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albums"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ÁLBUM"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Álbumes"
           }
         }
       }
     },
-    "Albums": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Albums"
+    "ALBUMS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ALBUMS"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Álbumes"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ÁLBUMES"
           }
         }
       }
     },
-    "ALBUMS": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ALBUMS"
+    "All Albums" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Albums"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ÁLBUMES"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los álbumes"
           }
         }
       }
     },
-    "All Albums": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "All Albums"
+    "artist" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "artist"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Todos los álbumes"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "artista"
           }
         }
       }
     },
-    "Artist": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Artist"
+    "Artist" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artist"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Artista"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artista"
           }
         }
       }
     },
-    "ARTIST": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ARTIST"
+    "ARTIST" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ARTIST"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ARTISTA"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ARTISTA"
           }
         }
       }
     },
-    "Artists": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Artists"
+    "artists" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "artists"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Artistas"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "artistas"
           }
         }
       }
     },
-    "Audio & Output": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Audio & Output"
+    "Artists" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artists"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Audio y Salida"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artistas"
           }
         }
       }
     },
-    "Audio Engine & Bit-Perfect": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Audio Engine & Bit-Perfect"
+    "Audio & Output" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio & Output"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Motor de Audio y Bit-Perfect"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio y Salida"
           }
         }
       }
     },
-    "Audio Engine & Exclusive Mode": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Audio Engine & Exclusive Mode"
+    "Audio Engine & Bit-Perfect" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Engine & Bit-Perfect"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Motor de Audio y Modo Exclusivo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motor de Audio y Bit-Perfect"
           }
         }
       }
     },
-    "Authentication token or password": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Authentication token or password"
+    "Audio Engine & Exclusive Mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Engine & Exclusive Mode"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Token de autenticación o contraseña"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motor de Audio y Modo Exclusivo"
           }
         }
       }
     },
-    "Auto-Connect": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Auto-Connect"
+    "Authentication token or password" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication token or password"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conexión automática"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Token de autenticación o contraseña"
           }
         }
       }
     },
-    "Auto-Connect on Launch": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Auto-Connect on Launch"
+    "Auto-Connect" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-Connect"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conectar automáticamente al inicio"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conexión automática"
           }
         }
       }
     },
-    "Auto-Connect to Navidrome server on application startup": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Auto-Connect to Navidrome server on application startup"
+    "Auto-Connect on Launch" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-Connect on Launch"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conectar automáticamente al servidor Navidrome al iniciar la app"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectar automáticamente al inicio"
           }
         }
       }
     },
-    "Automatically changes DAC physical sample rate to match track quality without resampling": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Automatically changes DAC physical sample rate to match track quality without resampling"
+    "Auto-Connect to Navidrome server on application startup" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-Connect to Navidrome server on application startup"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cambia automáticamente la frecuencia de muestreo del DAC según la pista sin remuestreo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectar automáticamente al servidor Navidrome al iniciar la app"
           }
         }
       }
     },
-    "Automatically requests high sample rate (up to 96kHz) when a USB DAC like HiBy FC1 is connected.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Automatically requests high sample rate (up to 96kHz) when a USB DAC like HiBy FC1 is connected."
+    "Automatically changes DAC physical sample rate to match track quality without resampling" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically changes DAC physical sample rate to match track quality without resampling"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solicita alta frecuencia de muestreo (hasta 96kHz) al conectar un DAC USB como HiBy FC1."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia automáticamente la frecuencia de muestreo del DAC según la pista sin remuestreo"
           }
         }
       }
     },
-    "Back": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Back"
+    "Automatically requests high sample rate (up to 96kHz) when a USB DAC like HiBy FC1 is connected." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically requests high sample rate (up to 96kHz) when a USB DAC like HiBy FC1 is connected."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volver"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicita alta frecuencia de muestreo (hasta 96kHz) al conectar un DAC USB como HiBy FC1."
           }
         }
       }
     },
-    "Bit-Perfect Sample Rate": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bit-Perfect Sample Rate"
+    "Back" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Frecuencia de Muestreo Bit-Perfect"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver"
           }
         }
       }
     },
-    "Bit-Perfect Sample Rate Switching": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bit-Perfect Sample Rate Switching"
+    "Bit-Perfect Sample Rate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bit-Perfect Sample Rate"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conmutación Bit-Perfect de Frecuencia"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frecuencia de Muestreo Bit-Perfect"
           }
         }
       }
     },
-    "Browse": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Browse"
+    "Bit-Perfect Sample Rate Switching" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bit-Perfect Sample Rate Switching"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inicio"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conmutación Bit-Perfect de Frecuencia"
           }
         }
       }
     },
-    "Buscar...": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Search..."
+    "Browse" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Buscar..."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicio"
           }
         }
       }
     },
-    "Cache & Storage": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cache & Storage"
+    "Buscar..." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search..."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Caché y Almacenamiento"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar..."
           }
         }
       }
     },
-    "Cancel": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancel"
+    "Cache & Storage" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cache & Storage"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancelar"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caché y Almacenamiento"
           }
         }
       }
     },
-    "Clear Cache": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Clear Cache"
+    "Cancel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Borrar Caché"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         }
       }
     },
-    "Clear Queue": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Clear Queue"
+    "Clear Cache" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Cache"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Limpiar cola"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar Caché"
           }
         }
       }
     },
-    "Configure your Navidrome server connection and audiophile CoreAudio playback.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Configure your Navidrome server connection and audiophile CoreAudio playback."
+    "Clear Queue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Queue"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Configura la conexión con tu servidor Navidrome y la reproducción audiófila CoreAudio."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpiar cola"
           }
         }
       }
     },
-    "Connect automatically when mpvg launches": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connect automatically when mpvg launches"
+    "Configure your Navidrome server connection and audiophile CoreAudio playback." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configure your Navidrome server connection and audiophile CoreAudio playback."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conectar automáticamente al iniciar mpvg"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configura la conexión con tu servidor Navidrome y la reproducción audiófila CoreAudio."
           }
         }
       }
     },
-    "Connected": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connected"
+    "Connect automatically when mpvg launches" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect automatically when mpvg launches"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conectado"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectar automáticamente al iniciar mpvg"
           }
         }
       }
     },
-    "Connected successfully": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connected successfully"
+    "Connected" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conectado con éxito"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectado"
           }
         }
       }
     },
-    "CoreAudio Exclusive Mode": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CoreAudio Exclusive Mode"
+    "Connected successfully" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected successfully"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Modo Exclusivo CoreAudio"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectado con éxito"
           }
         }
       }
     },
-    "CoreAudio Exclusive Mode (Hog Mode)": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CoreAudio Exclusive Mode (Hog Mode)"
+    "CoreAudio Exclusive Mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CoreAudio Exclusive Mode"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Modo Exclusivo CoreAudio (Hog Mode)"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo Exclusivo CoreAudio"
           }
         }
       }
     },
-    "CoreAudio Output Device": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CoreAudio Output Device"
+    "CoreAudio Exclusive Mode (Hog Mode)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CoreAudio Exclusive Mode (Hog Mode)"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dispositivo de Salida CoreAudio"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo Exclusivo CoreAudio (Hog Mode)"
           }
         }
       }
     },
-    "DAC OFF": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DAC OFF"
+    "CoreAudio Output Device" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CoreAudio Output Device"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DAC OFF"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispositivo de Salida CoreAudio"
           }
         }
       }
     },
-    "Default System Device": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Default System Device"
+    "DAC OFF" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DAC OFF"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dispositivo por defecto del sistema"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DAC OFF"
           }
         }
       }
     },
-    "Disable Exclusive Mode": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disable Exclusive Mode"
+    "Default System Device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default System Device"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Desactivar modo exclusivo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispositivo por defecto del sistema"
           }
         }
       }
     },
-    "DISCOGRAPHY": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DISCOGRAPHY"
+    "Disable Exclusive Mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disable Exclusive Mode"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DISCOGRAFÍA"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar modo exclusivo"
           }
         }
       }
     },
-    "Disconnected": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disconnected"
+    "DISCOGRAPHY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DISCOGRAPHY"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Desconectado"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DISCOGRAFÍA"
           }
         }
       }
     },
-    "DISCOVER": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DISCOVER"
+    "Disconnected" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disconnected"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DESCUBRIR"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desconectado"
           }
         }
       }
     },
-    "Done": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Done"
+    "DISCOVER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DISCOVER"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Listo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DESCUBRIR"
           }
         }
       }
     },
-    "Enable Exclusive Mode": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enable Exclusive Mode"
+    "Done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activar modo exclusivo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo"
           }
         }
       }
     },
-    "End of queue": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "End of queue"
+    "Enable Exclusive Mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Exclusive Mode"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fin de la cola"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar modo exclusivo"
           }
         }
       }
     },
-    "EXCLUSIVE": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "EXCLUSIVE"
+    "End of queue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End of queue"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "EXCLUSIVO"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin de la cola"
           }
         }
       }
     },
-    "Explore Artists": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Explore Artists"
+    "EXCLUSIVE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EXCLUSIVE"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Explorar Artistas"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EXCLUSIVO"
           }
         }
       }
     },
-    "Fabián Sanhueza": {},
-    "Featured": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Featured"
+    "Explore Artists" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explore Artists"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Destacados"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explorar Artistas"
           }
         }
       }
+    },
+    "Fabián Sanhueza" : {
+
     },
-    "FORMAT": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FORMAT"
+    "Featured" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Featured"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FORMATO"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destacados"
           }
         }
       }
     },
-    "FS": {},
-    "Gapless Audio Playback": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gapless Audio Playback"
+    "FORMAT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FORMAT"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reproducción continua sin pausas (Gapless)"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FORMATO"
           }
         }
       }
     },
-    "Gapless Playback": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gapless Playback"
+    "FS" : {
+
+    },
+    "Gapless Audio Playback" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gapless Audio Playback"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reproducción Sin Pausas (Gapless)"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducción continua sin pausas (Gapless)"
           }
         }
       }
     },
-    "Genres": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Genres"
+    "Gapless Playback" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gapless Playback"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Géneros"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducción Sin Pausas (Gapless)"
           }
         }
       }
     },
-    "HI-RES LOSSLESS": {},
-    "https://music.example.com": {},
-    "Inicio": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Browse"
+    "Genres" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genres"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inicio"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Géneros"
           }
         }
       }
+    },
+    "HI-RES LOSSLESS" : {
+
     },
-    "IPC Socket: /tmp/mpv_player.sock": {},
-    "LIBRARY": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LIBRARY"
+    "https://music.example.com" : {
+
+    },
+    "Inicio" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "BIBLIOTECA"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicio"
           }
         }
       }
+    },
+    "IPC Socket: /tmp/mpv_player.sock" : {
+
     },
-    "Load Demo": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Load Demo"
+    "LIBRARY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LIBRARY"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cargar Demo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BIBLIOTECA"
           }
         }
       }
     },
-    "Load Demo Catalog": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Load Demo Catalog"
+    "Load Demo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load Demo"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cargar Catálogo Demo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargar Demo"
           }
         }
       }
     },
-    "Loading albums...": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading albums..."
+    "Load Demo Catalog" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load Demo Catalog"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cargando álbumes..."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargar Catálogo Demo"
           }
         }
       }
     },
-    "Loading tracks...": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading tracks..."
+    "Loading albums..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading albums..."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cargando canciones..."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando álbumes..."
           }
         }
       }
     },
-    "Local Library": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Local Library"
+    "Loading tracks..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading tracks..."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Biblioteca Local"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando canciones..."
           }
         }
       }
     },
-    "LOSSLESS": {},
-    "Matches DAC hardware sample rate dynamically to source track (44.1kHz, 96kHz, 192kHz) without resampling.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Matches DAC hardware sample rate dynamically to source track (44.1kHz, 96kHz, 192kHz) without resampling."
+    "Local Library" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local Library"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajusta dinámicamente la frecuencia de muestreo del DAC a la pista fuente (44.1kHz, 96kHz, 192kHz) sin remuestreo."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biblioteca Local"
           }
         }
       }
     },
-    "Most Popular": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Most Popular"
+    "LOSSLESS" : {
+
+    },
+    "Matches DAC hardware sample rate dynamically to source track (44.1kHz, 96kHz, 192kHz) without resampling." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matches DAC hardware sample rate dynamically to source track (44.1kHz, 96kHz, 192kHz) without resampling."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Más populares"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajusta dinámicamente la frecuencia de muestreo del DAC a la pista fuente (44.1kHz, 96kHz, 192kHz) sin remuestreo."
           }
         }
       }
     },
-    "music.ssft.cl": {},
-    "Native CoreAudio Bit-Perfect Output": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Native CoreAudio Bit-Perfect Output"
+    "Most Popular" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Most Popular"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Salida Nativa CoreAudio Bit-Perfect"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más populares"
           }
         }
       }
     },
-    "Navidrome Server": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Navidrome Server"
+    "Motor mpv reiniciado y modo exclusivo liberado" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mpv engine restarted and exclusive mode released"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Servidor Navidrome"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motor mpv reiniciado y modo exclusivo liberado"
           }
         }
       }
     },
-    "No albums found for this artist": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No albums found for this artist"
+    "music.ssft.cl" : {
+
+    },
+    "Native CoreAudio Bit-Perfect Output" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Native CoreAudio Bit-Perfect Output"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se encontraron álbumes para este artista"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salida Nativa CoreAudio Bit-Perfect"
           }
         }
       }
     },
-    "No albums or songs found": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No albums or songs found"
+    "Navidrome Server" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navidrome Server"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se encontraron álbumes ni canciones"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servidor Navidrome"
           }
         }
       }
     },
-    "No track playing": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No track playing"
+    "No albums found for this artist" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No albums found for this artist"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ninguna pista en reproducción"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron álbumes para este artista"
           }
         }
       }
     },
-    "No tracks found for this album": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No tracks found for this album"
+    "No albums or songs found" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No albums or songs found"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se encontraron canciones para este álbum"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron álbumes ni canciones"
           }
         }
       }
     },
-    "NOW PLAYING": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "NOW PLAYING"
+    "No track playing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No track playing"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SONANDO AHORA"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguna canción en reproducción"
           }
         }
       }
     },
-    "Output Device": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Output Device"
+    "No tracks found for this album" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No tracks found for this album"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dispositivo de Salida"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron canciones para este álbum"
           }
         }
       }
     },
-    "Output device:": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Output device:"
+    "No playlists found" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No playlists found"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dispositivo de salida:"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron listas de reproducción"
           }
         }
       }
     },
-    "Password": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Password"
+    "No genres found" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No genres found"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Contraseña"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron géneros"
           }
         }
       }
     },
-    "PLAY": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PLAY"
+    "Playlists from your server will appear here." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlists from your server will appear here."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "REPRODUCIR"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las listas de reproducción del servidor aparecerán aquí."
           }
         }
       }
     },
-    "Play Album": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Play Album"
+    "Music genres defined in your library will appear here." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Music genres defined in your library will appear here."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reproducir álbum"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los géneros musicales de tu biblioteca aparecerán aquí."
           }
         }
       }
     },
-    "Play Artist": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Play Artist"
+    "PLAYLIST" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PLAYLIST"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reproducir artista"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LISTA DE REPRODUCCIÓN"
           }
         }
       }
     },
-    "Playing": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Playing"
+    "GENRE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GENRE"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reproduciendo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GÉNERO"
           }
         }
       }
     },
-    "Playing an album will automatically queue all remaining tracks.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Playing an album will automatically queue all remaining tracks."
+    "NOW PLAYING" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOW PLAYING"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Al reproducir un álbum se añadirán automáticamente las pistas restantes a la cola."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SONANDO AHORA"
           }
         }
       }
     },
-    "Playing Queue": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Playing Queue"
+    "Output Device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Output Device"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cola de reproducción"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispositivo de Salida"
           }
         }
       }
     },
-    "Playlists": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Playlists"
+    "Output device:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Output device:"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Listas de reproducción"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dispositivo de salida:"
           }
         }
       }
     },
-    "RATING": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "RATING"
+    "Password" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "VALORACIÓN"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseña"
           }
         }
       }
     },
-    "Recently Added": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recently Added"
+    "PLAY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PLAY"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Añadidos recientemente"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "REPRODUCIR"
           }
         }
       }
     },
-    "Restart Engine": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restart Engine"
+    "Play Album" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play Album"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reiniciar Motor"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducir álbum"
           }
         }
       }
     },
-    "Results for \"%@\"": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Results for \"%@\""
+    "Play Artist" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play Artist"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Resultados para \"%@\""
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducir artista"
           }
         }
       }
     },
-    "Save & Test Connection": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Save & Test Connection"
+    "Playing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playing"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardar y Probar Conexión"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproduciendo"
           }
         }
       }
     },
-    "Save Connection": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Save Connection"
+    "Playing an album will automatically queue all remaining tracks." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playing an album will automatically queue all remaining tracks."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardar Conexión"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al reproducir un álbum se añadirán automáticamente las pistas restantes a la cola."
           }
         }
       }
     },
-    "Seamless transition between consecutive tracks for live and continuous albums.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seamless transition between consecutive tracks for live and continuous albums."
+    "Playing Queue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playing Queue"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Transición fluida y sin silencios entre pistas consecutivas para álbumes continuos o en vivo."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cola de reproducción"
           }
         }
       }
     },
-    "Search": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Search"
+    "Playlists" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlists"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Buscar"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listas de reproducción"
           }
         }
       }
     },
-    "Search albums, tracks...": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Search albums, tracks..."
+    "RATING" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RATING"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Buscar álbumes, canciones..."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VALORACIÓN"
           }
         }
       }
     },
-    "Search your Navidrome library": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Search your Navidrome library"
+    "Recently Added" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recently Added"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Buscar en tu biblioteca de Navidrome"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadidos recientemente"
           }
         }
       }
     },
-    "Search...": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Search..."
+    "Restart Engine" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart Engine"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Buscar..."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar Motor"
           }
         }
       }
     },
-    "Select physical DAC or CoreAudio endpoint": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select physical DAC or CoreAudio endpoint"
+    "Results for \"%@\"" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Results for \"%@\""
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Selecciona el DAC físico o salida CoreAudio"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resultados para \"%@\""
           }
         }
       }
     },
-    "Server URL": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Server URL"
+    "Save & Test Connection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save & Test Connection"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "URL del servidor"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar y Probar Conexión"
           }
         }
       }
     },
-    "Settings": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Settings"
+    "Save Connection" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Connection"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajustes"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar Conexión"
           }
         }
       }
     },
-    "SHARED": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SHARED"
+    "Seamless transition between consecutive tracks for live and continuous albums." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seamless transition between consecutive tracks for live and continuous albums."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "COMPARTIDO"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transición fluida y sin silencios entre pistas consecutivas para álbumes continuos o en vivo."
           }
         }
       }
     },
-    "Shuffle": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shuffle"
+    "Search" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aleatorio"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar"
           }
         }
       }
     },
-    "SONGS": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SONGS"
+    "Search albums, tracks..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search albums, tracks..."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CANCIONES"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar álbumes, canciones..."
           }
         }
       }
     },
-    "Songs, albums, artists...": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Songs, albums, artists..."
+    "Search your Navidrome library" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search your Navidrome library"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Canciones, álbumes, artistas..."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar en tu biblioteca de Navidrome"
           }
         }
       }
     },
-    "Subsonic API user": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Subsonic API user"
+    "Search..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search..."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usuario de API Subsonic"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar..."
           }
         }
       }
     },
-    "SYSTEM": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SYSTEM"
+    "Select physical DAC or CoreAudio endpoint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select physical DAC or CoreAudio endpoint"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SISTEMA"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona el DAC físico o salida CoreAudio"
           }
         }
       }
     },
-    "Takes exclusive direct hardware control of the connected DAC, bypassing macOS system mixer and alerts (--audio-exclusive=yes).": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Takes exclusive direct hardware control of the connected DAC, bypassing macOS system mixer and alerts (--audio-exclusive=yes)."
+    "Server URL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server URL"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toma el control directo por hardware del DAC conectado, omitiendo el mezclador del sistema macOS y alertas (--audio-exclusive=yes)."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL del servidor"
           }
         }
       }
     },
-    "Test Connection": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Test Connection"
+    "Settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Probar Conexión"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
           }
         }
       }
     },
-    "Testing Connection...": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Testing Connection..."
+    "SHARED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SHARED"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Probando conexión..."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "COMPARTIDO"
           }
         }
       }
     },
-    "TIME": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "TIME"
+    "Shuffle" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shuffle"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "DURACIÓN"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aleatorio"
           }
         }
       }
     },
-    "TITLE": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "TITLE"
+    "SONGS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SONGS"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "TÍTULO"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CANCIONES"
           }
         }
       }
     },
-    "Tracks": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tracks"
+    "Songs, albums, artists..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Songs, albums, artists..."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pistas"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canciones, álbumes, artistas..."
           }
         }
       }
     },
-    "TRACKS": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "TRACKS"
+    "Subsonic API user" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subsonic API user"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CANCIONES"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuario de API Subsonic"
           }
         }
       }
     },
-    "Unknown Album": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unknown Album"
+    "SYSTEM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SYSTEM"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Álbum desconocido"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SISTEMA"
           }
         }
       }
     },
-    "Unknown Artist": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unknown Artist"
+    "Takes exclusive direct hardware control of the connected DAC, bypassing macOS system mixer and alerts (--audio-exclusive=yes)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Takes exclusive direct hardware control of the connected DAC, bypassing macOS system mixer and alerts (--audio-exclusive=yes)."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Artista desconocido"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toma el control directo por hardware del DAC conectado, omitiendo el mezclador del sistema macOS y alertas (--audio-exclusive=yes)."
           }
         }
       }
     },
-    "UP NEXT (%lld)": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UP NEXT (%lld)"
+    "Test Connection" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test Connection"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A CONTINUACIÓN (%lld)"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probar Conexión"
           }
         }
       }
     },
-    "URL to your Navidrome instance": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "URL to your Navidrome instance"
+    "Testing Connection..." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Testing Connection..."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "URL de tu instancia de Navidrome"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probando conexión..."
           }
         }
       }
     },
-    "username": {},
-    "Username": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Username"
+    "TIME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TIME"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usuario"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DURACIÓN"
           }
         }
       }
     },
-    "View All": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View All"
+    "TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TITLE"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ver todo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TÍTULO"
           }
         }
       }
     },
-    "YEAR / GENRE": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "YEAR / GENRE"
+    "track" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "track"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AÑO / GÉNERO"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "canción"
           }
         }
       }
     },
-    "album": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "album"
+    "tracks" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tracks"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "álbum"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "canciones"
           }
         }
       }
     },
-    "albums": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "albums"
+    "Tracks" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tracks"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "álbumes"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pistas"
           }
         }
       }
     },
-    "artist": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "artist"
+    "TRACKS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TRACKS"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "artista"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CANCIONES"
           }
         }
       }
     },
-    "artists": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "artists"
+    "Unknown Album" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown Album"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "artistas"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Álbum desconocido"
           }
         }
       }
     },
-    "%lld albums": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld albums"
+    "Unknown Artist" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown Artist"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld álbumes"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artista desconocido"
           }
         }
       }
     },
-    "Album": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Album"
+    "UP NEXT (%lld)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UP NEXT (%lld)"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Álbum"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A CONTINUACIÓN (%lld)"
           }
         }
       }
     },
-    "%lld track": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld track"
+    "URL to your Navidrome instance" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL to your Navidrome instance"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld canción"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL de tu instancia de Navidrome"
           }
         }
       }
+    },
+    "username" : {
+
     },
-    "tracks": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "tracks"
+    "Username" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Username"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "canciones"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuario"
           }
         }
       }
     },
-    "track": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "track"
+    "View All" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View All"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "canción"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver todo"
           }
         }
       }
     },
-    "Motor mpv reiniciado y modo exclusivo liberado": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "mpv engine restarted and exclusive mode released"
+    "YEAR / GENRE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YEAR / GENRE"
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Motor mpv reiniciado y modo exclusivo liberado"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AÑO / GÉNERO"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
