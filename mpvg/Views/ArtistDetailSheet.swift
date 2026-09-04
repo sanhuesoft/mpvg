@@ -59,7 +59,7 @@ struct ArtistDetailView: View {
             
             // Metadata & Controls
             VStack(alignment: .leading, spacing: 8) {
-                Text("ARTIST")
+                Text("Artist")
                     .font(.system(size: 11, weight: .heavy, design: .monospaced))
                     .foregroundColor(ColorTheme.terracotta)
                 

@@ -36,6 +36,16 @@ struct CachedAsyncImage<Placeholder: View>: View {
     
     @State private var loadedImage: PlatformImage?
     
+    init(url: URL?, @ViewBuilder placeholder: @escaping () -> Placeholder) {
+        self.url = url
+        self.placeholder = placeholder
+        if let url = url, let cached = ImageCacheManager.shared.image(for: url) {
+            self._loadedImage = State(initialValue: cached)
+        } else {
+            self._loadedImage = State(initialValue: nil)
+        }
+    }
+    
     var body: some View {
         Group {
             if let img = loadedImage {

@@ -56,7 +56,7 @@ struct AlbumDetailView: View {
             // Metadata & Controls
             VStack(alignment: .leading, spacing: 8) {
                 // Type badge
-                Text("ALBUM")
+                Text("Album")
                     .font(.system(size: 11, weight: .heavy, design: .monospaced))
                     .foregroundColor(ColorTheme.terracotta)
                 
@@ -99,7 +99,11 @@ struct AlbumDetailView: View {
                     }
                     if let count = album.songCount {
                         Text("•")
-                        Text("\(count) tracks")
+                        if count == 1 {
+                            Text("\(count) track")
+                        } else {
+                            Text("\(count) tracks")
+                        }
                     }
                     if !album.formattedDuration.isEmpty {
                         Text("•")

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-#if os(macOS)
+#if canImport(AppKit)
 import AppKit
 
 public typealias PlatformImage = NSImage
@@ -30,7 +30,7 @@ extension View {
     }
 }
 
-#elseif os(iOS)
+#elseif canImport(UIKit)
 import UIKit
 
 public typealias PlatformImage = UIImage

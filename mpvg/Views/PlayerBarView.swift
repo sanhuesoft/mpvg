@@ -15,33 +15,7 @@ struct PlayerBarView: View {
     @State private var dragValue: Double = 0.0
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Subtle progress bar on top edge of crystal bar
-            GeometryReader { geo in
-                let current = isDraggingSlider ? dragValue : viewModel.mpv.currentTime
-                let total = viewModel.mpv.duration
-                let progress = total > 0 ? max(0.0, min(1.0, current / total)) : 0.0
-                
-                ZStack(alignment: .leading) {
-                    Rectangle()
-                        .fill(ColorTheme.cardBorder.opacity(0.3))
-                        .frame(height: 2)
-                    
-                    if viewModel.isLoadingTrack {
-                        ProgressView()
-                            .progressViewStyle(.linear)
-                            .tint(ColorTheme.terracotta)
-                            .frame(height: 2)
-                    } else {
-                        Rectangle()
-                            .fill(ColorTheme.terracotta)
-                            .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 2)
-                    }
-                }
-            }
-            .frame(height: 2)
-            
-            HStack(spacing: 16) {
+        HStack(spacing: 16) {
                 // ── Left: Mini Artwork & Track Metadata ──
                 HStack(spacing: 10) {
                     let artURL: URL? = {
@@ -298,7 +272,6 @@ struct PlayerBarView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
-        }
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(.ultraThinMaterial)

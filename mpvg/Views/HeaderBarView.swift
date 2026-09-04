@@ -179,9 +179,13 @@ struct HeaderBarView: View {
         .padding(.vertical, 14)
     }
     
-    private var itemCountLabel: String {
-        let count = viewModel.albums.count
-        return "\(count) albums"
+    private var itemCountLabel: LocalizedStringKey {
+        switch viewModel.activeTab {
+        case .artists:
+            return "\(viewModel.artists.count) artists"
+        default:
+            return "\(viewModel.albums.count) albums"
+        }
     }
     
     private func destinationTitle(_ dest: NavigationDestination) -> String {

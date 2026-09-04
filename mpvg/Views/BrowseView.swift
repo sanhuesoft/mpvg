@@ -33,7 +33,7 @@ struct BrowseView: View {
                     case .albums:
                         albumSection(title: "All Albums", albums: viewModel.albums)
                     case .artists:
-                        artistsGridSection
+                        artistsSection
                     case .playlists, .genres:
                         albumSection(title: viewModel.activeTab.rawValue, albums: viewModel.albums)
                     case .settings:
@@ -88,7 +88,7 @@ struct BrowseView: View {
     }
     
     // MARK: - Artists Section
-    private var artistsGridSection: some View {
+    private var artistsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
                 Text("Artists")
@@ -100,10 +100,14 @@ struct BrowseView: View {
                     .foregroundColor(ColorTheme.textTertiary)
             }
             
-            LazyVGrid(columns: artistColumns, spacing: 14) {
-                ForEach(viewModel.artists) { artist in
-                    ArtistCardView(artist: artist, viewModel: viewModel)
+            if viewModel.viewMode == .grid {
+                LazyVGrid(columns: artistColumns, spacing: 14) {
+                    ForEach(viewModel.artists) { artist in
+                        ArtistCardView(artist: artist, viewModel: viewModel)
+                    }
                 }
+            } else {
+                artistTableView(artists: viewModel.artists)
             }
         }
     }
@@ -138,53 +142,94 @@ struct BrowseView: View {
                 Text("#")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(ColorTheme.textTertiary)
-                    .frame(width: 24, alignment: .center)
+                    .frame(width: 28, alignment: .center)
                 
                 Text("ALBUM")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(ColorTheme.textTertiary)
-                    .frame(minWidth: 160, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Text("ARTIST")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(ColorTheme.textTertiary)
-                    .frame(minWidth: 120, alignment: .leading)
+                    .frame(width: 180, alignment: .leading)
                 
                 Text("YEAR / GENRE")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(ColorTheme.textTertiary)
-                    .frame(width: 120, alignment: .leading)
-                
-                Spacer()
+                    .frame(width: 140, alignment: .leading)
                 
                 Text("FORMAT")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(ColorTheme.textTertiary)
-                    .frame(width: 70, alignment: .center)
+                    .frame(width: 65, alignment: .center)
                 
                 Text("TRACKS")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(ColorTheme.textTertiary)
-                    .frame(width: 60, alignment: .trailing)
+                    .frame(width: 75, alignment: .trailing)
                 
                 Text("PLAY")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundColor(ColorTheme.textTertiary)
-                    .frame(width: 44, alignment: .trailing)
+                    .frame(width: 36, alignment: .trailing)
             }
             .padding(.horizontal, 12)
             .padding(.bottom, 6)
             
             Divider()
                 .background(ColorTheme.cardBorder.opacity(0.6))
-                .padding(.bottom, 2)
+                .padding(.bottom, 4)
             
-            // Table Rows
-            VStack(spacing: 2) {
+            // Table Rows (LazyVStack for smooth 60fps scrolling with large libraries)
+            LazyVStack(spacing: 2) {
                 ForEach(Array(albums.enumerated()), id: \.element.id) { index, album in
                     AlbumTableRowView(
                         index: index + 1,
                         album: album,
+                        viewModel: viewModel
+                    )
+                }
+            }
+        }
+    }
+    
+    // MARK: - Unified Artist Table View (List Mode)
+    private func artistTableView(artists: [ArtistItem]) -> some View {
+        VStack(spacing: 0) {
+            // Table Header
+            HStack(spacing: 12) {
+                Text("#")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 28, alignment: .center)
+                
+                Text("ARTIST")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text("ALBUMS")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 120, alignment: .trailing)
+                
+                Text("")
+                    .frame(width: 36, alignment: .trailing)
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 6)
+            
+            Divider()
+                .background(ColorTheme.cardBorder.opacity(0.6))
+                .padding(.bottom, 4)
+            
+            // Table Rows (LazyVStack for high performance)
+            LazyVStack(spacing: 2) {
+                ForEach(Array(artists.enumerated()), id: \.element.id) { index, artist in
+                    ArtistTableRowView(
+                        index: index + 1,
+                        artist: artist,
                         viewModel: viewModel
                     )
                 }
@@ -224,7 +269,7 @@ struct BrowseView: View {
                 }
                 
                 if !viewModel.searchSongs.isEmpty {
-                    VStack(spacing: 4) {
+                    LazyVStack(spacing: 4) {
                         ForEach(viewModel.searchSongs) { song in
                             SongRowView(
                                 song: song,
@@ -306,7 +351,7 @@ struct AlbumTableRowView: View {
                         .foregroundColor(ColorTheme.textTertiary)
                 }
             }
-            .frame(width: 24, alignment: .center)
+            .frame(width: 28, alignment: .center)
             
             // Mini Cover Thumbnail + Title
             HStack(spacing: 10) {
@@ -335,15 +380,17 @@ struct AlbumTableRowView: View {
                     .font(.system(size: 13, weight: isCurrentlyPlaying ? .bold : .semibold))
                     .foregroundColor(isCurrentlyPlaying ? ColorTheme.terracotta : ColorTheme.textPrimary)
                     .lineLimit(1)
+                    .truncationMode(.tail)
             }
-            .frame(minWidth: 160, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
             
             // Artist
             Text(album.displayArtist)
                 .font(.system(size: 12))
                 .foregroundColor(ColorTheme.textSecondary)
                 .lineLimit(1)
-                .frame(minWidth: 120, alignment: .leading)
+                .truncationMode(.tail)
+                .frame(width: 180, alignment: .leading)
             
             // Year & Genre
             HStack(spacing: 4) {
@@ -351,36 +398,47 @@ struct AlbumTableRowView: View {
                     Text(album.displayYear)
                 }
                 if let genre = album.genre, !genre.isEmpty {
-                    Text("•")
+                    if !album.displayYear.isEmpty {
+                        Text("•")
+                    }
                     Text(genre)
                         .lineLimit(1)
+                        .truncationMode(.tail)
                 }
             }
             .font(.system(size: 11))
             .foregroundColor(ColorTheme.textTertiary)
-            .frame(width: 120, alignment: .leading)
-            
-            Spacer()
+            .lineLimit(1)
+            .frame(width: 140, alignment: .leading)
             
             // Format Badge
-            if let spec = album.suffix, !spec.isEmpty {
-                Text(spec)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(ColorTheme.sageGreen)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(ColorTheme.sageGreenBg)
-                    .cornerRadius(4)
-                    .frame(width: 70, alignment: .center)
-            } else {
-                Spacer().frame(width: 70)
+            ZStack {
+                if let spec = album.suffix, !spec.isEmpty {
+                    Text(spec.uppercased())
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(ColorTheme.sageGreen)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(ColorTheme.sageGreenBg)
+                        .cornerRadius(4)
+                        .lineLimit(1)
+                }
             }
+            .frame(width: 65, alignment: .center)
             
             // Track Count
-            Text("\(album.songCount ?? 0) tracks")
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .foregroundColor(ColorTheme.textTertiary)
-                .frame(width: 60, alignment: .trailing)
+            let count = album.songCount ?? 0
+            Group {
+                if count == 1 {
+                    Text("\(count) track")
+                } else {
+                    Text("\(count) tracks")
+                }
+            }
+            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .foregroundColor(ColorTheme.textTertiary)
+            .lineLimit(1)
+            .frame(width: 75, alignment: .trailing)
             
             // Quick Play Button
             Button(action: {
@@ -399,9 +457,9 @@ struct AlbumTableRowView: View {
             }
             .buttonStyle(.plain)
             .pointingHandOnHover()
-            .frame(width: 44, alignment: .trailing)
+            .frame(width: 36, alignment: .trailing)
         }
-        .padding(.horizontal, 10)
+        .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(
             isCurrentlyPlaying ? ColorTheme.terracottaLight.opacity(0.35) :
@@ -416,6 +474,82 @@ struct AlbumTableRowView: View {
         }
         .onTapGesture {
             viewModel.navigateToAlbum(album)
+        }
+        .pointingHandOnHover()
+    }
+}
+
+// MARK: - Unified Artist Table Row View
+struct ArtistTableRowView: View {
+    let index: Int
+    let artist: ArtistItem
+    @ObservedObject var viewModel: PlayerViewModel
+    @State private var isHovered: Bool = false
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // Index #
+            Text("\(index)")
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundColor(ColorTheme.textTertiary)
+                .frame(width: 28, alignment: .center)
+            
+            // Mini Circular Avatar + Artist Name
+            HStack(spacing: 10) {
+                let avatarURL = artist.artistImageUrl.flatMap { URL(string: $0) }
+                CachedAsyncImage(url: avatarURL) {
+                    ZStack {
+                        ColorTheme.terracottaLight
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(ColorTheme.terracotta)
+                    }
+                }
+                .frame(width: 32, height: 32)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(ColorTheme.cardBorder, lineWidth: 0.8))
+                
+                Text(artist.name)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            // Album Count
+            if let count = artist.albumCount, count > 0 {
+                Text("\(count) \(count == 1 ? String(localized: "album") : String(localized: "albums"))")
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 120, alignment: .trailing)
+            } else {
+                Text("-")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 120, alignment: .trailing)
+            }
+            
+            // Navigation chevron
+            Image(systemName: "chevron.right")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundColor(isHovered ? ColorTheme.terracotta : ColorTheme.textTertiary)
+                .frame(width: 36, alignment: .trailing)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(
+            isHovered ? ColorTheme.cardBorder.opacity(0.35) : Color.clear
+        )
+        .cornerRadius(6)
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.1)) {
+                self.isHovered = hovering
+            }
+        }
+        .onTapGesture {
+            viewModel.navigateToArtist(artist)
         }
         .pointingHandOnHover()
     }
