@@ -18,12 +18,7 @@ struct PlayerBarView: View {
         HStack(spacing: 16) {
                 // ── Left: Mini Artwork & Track Metadata ──
                 HStack(spacing: 10) {
-                    let artURL: URL? = {
-                        if let coverId = viewModel.currentSong?.coverArt ?? viewModel.currentAlbum?.coverArt {
-                            return viewModel.coverArtURL(for: coverId)
-                        }
-                        return nil
-                    }()
+                    let artURL = viewModel.currentArtworkURL
                     
                     ZStack {
                         CachedAsyncImage(url: artURL) {
@@ -34,6 +29,7 @@ struct PlayerBarView: View {
                                     .foregroundColor(ColorTheme.terracotta)
                             }
                         }
+                        .id(artURL)
                         
                         if viewModel.isLoadingTrack {
                             Color.black.opacity(0.4)

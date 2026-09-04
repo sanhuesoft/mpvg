@@ -70,12 +70,7 @@ struct NowPlayingSheetView: View {
                 Spacer(minLength: 16)
                 
                 // Hero 1:1 Square Album Cover
-                let artURL: URL? = {
-                    if let coverId = viewModel.currentSong?.coverArt ?? viewModel.currentAlbum?.coverArt {
-                        return viewModel.coverArtURL(for: coverId)
-                    }
-                    return nil
-                }()
+                let artURL = viewModel.currentArtworkURL
                 
                 CachedAsyncImage(url: artURL) {
                     ZStack {
@@ -89,6 +84,7 @@ struct NowPlayingSheetView: View {
                             .foregroundColor(ColorTheme.terracotta)
                     }
                 }
+                .id(artURL)
                 .aspectRatio(1.0, contentMode: .fit)
                 .frame(maxWidth: 320, maxHeight: 320)
                 .cornerRadius(22)

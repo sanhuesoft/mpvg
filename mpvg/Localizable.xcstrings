@@ -2108,6 +2108,22 @@
           }
         }
       }
+    },
+    "Motor mpv reiniciado y modo exclusivo liberado": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mpv engine restarted and exclusive mode released"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Motor mpv reiniciado y modo exclusivo liberado"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

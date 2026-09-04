@@ -15,6 +15,7 @@ struct SettingsView: View {
     @State private var password: String = ""
     @State private var autoConnect: Bool = true
     @State private var selectedDeviceId: String = ""
+    @State private var isRestartingEngine: Bool = false
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
@@ -258,14 +259,24 @@ struct SettingsView: View {
                     
                     Spacer()
                     
-                    Button(action: { viewModel.mpv.restart() }) {
+                    Button(action: {
+                        isRestartingEngine = true
+                        viewModel.mpv.restart()
+                        viewModel.showToast(String(localized: "Motor mpv reiniciado y modo exclusivo liberado"))
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                            isRestartingEngine = false
+                        }
+                    }) {
                         HStack(spacing: 5) {
                             Image(systemName: "arrow.clockwise")
+                                .rotationEffect(.degrees(isRestartingEngine ? 360 : 0))
+                                .animation(isRestartingEngine ? .linear(duration: 0.8).repeatForever(autoreverses: false) : .default, value: isRestartingEngine)
                             Text(LocalizedStringKey("Restart Engine"))
                         }
                         .font(.system(size: 12, weight: .medium))
                     }
                     .buttonStyle(.bordered)
+                    .disabled(isRestartingEngine)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)

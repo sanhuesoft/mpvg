@@ -352,7 +352,8 @@ final class PlayerViewModel: ObservableObject {
     // MARK: - Playback Control
     func playSong(_ song: SongItem, inAlbum album: AlbumItem?, queue: [SongItem]) {
         self.currentSong = song
-        self.currentAlbum = album
+        let resolvedAlbum = album ?? self.albums.first(where: { $0.id == song.parent || (song.album != nil && $0.name == song.album) })
+        self.currentAlbum = resolvedAlbum
         
         // If queue is provided with multiple items, use it
         if !queue.isEmpty {
@@ -457,7 +458,8 @@ final class PlayerViewModel: ObservableObject {
         if queueIndex + 1 < queue.count {
             queueIndex += 1
             let next = queue[queueIndex]
-            playSong(next, inAlbum: currentAlbum, queue: queue)
+            let nextAlbum = self.albums.first(where: { $0.id == next.parent || (next.album != nil && $0.name == next.album) }) ?? (next.album == currentAlbum?.name ? currentAlbum : nil)
+            playSong(next, inAlbum: nextAlbum, queue: queue)
         }
     }
     
@@ -471,7 +473,8 @@ final class PlayerViewModel: ObservableObject {
         if queueIndex > 0 {
             queueIndex -= 1
             let prev = queue[queueIndex]
-            playSong(prev, inAlbum: currentAlbum, queue: queue)
+            let prevAlbum = self.albums.first(where: { $0.id == prev.parent || (prev.album != nil && $0.name == prev.album) }) ?? (prev.album == currentAlbum?.name ? currentAlbum : nil)
+            playSong(prev, inAlbum: prevAlbum, queue: queue)
         }
     }
     
@@ -653,6 +656,20 @@ final class PlayerViewModel: ObservableObject {
                 coverArtURLCache[id] = url
                 return url
             }
+        }
+        return nil
+    }
+    
+    var currentArtworkURL: URL? {
+        guard let song = currentSong else { return nil }
+        if let coverId = song.coverArt, !coverId.isEmpty {
+            return coverArtURL(for: coverId)
+        }
+        if let albumCover = currentAlbum?.coverArt, !albumCover.isEmpty {
+            return coverArtURL(for: albumCover)
+        }
+        if let parentId = song.parent, !parentId.isEmpty {
+            return coverArtURL(for: parentId)
         }
         return nil
     }

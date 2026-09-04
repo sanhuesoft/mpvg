@@ -93,11 +93,19 @@ final class MPVProcessManager: ObservableObject {
     }
     
     nonisolated static func killStaleMpvProcesses() {
+        // 1. Kill any mpv associated with our IPC socket
         let pkill = Process()
         pkill.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
         pkill.arguments = ["-9", "-f", "mpv_player.sock"]
         try? pkill.run()
         pkill.waitUntilExit()
+        
+        // 2. Kill all mpv instances on system to completely disengage CoreAudio exclusive hog mode
+        let killall = Process()
+        killall.executableURL = URL(fileURLWithPath: "/usr/bin/killall")
+        killall.arguments = ["-9", "mpv"]
+        try? killall.run()
+        killall.waitUntilExit()
     }
     
     // MARK: - CoreAudio Hotplug Listener
@@ -339,12 +347,15 @@ final class MPVProcessManager: ObservableObject {
             let pid = proc.processIdentifier
             sendCommand(["quit"])
             proc.terminate()
-            DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.1) {
-                if kill(pid, 0) == 0 {
-                    kill(pid, SIGKILL)
-                }
+            if kill(pid, 0) == 0 {
+                kill(pid, SIGKILL)
             }
+            proc.waitUntilExit()
         }
+        
+        // Kill any lingering or orphaned mpv processes completely
+        Self.killStaleMpvProcesses()
+        
         process = nil
         self.isRunning = false
         try? FileManager.default.removeItem(atPath: socketPath)
@@ -352,7 +363,10 @@ final class MPVProcessManager: ObservableObject {
     
     func restart() {
         stop()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+        // Wait 400ms for macOS coreaudiod to completely release exclusive hog mode lock
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 400_000_000) // 400ms
+            self.detectAudioDevices()
             self.start()
         }
     }

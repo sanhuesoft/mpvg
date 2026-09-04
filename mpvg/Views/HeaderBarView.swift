@@ -62,22 +62,12 @@ struct HeaderBarView: View {
                 .transition(.opacity.combined(with: .scale(scale: 0.95)))
             }
             
-            // Title & Count / Breadcrumbs
+            // Title when navigated into a detail view (directly next to back button)
             if let dest = viewModel.navigationStack.last {
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(LocalizedStringKey(viewModel.activeTab.rawValue))
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(ColorTheme.textTertiary)
-                    
-                    Text("›")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(ColorTheme.textTertiary)
-                    
-                    Text(destinationTitle(dest))
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(ColorTheme.textPrimary)
-                        .lineLimit(1)
-                }
+                Text(destinationTitle(dest))
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .lineLimit(1)
             } else {
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
                     Text(LocalizedStringKey(viewModel.activeTab.rawValue))

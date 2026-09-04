@@ -53,30 +53,37 @@ struct CachedAsyncImage<Placeholder: View>: View {
                     .resizable()
             } else {
                 placeholder()
-                    .task(id: url) {
-                        await loadImage()
-                    }
             }
+        }
+        .task(id: url) {
+            guard let targetURL = url else {
+                self.loadedImage = nil
+                return
+            }
+            
+            // Check memory cache first
+            if let cached = ImageCacheManager.shared.image(for: targetURL) {
+                self.loadedImage = cached
+                return
+            }
+            
+            // Reset to nil so stale image from previous track is immediately cleared
+            self.loadedImage = nil
+            await loadImage(for: targetURL)
         }
     }
     
-    private func loadImage() async {
-        guard let url = url else { return }
-        
-        // Check memory cache first
-        if let cached = ImageCacheManager.shared.image(for: url) {
-            self.loadedImage = cached
-            return
-        }
-        
-        // Download image
+    private func loadImage(for targetURL: URL) async {
         do {
-            let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 15)
+            let request = URLRequest(url: targetURL, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 15)
             let (data, response) = try await URLSession.shared.data(for: request)
+            if Task.isCancelled { return }
             if let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode),
                let img = PlatformImage(data: data) {
-                ImageCacheManager.shared.setImage(img, for: url)
-                self.loadedImage = img
+                ImageCacheManager.shared.setImage(img, for: targetURL)
+                if self.url == targetURL {
+                    self.loadedImage = img
+                }
             }
         } catch {
             // Silently handle cancelled requests
