@@ -195,6 +195,85 @@
     "⚠️ %@" : {
 
     },
+    "0" : {
+
+    },
+    "1" : {
+
+    },
+    "1 track" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 track"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 canción"
+          }
+        }
+      }
+    },
+    "3" : {
+
+    },
+    "3 tracks" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 tracks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 canciones"
+          }
+        }
+      }
+    },
+    "5" : {
+
+    },
+    "5 tracks (Default)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 tracks (Default)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 canciones (Por defecto)"
+          }
+        }
+      }
+    },
+    "10" : {
+
+    },
+    "10 tracks" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 tracks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 canciones"
+          }
+        }
+      }
+    },
     "12" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -504,6 +583,22 @@
         }
       }
     },
+    "Audio Cache" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Cache"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caché de Audio"
+          }
+        }
+      }
+    },
     "Audio Engine & Bit-Perfect" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -752,7 +847,6 @@
       }
     },
     "Clear Cache" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -944,6 +1038,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Desactivar modo exclusivo"
+          }
+        }
+      }
+    },
+    "Disabled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabled"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivado"
           }
         }
       }
@@ -1292,6 +1402,22 @@
         }
       }
     },
+    "Local audio downloaded for seamless playback" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local audio downloaded for seamless playback"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio local descargado para reproducción continua"
+          }
+        }
+      }
+    },
     "Local Library" : {
       "localizations" : {
         "en" : {
@@ -1506,182 +1632,6 @@
         }
       }
     },
-    "Playback & Audio Cache" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Playback & Audio Cache"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reproducción y Caché de Audio"
-          }
-        }
-      }
-    },
-    "Queue Preload" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queue Preload"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Precarga de Cola"
-          }
-        }
-      }
-    },
-    "Preload upcoming tracks in queue for instant start" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preload upcoming tracks in queue for instant start"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Precarga canciones siguientes para inicio instantáneo"
-          }
-        }
-      }
-    },
-    "Upcoming tracks to preload in background" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upcoming tracks to preload in background"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Canciones siguientes a precargar en segundo plano"
-          }
-        }
-      }
-    },
-    "Audio Cache" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio Cache"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Caché de Audio"
-          }
-        }
-      }
-    },
-    "Local audio downloaded for seamless playback" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Local audio downloaded for seamless playback"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio local descargado para reproducción continua"
-          }
-        }
-      }
-    },
-    "Disabled" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disabled"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desactivado"
-          }
-        }
-      }
-    },
-    "1 track" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 track"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 canción"
-          }
-        }
-      }
-    },
-    "3 tracks" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "3 tracks"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "3 canciones"
-          }
-        }
-      }
-    },
-    "5 tracks (Default)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "5 tracks (Default)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "5 canciones (Por defecto)"
-          }
-        }
-      }
-    },
-    "10 tracks" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10 tracks"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10 canciones"
-          }
-        }
-      }
-    },
     "NOW PLAYING" : {
       "localizations" : {
         "en" : {
@@ -1794,6 +1744,22 @@
         }
       }
     },
+    "Playback & Audio Cache" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playback & Audio Cache"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducción y Caché de Audio"
+          }
+        }
+      }
+    },
     "Playing" : {
       "localizations" : {
         "en" : {
@@ -1886,6 +1852,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Las listas de reproducción del servidor aparecerán aquí."
+          }
+        }
+      }
+    },
+    "Preload upcoming tracks in queue for instant start" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preload upcoming tracks in queue for instant start"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Precarga canciones siguientes para inicio instantáneo"
+          }
+        }
+      }
+    },
+    "Queue Preload" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queue Preload"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Precarga de Cola"
           }
         }
       }
@@ -2403,6 +2401,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A CONTINUACIÓN (%lld)"
+          }
+        }
+      }
+    },
+    "Upcoming tracks to preload in background" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upcoming tracks to preload in background"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canciones siguientes a precargar en segundo plano"
           }
         }
       }
