@@ -113,9 +113,28 @@ struct SidebarView: View {
                         SidebarRowItem(
                             iconName: "clock.arrow.circlepath",
                             label: "Recently Added",
+                            count: viewModel.recentAlbums.isEmpty ? nil : "\(viewModel.recentAlbums.count)",
                             isSelected: viewModel.activeTab == .recentlyAdded
                         ) {
                             viewModel.activeTab = .recentlyAdded
+                        }
+                        
+                        SidebarRowItem(
+                            iconName: "play.circle",
+                            label: "Recently Played",
+                            count: viewModel.recentlyPlayedAlbums.isEmpty ? nil : "\(viewModel.recentlyPlayedAlbums.count)",
+                            isSelected: viewModel.activeTab == .recentlyPlayed
+                        ) {
+                            viewModel.activeTab = .recentlyPlayed
+                        }
+                        
+                        SidebarRowItem(
+                            iconName: "star.fill",
+                            label: "Top Rated",
+                            count: viewModel.topRatedAlbums.isEmpty ? nil : "\(viewModel.topRatedAlbums.count)",
+                            isSelected: viewModel.activeTab == .topRated
+                        ) {
+                            viewModel.activeTab = .topRated
                         }
                     }
                     

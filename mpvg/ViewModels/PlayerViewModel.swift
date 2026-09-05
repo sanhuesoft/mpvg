@@ -14,6 +14,8 @@ import CryptoKit
 enum SidebarTab: String, CaseIterable, Identifiable {
     case browse = "Browse"
     case recentlyAdded = "Recently Added"
+    case recentlyPlayed = "Recently Played"
+    case topRated = "Top Rated"
     case albums = "Albums"
     case artists = "Artists"
     case playlists = "Playlists"
@@ -26,6 +28,8 @@ enum SidebarTab: String, CaseIterable, Identifiable {
         switch self {
         case .browse: return "square.grid.2x2"
         case .recentlyAdded: return "clock.arrow.circlepath"
+        case .recentlyPlayed: return "play.circle"
+        case .topRated: return "star.fill"
         case .albums: return "opticaldisc"
         case .artists: return "music.mic"
         case .playlists: return "music.note.list"
@@ -91,9 +95,23 @@ final class PlayerViewModel: ObservableObject {
     @Published var albums: [AlbumItem] = []
     @Published var featuredAlbums: [AlbumItem] = []
     @Published var recentAlbums: [AlbumItem] = []
+    @Published var recentlyPlayedAlbums: [AlbumItem] = []
     @Published var artists: [ArtistItem] = []
     @Published var playlists: [PlaylistItem] = []
     @Published var genres: [GenreItem] = []
+    
+    /// Returns albums with a 4 or 5-star rating, sorted by rating descending
+    var topRatedAlbums: [AlbumItem] {
+        albums.filter { ($0.userRating ?? 0) >= 4 }
+            .sorted {
+                let r1 = $0.userRating ?? 0
+                let r2 = $1.userRating ?? 0
+                if r1 != r2 {
+                    return r1 > r2
+                }
+                return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
+    }
     
     // Search Results
     @Published var searchAlbums: [AlbumItem] = []
@@ -138,6 +156,7 @@ final class PlayerViewModel: ObservableObject {
             self.albums = cached.albums
             self.featuredAlbums = cached.featuredAlbums
             self.recentAlbums = cached.recentAlbums
+            self.recentlyPlayedAlbums = cached.recentlyPlayedAlbums ?? []
             self.artists = cached.artists
             self.playlists = cached.playlists
             self.genres = cached.genres
@@ -247,15 +266,17 @@ final class PlayerViewModel: ObservableObject {
         guard isConnected else { return }
         
         async let recent = navidrome.getAlbums(type: "newest", size: 30)
+        async let recentPlayed = navidrome.getAlbums(type: "recent", size: 30)
         async let frequent = navidrome.getAlbums(type: "frequent", size: 24)
         async let allAlb = navidrome.getAllAlbums(type: "alphabeticalByArtist")
         async let arts = navidrome.getArtists()
         async let pls = navidrome.getPlaylists()
         async let gen = navidrome.getGenres()
         
-        let (rec, freq, allA, artList, plList, genList) = await (recent, frequent, allAlb, arts, pls, gen)
+        let (rec, recPlayed, freq, allA, artList, plList, genList) = await (recent, recentPlayed, frequent, allAlb, arts, pls, gen)
         
         self.recentAlbums = rec
+        self.recentlyPlayedAlbums = recPlayed
         self.featuredAlbums = freq
         self.albums = allA
         self.artists = artList
@@ -266,6 +287,7 @@ final class PlayerViewModel: ObservableObject {
             albums: allA,
             featuredAlbums: freq,
             recentAlbums: rec,
+            recentlyPlayedAlbums: recPlayed,
             artists: artList,
             playlists: plList,
             genres: genList
@@ -636,6 +658,9 @@ final class PlayerViewModel: ObservableObject {
         for i in recentAlbums.indices where recentAlbums[i].id == album.id {
             recentAlbums[i].userRating = clamped
         }
+        for i in recentlyPlayedAlbums.indices where recentlyPlayedAlbums[i].id == album.id {
+            recentlyPlayedAlbums[i].userRating = clamped
+        }
         for i in featuredAlbums.indices where featuredAlbums[i].id == album.id {
             featuredAlbums[i].userRating = clamped
         }
@@ -798,7 +823,7 @@ final class PlayerViewModel: ObservableObject {
     
     // MARK: - Curated Sample / Demo Catalog
     func loadSampleCatalog() {
-        let sampleList: [AlbumItem] = [
+        var sampleList: [AlbumItem] = [
             AlbumItem(
                 id: "demo-1",
                 name: "Random Access Memories",
@@ -921,8 +946,15 @@ final class PlayerViewModel: ObservableObject {
             )
         ]
         
+        if sampleList.count >= 3 {
+            sampleList[0].userRating = 5
+            sampleList[1].userRating = 5
+            sampleList[2].userRating = 4
+        }
+        
         self.featuredAlbums = Array(sampleList.prefix(4))
         self.recentAlbums = Array(sampleList.suffix(4))
+        self.recentlyPlayedAlbums = Array(sampleList.prefix(3))
         self.albums = sampleList
         
         self.artists = [

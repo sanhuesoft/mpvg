@@ -13,6 +13,7 @@ struct IOSMainView: View {
     @ObservedObject var viewModel: PlayerViewModel
     @State private var selectedTab: Int = 0
     @State private var showNowPlayingSheet: Bool = false
+    @State private var showSettingsSheet: Bool = false
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -22,6 +23,9 @@ struct IOSMainView: View {
                     BrowseView(viewModel: viewModel)
                         .navigationTitle("Browse")
                         .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                settingsToolbarButton
+                            }
                             ToolbarItem(placement: .topBarTrailing) {
                                 syncToolbarButton
                             }
@@ -33,9 +37,29 @@ struct IOSMainView: View {
                 .tag(0)
                 
                 NavigationStack {
+                    IOSPlaylistsView(viewModel: viewModel)
+                        .navigationTitle("Playlists")
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                settingsToolbarButton
+                            }
+                            ToolbarItem(placement: .topBarTrailing) {
+                                syncToolbarButton
+                            }
+                        }
+                }
+                .tabItem {
+                    Label("Playlists", systemImage: "music.note.list")
+                }
+                .tag(1)
+                
+                NavigationStack {
                     AlbumsGridView(viewModel: viewModel)
                         .navigationTitle("Albums")
                         .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                settingsToolbarButton
+                            }
                             ToolbarItem(placement: .topBarTrailing) {
                                 syncToolbarButton
                             }
@@ -44,12 +68,15 @@ struct IOSMainView: View {
                 .tabItem {
                     Label("Albums", systemImage: "opticaldisc")
                 }
-                .tag(1)
+                .tag(2)
                 
                 NavigationStack {
                     ArtistsGridView(viewModel: viewModel)
                         .navigationTitle("Artists")
                         .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                settingsToolbarButton
+                            }
                             ToolbarItem(placement: .topBarTrailing) {
                                 syncToolbarButton
                             }
@@ -58,23 +85,19 @@ struct IOSMainView: View {
                 .tabItem {
                     Label("Artists", systemImage: "music.mic")
                 }
-                .tag(2)
+                .tag(3)
                 
                 NavigationStack {
                     IOSSearchView(viewModel: viewModel)
                         .navigationTitle("Search")
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                settingsToolbarButton
+                            }
+                        }
                 }
                 .tabItem {
                     Label("Search", systemImage: "magnifyingglass")
-                }
-                .tag(3)
-                
-                NavigationStack {
-                    SettingsView(viewModel: viewModel)
-                        .navigationTitle("Settings")
-                }
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape")
                 }
                 .tag(4)
             }
@@ -98,6 +121,28 @@ struct IOSMainView: View {
         }
         .sheet(isPresented: $viewModel.showQueueSheet) {
             QueueView(viewModel: viewModel)
+        }
+        .sheet(isPresented: $showSettingsSheet) {
+            NavigationStack {
+                SettingsView(viewModel: viewModel)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") {
+                                showSettingsSheet = false
+                            }
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(ColorTheme.terracotta)
+                        }
+                    }
+            }
+        }
+    }
+    
+    private var settingsToolbarButton: some View {
+        Button(action: { showSettingsSheet = true }) {
+            Image(systemName: "gearshape")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(ColorTheme.textSecondary)
         }
     }
     
@@ -211,8 +256,167 @@ struct IOSMainView: View {
 }
 
 // MARK: - Standalone Tab Views for iPhone
+struct IOSPlaylistsView: View {
+    @ObservedObject var viewModel: PlayerViewModel
+    
+    private let albumColumns = [
+        GridItem(.adaptive(minimum: 150, maximum: 200), spacing: 14)
+    ]
+    
+    var body: some View {
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(alignment: .leading, spacing: 24) {
+                // Section 1: Smart Collections
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Smart Playlists")
+                        .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .tracking(1.2)
+                    
+                    VStack(spacing: 10) {
+                        // 1. Recently Added
+                        NavigationLink(destination: AlbumsGridView(
+                            viewModel: viewModel,
+                            customAlbums: viewModel.recentAlbums,
+                            title: "Recently Added"
+                        )) {
+                            smartCollectionRow(
+                                title: "Recently Added",
+                                subtitle: "\(viewModel.recentAlbums.count) \(viewModel.recentAlbums.count == 1 ? String(localized: "album") : String(localized: "albums"))",
+                                iconName: "clock.arrow.circlepath",
+                                gradientColors: [Color(hex: "E07A5F"), Color(hex: "B45309")]
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        // 2. Recently Played
+                        NavigationLink(destination: AlbumsGridView(
+                            viewModel: viewModel,
+                            customAlbums: viewModel.recentlyPlayedAlbums,
+                            title: "Recently Played"
+                        )) {
+                            smartCollectionRow(
+                                title: "Recently Played",
+                                subtitle: "\(viewModel.recentlyPlayedAlbums.count) \(viewModel.recentlyPlayedAlbums.count == 1 ? String(localized: "album") : String(localized: "albums"))",
+                                iconName: "play.circle.fill",
+                                gradientColors: [Color(hex: "D97706"), Color(hex: "9A3412")]
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        // 3. Top Rated (4 & 5 stars)
+                        NavigationLink(destination: AlbumsGridView(
+                            viewModel: viewModel,
+                            customAlbums: viewModel.topRatedAlbums,
+                            title: "Top Rated"
+                        )) {
+                            smartCollectionRow(
+                                title: "Top Rated",
+                                subtitle: "\(viewModel.topRatedAlbums.count) \(viewModel.topRatedAlbums.count == 1 ? String(localized: "album") : String(localized: "albums")) (4 & 5 stars)",
+                                iconName: "star.fill",
+                                gradientColors: [Color(hex: "F59E0B"), Color(hex: "D97706")]
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                
+                // Section 2: Server Playlists
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Playlists")
+                            .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                            .foregroundColor(ColorTheme.textTertiary)
+                            .tracking(1.2)
+                        Spacer()
+                        if !viewModel.playlists.isEmpty {
+                            Text("\(viewModel.playlists.count)")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(ColorTheme.terracotta)
+                        }
+                    }
+                    
+                    if viewModel.playlists.isEmpty {
+                        VStack(spacing: 8) {
+                            Image(systemName: "music.note.list")
+                                .font(.system(size: 36))
+                                .foregroundColor(ColorTheme.textTertiary.opacity(0.6))
+                                .padding(.top, 16)
+                            Text("No playlists found")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(ColorTheme.textSecondary)
+                            Text("Playlists from your server will appear here.")
+                                .font(.system(size: 12))
+                                .foregroundColor(ColorTheme.textTertiary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 24)
+                    } else {
+                        LazyVGrid(columns: albumColumns, spacing: 14) {
+                            ForEach(viewModel.playlists) { playlist in
+                                PlaylistCardView(playlist: playlist, viewModel: viewModel)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(16)
+            .padding(.bottom, 60)
+        }
+        .refreshable {
+            await viewModel.syncLibrary()
+        }
+        .background(ColorTheme.windowBackground)
+    }
+    
+    private func smartCollectionRow(title: String, subtitle: String, iconName: String, gradientColors: [Color]) -> some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .frame(width: 48, height: 48)
+                
+                Image(systemName: iconName)
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(.white)
+            }
+            .shadow(color: gradientColors.first?.opacity(0.3) ?? .clear, radius: 6, x: 0, y: 3)
+            
+            VStack(alignment: .leading, spacing: 3) {
+                Text(LocalizedStringKey(title))
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                
+                Text(LocalizedStringKey(subtitle))
+                    .font(.system(size: 12))
+                    .foregroundColor(ColorTheme.textSecondary)
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(ColorTheme.textTertiary)
+        }
+        .padding(12)
+        .background(ColorTheme.cardBackground)
+        .cornerRadius(14)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(ColorTheme.cardBorder, lineWidth: 1)
+        )
+    }
+}
+
 struct AlbumsGridView: View {
     @ObservedObject var viewModel: PlayerViewModel
+    var customAlbums: [AlbumItem]? = nil
+    var title: String? = nil
+    
+    private var displayAlbums: [AlbumItem] {
+        customAlbums ?? viewModel.albums
+    }
     
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: 200), spacing: 14)
@@ -220,14 +424,28 @@ struct AlbumsGridView: View {
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
-            LazyVGrid(columns: columns, spacing: 14) {
-                ForEach(viewModel.albums) { album in
-                    AlbumCardView(album: album, viewModel: viewModel)
+            if displayAlbums.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "opticaldisc")
+                        .font(.system(size: 40))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .padding(.top, 60)
+                    Text("No albums found")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(ColorTheme.textSecondary)
                 }
+                .frame(maxWidth: .infinity)
+            } else {
+                LazyVGrid(columns: columns, spacing: 14) {
+                    ForEach(displayAlbums) { album in
+                        AlbumCardView(album: album, viewModel: viewModel)
+                    }
+                }
+                .padding(16)
+                .padding(.bottom, 60) // Extra padding for mini-player
             }
-            .padding(16)
-            .padding(.bottom, 60) // Extra padding for mini-player
         }
+        .navigationTitle(title != nil ? LocalizedStringKey(title!) : LocalizedStringKey("Albums"))
         .refreshable {
             await viewModel.syncLibrary()
         }

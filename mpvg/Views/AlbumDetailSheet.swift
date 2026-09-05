@@ -188,7 +188,7 @@ struct AlbumDetailView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "text.badge.plus")
                             .font(.system(size: 13, weight: .semibold))
-                        Text("Queue")
+                        Text("Add to Queue")
                             .font(.system(size: 13, weight: .semibold))
                     }
                     .frame(maxWidth: .infinity)

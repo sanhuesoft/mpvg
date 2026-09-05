@@ -30,6 +30,10 @@ struct BrowseView: View {
                         defaultBrowseContent
                     case .recentlyAdded:
                         albumSection(title: "Recently Added", albums: viewModel.recentAlbums)
+                    case .recentlyPlayed:
+                        albumSection(title: "Recently Played", albums: viewModel.recentlyPlayedAlbums)
+                    case .topRated:
+                        albumSection(title: "Top Rated", albums: viewModel.topRatedAlbums)
                     case .albums:
                         albumSection(title: "All Albums", albums: viewModel.albums)
                     case .artists:
@@ -87,6 +91,44 @@ struct BrowseView: View {
                     }
                 } else {
                     albumTableView(albums: viewModel.recentAlbums)
+                }
+            }
+            
+            // Section 3: Recently Played
+            if !viewModel.recentlyPlayedAlbums.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    sectionHeader(title: "Recently Played") {
+                        viewModel.activeTab = .recentlyPlayed
+                    }
+                    
+                    if viewModel.viewMode == .grid {
+                        LazyVGrid(columns: albumColumns, spacing: 14) {
+                            ForEach(viewModel.recentlyPlayedAlbums) { album in
+                                AlbumCardView(album: album, viewModel: viewModel)
+                            }
+                        }
+                    } else {
+                        albumTableView(albums: viewModel.recentlyPlayedAlbums)
+                    }
+                }
+            }
+            
+            // Section 4: Top Rated (4 & 5 stars)
+            if !viewModel.topRatedAlbums.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    sectionHeader(title: "Top Rated") {
+                        viewModel.activeTab = .topRated
+                    }
+                    
+                    if viewModel.viewMode == .grid {
+                        LazyVGrid(columns: albumColumns, spacing: 14) {
+                            ForEach(viewModel.topRatedAlbums) { album in
+                                AlbumCardView(album: album, viewModel: viewModel)
+                            }
+                        }
+                    } else {
+                        albumTableView(albums: viewModel.topRatedAlbums)
+                    }
                 }
             }
         }

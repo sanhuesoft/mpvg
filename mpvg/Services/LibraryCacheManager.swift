@@ -12,6 +12,7 @@ struct LibraryCacheData: Codable {
     let albums: [AlbumItem]
     let featuredAlbums: [AlbumItem]
     let recentAlbums: [AlbumItem]
+    let recentlyPlayedAlbums: [AlbumItem]?
     let artists: [ArtistItem]
     let playlists: [PlaylistItem]
     let genres: [GenreItem]
@@ -59,6 +60,7 @@ final class LibraryCacheManager {
         albums: [AlbumItem],
         featuredAlbums: [AlbumItem],
         recentAlbums: [AlbumItem],
+        recentlyPlayedAlbums: [AlbumItem] = [],
         artists: [ArtistItem],
         playlists: [PlaylistItem],
         genres: [GenreItem]
@@ -69,6 +71,7 @@ final class LibraryCacheManager {
                 albums: albums,
                 featuredAlbums: featuredAlbums,
                 recentAlbums: recentAlbums,
+                recentlyPlayedAlbums: recentlyPlayedAlbums,
                 artists: artists,
                 playlists: playlists,
                 genres: genres,

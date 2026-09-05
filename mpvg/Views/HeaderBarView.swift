@@ -210,6 +210,10 @@ struct HeaderBarView: View {
             return viewModel.genres.isEmpty ? "" : "\(viewModel.genres.count) genres"
         case .recentlyAdded:
             return viewModel.recentAlbums.isEmpty ? "" : "\(viewModel.recentAlbums.count) albums"
+        case .recentlyPlayed:
+            return viewModel.recentlyPlayedAlbums.isEmpty ? "" : "\(viewModel.recentlyPlayedAlbums.count) albums"
+        case .topRated:
+            return viewModel.topRatedAlbums.isEmpty ? "" : "\(viewModel.topRatedAlbums.count) albums"
         case .albums:
             return viewModel.albums.isEmpty ? "" : "\(viewModel.albums.count) albums"
         case .browse, .settings:
