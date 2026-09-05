@@ -47,6 +47,9 @@ struct BrowseView: View {
             .padding(.top, 10)
             .padding(.bottom, 80)
         }
+        .refreshable {
+            await viewModel.syncLibrary()
+        }
         .background(ColorTheme.windowBackground)
     }
     
@@ -677,7 +680,7 @@ struct ArtistTableRowView: View {
             
             // Mini Circular Avatar + Artist Name
             HStack(spacing: 10) {
-                let avatarURL = artist.artistImageUrl.flatMap { URL(string: $0) }
+                let avatarURL = viewModel.artistAvatarURL(for: artist)
                 CachedAsyncImage(url: avatarURL) {
                     ZStack {
                         ColorTheme.terracottaLight

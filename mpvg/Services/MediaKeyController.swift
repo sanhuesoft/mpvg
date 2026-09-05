@@ -30,6 +30,10 @@ final class MediaKeyController {
         self.viewModel = viewModel
         self.isConfigured = true
         
+        #if canImport(UIKit)
+        UIApplication.shared.beginReceivingRemoteControlEvents()
+        #endif
+        
         let center = MPRemoteCommandCenter.shared()
         
         // Play / Pause / Toggle

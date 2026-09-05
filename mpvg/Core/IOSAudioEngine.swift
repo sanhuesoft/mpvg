@@ -62,7 +62,7 @@ final class IOSAudioEngine: ObservableObject {
     private func setupAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, policy: .longFormAudio)
+            try session.setCategory(.playback, mode: .default)
             // Request high sample rate for audiophile USB DACs
             try session.setPreferredSampleRate(96000.0)
             try session.setActive(true)
@@ -186,7 +186,16 @@ final class IOSAudioEngine: ObservableObject {
             player?.replaceCurrentItem(with: item)
         }
         
+        player?.automaticallyWaitsToMinimizeStalling = true
+        player?.preventsDisplaySleepDuringVideoPlayback = false
         player?.volume = Float(volume / 100.0)
+        
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Error activating AVAudioSession on play: \(error)")
+        }
+        
         player?.play()
         self.isPaused = false
         self.objectWillChange.send()
@@ -214,6 +223,9 @@ final class IOSAudioEngine: ObservableObject {
     }
     
     func resume() {
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch { }
         player?.play()
         self.isPaused = false
         self.objectWillChange.send()

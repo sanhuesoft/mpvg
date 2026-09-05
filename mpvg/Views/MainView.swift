@@ -38,9 +38,6 @@ struct MainView: View {
         .task {
             viewModel.mpv.start()
         }
-        .onDisappear {
-            viewModel.mpv.stop()
-        }
         #endif
     }
     

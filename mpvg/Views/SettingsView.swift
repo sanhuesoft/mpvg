@@ -357,6 +357,49 @@ struct SettingsView: View {
                         .pointingHandOnHover()
                     }
                 }
+                
+                Divider().background(ColorTheme.cardBorder)
+                
+                // Row 3: Artwork Cache Size & Clear Action
+                macOSFormRow(label: "Artwork Cache", subtitle: "Album covers and artist portraits stored locally") {
+                    HStack(spacing: 12) {
+                        Text(viewModel.formattedArtworkCacheSize)
+                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                            .foregroundColor(ColorTheme.textSecondary)
+                        
+                        Button(role: .destructive, action: {
+                            viewModel.clearArtworkCache()
+                        }) {
+                            Text(LocalizedStringKey("Clear Cache"))
+                                .font(.system(size: 12))
+                        }
+                        .buttonStyle(.bordered)
+                        .pointingHandOnHover()
+                    }
+                }
+                
+                Divider().background(ColorTheme.cardBorder)
+                
+                // Row 4: Library Sync
+                macOSFormRow(label: "Library Sync", subtitle: "Rescan server folders and refresh local catalog") {
+                    Button(action: {
+                        Task {
+                            await viewModel.syncLibrary()
+                        }
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .rotationEffect(.degrees(viewModel.isSyncingLibrary ? 360 : 0))
+                                .animation(viewModel.isSyncingLibrary ? .linear(duration: 1.0).repeatForever(autoreverses: false) : .default, value: viewModel.isSyncingLibrary)
+                            Text(viewModel.isSyncingLibrary ? "Syncing..." : "Sync Library Now")
+                        }
+                        .font(.system(size: 12, weight: .medium))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(ColorTheme.terracotta)
+                    .disabled(viewModel.isSyncingLibrary)
+                    .pointingHandOnHover()
+                }
             }
         }
     }
@@ -587,6 +630,57 @@ struct SettingsView: View {
                             .font(.system(size: 13, weight: .medium))
                     }
                     .buttonStyle(.bordered)
+                }
+                
+                Divider().background(ColorTheme.cardBorder)
+                
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(LocalizedStringKey("Artwork Cache"))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(ColorTheme.textPrimary)
+                        Text(viewModel.formattedArtworkCacheSize)
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundColor(ColorTheme.textTertiary)
+                    }
+                    Spacer()
+                    Button(role: .destructive, action: {
+                        viewModel.clearArtworkCache()
+                    }) {
+                        Text(LocalizedStringKey("Clear Cache"))
+                            .font(.system(size: 13, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+                }
+                
+                Divider().background(ColorTheme.cardBorder)
+                
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(LocalizedStringKey("Library Sync"))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(ColorTheme.textPrimary)
+                        Text(LocalizedStringKey("Rescan server and refresh catalog"))
+                            .font(.system(size: 11))
+                            .foregroundColor(ColorTheme.textTertiary)
+                    }
+                    Spacer()
+                    Button(action: {
+                        Task {
+                            await viewModel.syncLibrary()
+                        }
+                    }) {
+                        HStack(spacing: 5) {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .rotationEffect(.degrees(viewModel.isSyncingLibrary ? 360 : 0))
+                                .animation(viewModel.isSyncingLibrary ? .linear(duration: 1.0).repeatForever(autoreverses: false) : .default, value: viewModel.isSyncingLibrary)
+                            Text(viewModel.isSyncingLibrary ? "Syncing..." : "Sync Now")
+                        }
+                        .font(.system(size: 13, weight: .medium))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(ColorTheme.terracotta)
+                    .disabled(viewModel.isSyncingLibrary)
                 }
             }
             .padding(16)

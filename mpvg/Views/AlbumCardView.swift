@@ -80,61 +80,69 @@ struct AlbumCardView: View {
                     .foregroundColor(ColorTheme.textSecondary)
                     .lineLimit(1)
                 
-                HStack(spacing: 6) {
-                    if !album.displayYear.isEmpty {
-                        Text(album.displayYear)
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(ColorTheme.textTertiary)
-                    }
-                    
-                    if let genre = album.genre, !genre.isEmpty {
-                        Text("•")
-                            .font(.system(size: 8))
-                            .foregroundColor(ColorTheme.textTertiary)
-                        Text(genre)
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(ColorTheme.textTertiary)
-                            .lineLimit(1)
-                    }
-                    
-                    Spacer()
-                    
-                    if album.rating > 0 {
-                        HStack(spacing: 2) {
-                            Image(systemName: "star.fill")
+                HStack(spacing: 4) {
+                    HStack(spacing: 4) {
+                        if !album.displayYear.isEmpty {
+                            Text(album.displayYear)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(ColorTheme.textTertiary)
+                                .lineLimit(1)
+                        }
+                        
+                        if let genre = album.genre, !genre.isEmpty {
+                            Text("•")
                                 .font(.system(size: 8))
-                                .foregroundColor(ColorTheme.terracotta)
-                            Text("\(album.rating)")
-                                .font(.system(size: 9, weight: .bold, design: .monospaced))
-                                .foregroundColor(ColorTheme.terracotta)
+                                .foregroundColor(ColorTheme.textTertiary)
+                            Text(genre)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(ColorTheme.textTertiary)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
                         }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 1.5)
-                        .background(ColorTheme.terracottaLight.opacity(0.6))
-                        .cornerRadius(4)
                     }
+                    .lineLimit(1)
+                    .layoutPriority(0)
                     
-                    if isCurrentlyPlaying {
-                        HStack(spacing: 3) {
-                            Circle().fill(ColorTheme.sageGreen).frame(width: 5, height: 5)
-                            Text("Playing")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(ColorTheme.sageGreen)
-                        }
-                        .padding(.horizontal, 5)
-                        .padding(.vertical, 1.5)
-                        .background(ColorTheme.sageGreenBg)
-                        .cornerRadius(4)
-                    } else if let suffix = album.suffix, !suffix.isEmpty {
-                        Text(suffix)
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundColor(ColorTheme.terracotta)
+                    Spacer(minLength: 4)
+                    
+                    HStack(spacing: 4) {
+                        if album.rating > 0 {
+                            HStack(spacing: 2) {
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 8))
+                                    .foregroundColor(ColorTheme.terracotta)
+                                Text("\(album.rating)")
+                                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                                    .foregroundColor(ColorTheme.terracotta)
+                            }
                             .padding(.horizontal, 4)
-                            .padding(.vertical, 1)
-                            .background(ColorTheme.terracottaLight.opacity(0.5))
-                            .cornerRadius(3)
+                            .padding(.vertical, 1.5)
+                            .background(ColorTheme.terracottaLight.opacity(0.6))
+                            .cornerRadius(4)
+                        }
+                        
+                        if isCurrentlyPlaying {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 7.5, weight: .bold))
+                                .foregroundColor(ColorTheme.sageGreen)
+                                .frame(width: 16, height: 16)
+                                .background(ColorTheme.sageGreenBg)
+                                .cornerRadius(4)
+                        } else if let suffix = album.suffix, !suffix.isEmpty {
+                            Text(suffix)
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(ColorTheme.terracotta)
+                                .lineLimit(1)
+                                .padding(.horizontal, 4)
+                                .padding(.vertical, 1.5)
+                                .background(ColorTheme.terracottaLight.opacity(0.5))
+                                .cornerRadius(3)
+                        }
                     }
+                    .fixedSize()
+                    .layoutPriority(1)
                 }
+                .frame(height: 18)
                 .padding(.top, 1)
             }
             .padding(.horizontal, 2)

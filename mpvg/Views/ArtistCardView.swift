@@ -79,7 +79,7 @@ struct ArtistCardView: View {
     
     @ViewBuilder
     private var avatarView: some View {
-        let avatarURL = artist.artistImageUrl.flatMap { URL(string: $0) }
+        let avatarURL = viewModel.artistAvatarURL(for: artist)
         CachedAsyncImage(url: avatarURL) {
             placeholderAvatar
         }

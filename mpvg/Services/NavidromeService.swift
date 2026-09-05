@@ -10,13 +10,26 @@ import CryptoKit
 
 actor NavidromeService {
     private var config: ServerConfig
-    
+    private var sessionSalt: String = "mpvg_salt"
+    private var sessionToken: String = ""
+    private var tokenCachedForPassword: String = ""
+
     init(config: ServerConfig = ServerConfig()) {
         self.config = config
     }
     
     func updateConfig(_ newConfig: ServerConfig) {
         self.config = newConfig
+        self.sessionToken = ""
+    }
+    
+    private func ensureToken() {
+        if sessionToken.isEmpty || tokenCachedForPassword != config.password {
+            let tokenInput = "\(config.password)\(sessionSalt)"
+            let tokenHash = Insecure.MD5.hash(data: Data(tokenInput.utf8))
+            self.sessionToken = tokenHash.map { String(format: "%02hhx", $0) }.joined()
+            self.tokenCachedForPassword = config.password
+        }
     }
     
     // MARK: - Auth Helpers
@@ -26,15 +39,12 @@ actor NavidromeService {
             return nil
         }
         
-        let salt = UUID().uuidString.prefix(8).lowercased()
-        let tokenInput = "\(config.password)\(salt)"
-        let tokenHash = Insecure.MD5.hash(data: Data(tokenInput.utf8))
-        let token = tokenHash.map { String(format: "%02hhx", $0) }.joined()
+        ensureToken()
         
         var queryItems: [URLQueryItem] = [
             URLQueryItem(name: "u", value: config.username),
-            URLQueryItem(name: "t", value: token),
-            URLQueryItem(name: "s", value: String(salt)),
+            URLQueryItem(name: "t", value: sessionToken),
+            URLQueryItem(name: "s", value: sessionSalt),
             URLQueryItem(name: "v", value: "1.16.1"),
             URLQueryItem(name: "c", value: "mpvg"),
             URLQueryItem(name: "f", value: "json")
@@ -46,6 +56,24 @@ actor NavidromeService {
         
         components.queryItems = queryItems
         return components.url
+    }
+    
+    // MARK: - Library Rescan
+    func startScan() async -> Bool {
+        guard let url = buildURL(endpoint: "startScan.view") else { return false }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else { return false }
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let sub = json["subsonic-response"] as? [String: Any],
+                  let status = sub["status"] as? String else {
+                return false
+            }
+            return status == "ok"
+        } catch {
+            print("Error triggering library scan: \(error)")
+            return false
+        }
     }
     
     // MARK: - Ping / Test Connection
@@ -557,6 +585,49 @@ actor NavidromeService {
     
     func coverArtURL(for id: String, size: Int = 300) -> URL? {
         buildURL(endpoint: "getCoverArt.view", extraParams: ["id": id, "size": "\(size)"])
+    }
+    
+    func artistArtworkURL(for artist: ArtistItem) -> URL? {
+        if let raw = artist.artistImageUrl, !raw.isEmpty {
+            if raw.hasPrefix("http://") || raw.hasPrefix("https://") {
+                if let url = URL(string: raw) {
+                    if let host = config.cleanURL?.host, url.host == host {
+                        if url.query?.contains("u=") == true {
+                            return url
+                        }
+                        ensureToken()
+                        var comp = URLComponents(url: url, resolvingAgainstBaseURL: false)
+                        var q = comp?.queryItems ?? []
+                        q.append(contentsOf: [
+                            URLQueryItem(name: "u", value: config.username),
+                            URLQueryItem(name: "t", value: sessionToken),
+                            URLQueryItem(name: "s", value: sessionSalt),
+                            URLQueryItem(name: "v", value: "1.16.1"),
+                            URLQueryItem(name: "c", value: "mpvg")
+                        ])
+                        comp?.queryItems = q
+                        return comp?.url ?? url
+                    }
+                    return url
+                }
+            } else if raw.hasPrefix("/") {
+                if let base = config.cleanURL {
+                    let full = base.appendingPathComponent(raw.trimmingCharacters(in: CharacterSet(charactersIn: "/")))
+                    ensureToken()
+                    var comp = URLComponents(url: full, resolvingAgainstBaseURL: false)
+                    comp?.queryItems = [
+                        URLQueryItem(name: "u", value: config.username),
+                        URLQueryItem(name: "t", value: sessionToken),
+                        URLQueryItem(name: "s", value: sessionSalt),
+                        URLQueryItem(name: "v", value: "1.16.1"),
+                        URLQueryItem(name: "c", value: "mpvg")
+                    ]
+                    return comp?.url
+                }
+            }
+        }
+        
+        return coverArtURL(for: artist.id)
     }
     
     // MARK: - Scrobble

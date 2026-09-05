@@ -16,22 +16,34 @@ struct ArtistDetailView: View {
         GridItem(.adaptive(minimum: 165, maximum: 220), spacing: 14)
     ]
     
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
+    
+    private var isCompact: Bool {
+        #if os(iOS)
+        return horizontalSizeClass == .compact
+        #else
+        return false
+        #endif
+    }
+    
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
             VStack(alignment: .leading, spacing: 0) {
                 // Hero Header Section
                 heroHeaderView
-                    .padding(.horizontal, 28)
-                    .padding(.top, 20)
-                    .padding(.bottom, 24)
+                    .padding(.horizontal, isCompact ? 18 : 28)
+                    .padding(.top, isCompact ? 16 : 20)
+                    .padding(.bottom, isCompact ? 18 : 24)
                 
                 Divider()
                     .background(ColorTheme.cardBorder)
-                    .padding(.horizontal, 28)
+                    .padding(.horizontal, isCompact ? 18 : 28)
                 
                 // Discography Grid Section
                 discographySection
-                    .padding(.horizontal, 28)
+                    .padding(.horizontal, isCompact ? 18 : 28)
                     .padding(.top, 20)
                     .padding(.bottom, 90) // Clear space for the floating player bar
             }
@@ -45,7 +57,71 @@ struct ArtistDetailView: View {
     }
     
     // MARK: - Hero Header View
+    @ViewBuilder
     private var heroHeaderView: some View {
+        if isCompact {
+            compactHeroHeaderView
+        } else {
+            horizontalHeroHeaderView
+        }
+    }
+    
+    // MARK: - Compact Hero Header
+    private var compactHeroHeaderView: some View {
+        VStack(alignment: .center, spacing: 12) {
+            avatarView
+                .frame(width: 120, height: 120)
+                .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke(ColorTheme.cardBorder, lineWidth: 1.5)
+                )
+                .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 5)
+            
+            VStack(spacing: 4) {
+                Text("Artist")
+                    .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                    .foregroundColor(ColorTheme.terracotta)
+                    .textCase(.uppercase)
+                
+                Text(artist.name)
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                
+                let albumCount = viewModel.selectedArtistAlbums.isEmpty ? (artist.albumCount ?? 0) : viewModel.selectedArtistAlbums.count
+                Text("\(albumCount) \(albumCount == 1 ? "album" : "albums") in library")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(ColorTheme.textSecondary)
+            }
+            
+            if let firstAlbum = viewModel.selectedArtistAlbums.first {
+                Button(action: {
+                    viewModel.playAlbum(firstAlbum)
+                }) {
+                    HStack(spacing: 7) {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 13, weight: .bold))
+                        Text("Play Artist")
+                            .font(.system(size: 13, weight: .bold))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 10)
+                    .background(ColorTheme.terracotta)
+                    .cornerRadius(10)
+                    .shadow(color: ColorTheme.terracotta.opacity(0.35), radius: 6, x: 0, y: 2)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 4)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+    
+    // MARK: - Desktop / Tablet Hero Header
+    private var horizontalHeroHeaderView: some View {
         HStack(alignment: .center, spacing: 24) {
             // Circular Avatar
             avatarView
@@ -144,7 +220,7 @@ struct ArtistDetailView: View {
     // MARK: - Avatar View
     @ViewBuilder
     private var avatarView: some View {
-        let avatarURL = artist.artistImageUrl.flatMap { URL(string: $0) }
+        let avatarURL = viewModel.artistAvatarURL(for: artist)
         CachedAsyncImage(url: avatarURL) {
             ZStack {
                 LinearGradient(

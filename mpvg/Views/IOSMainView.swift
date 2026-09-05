@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct IOSMainView: View {
     @ObservedObject var viewModel: PlayerViewModel
     @State private var selectedTab: Int = 0
@@ -20,6 +21,11 @@ struct IOSMainView: View {
                 NavigationStack {
                     BrowseView(viewModel: viewModel)
                         .navigationTitle("Browse")
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                syncToolbarButton
+                            }
+                        }
                 }
                 .tabItem {
                     Label("Browse", systemImage: "sparkles")
@@ -29,6 +35,11 @@ struct IOSMainView: View {
                 NavigationStack {
                     AlbumsGridView(viewModel: viewModel)
                         .navigationTitle("Albums")
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                syncToolbarButton
+                            }
+                        }
                 }
                 .tabItem {
                     Label("Albums", systemImage: "opticaldisc")
@@ -38,6 +49,11 @@ struct IOSMainView: View {
                 NavigationStack {
                     ArtistsGridView(viewModel: viewModel)
                         .navigationTitle("Artists")
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                syncToolbarButton
+                            }
+                        }
                 }
                 .tabItem {
                     Label("Artists", systemImage: "music.mic")
@@ -83,6 +99,21 @@ struct IOSMainView: View {
         .sheet(isPresented: $viewModel.showQueueSheet) {
             QueueView(viewModel: viewModel)
         }
+    }
+    
+    private var syncToolbarButton: some View {
+        Button(action: {
+            Task {
+                await viewModel.syncLibrary()
+            }
+        }) {
+            Image(systemName: "arrow.triangle.2.circlepath")
+                .font(.system(size: 15, weight: .semibold))
+                .rotationEffect(.degrees(viewModel.isSyncingLibrary ? 360 : 0))
+                .animation(viewModel.isSyncingLibrary ? .linear(duration: 1.0).repeatForever(autoreverses: false) : .default, value: viewModel.isSyncingLibrary)
+                .foregroundColor(ColorTheme.terracotta)
+        }
+        .disabled(viewModel.isSyncingLibrary)
     }
     
     // MARK: - Mini Player Bar (Liquid Glass Aesthetic)
@@ -197,6 +228,9 @@ struct AlbumsGridView: View {
             .padding(16)
             .padding(.bottom, 60) // Extra padding for mini-player
         }
+        .refreshable {
+            await viewModel.syncLibrary()
+        }
         .background(ColorTheme.windowBackground)
     }
 }
@@ -217,6 +251,9 @@ struct ArtistsGridView: View {
             }
             .padding(16)
             .padding(.bottom, 60)
+        }
+        .refreshable {
+            await viewModel.syncLibrary()
         }
         .background(ColorTheme.windowBackground)
     }
@@ -344,3 +381,5 @@ struct IOSSearchView: View {
         .background(ColorTheme.windowBackground)
     }
 }
+#endif
+

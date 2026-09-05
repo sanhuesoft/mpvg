@@ -82,6 +82,37 @@ struct HeaderBarView: View {
             
             Spacer()
             
+            // Sync Library Button
+            Button(action: {
+                Task {
+                    await viewModel.syncLibrary()
+                }
+            }) {
+                HStack(spacing: 5) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                        .font(.system(size: 12, weight: .semibold))
+                        .rotationEffect(.degrees(viewModel.isSyncingLibrary ? 360 : 0))
+                        .animation(viewModel.isSyncingLibrary ? .linear(duration: 1.0).repeatForever(autoreverses: false) : .default, value: viewModel.isSyncingLibrary)
+                    #if os(macOS)
+                    Text("Sync")
+                        .font(.system(size: 12, weight: .medium))
+                    #endif
+                }
+                .foregroundColor(viewModel.isSyncingLibrary ? ColorTheme.terracotta : ColorTheme.textSecondary)
+                .frame(height: 26)
+                .padding(.horizontal, 9)
+                .background(ColorTheme.inputBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(ColorTheme.inputBorder, lineWidth: 1)
+                )
+                .cornerRadius(8)
+            }
+            .buttonStyle(.plain)
+            .pointingHandOnHover()
+            .disabled(viewModel.isSyncingLibrary)
+            .help("Sync Library with Server")
+            
             // Grid / List Toggle (only at root tab view)
             if viewModel.navigationStack.isEmpty {
                 HStack(spacing: 2) {

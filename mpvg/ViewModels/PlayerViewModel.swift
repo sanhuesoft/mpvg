@@ -60,6 +60,8 @@ typealias AudioEngine = IOSAudioEngine
 
 @MainActor
 final class PlayerViewModel: ObservableObject {
+    static weak var shared: PlayerViewModel?
+    
     @Published var activeTab: SidebarTab = .browse {
         didSet {
             if oldValue != activeTab {
@@ -83,6 +85,7 @@ final class PlayerViewModel: ObservableObject {
     @Published var isConnected: Bool = false
     @Published var connectionStatusMessage: String = "Not connected"
     @Published var isTestingConnection: Bool = false
+    @Published var isSyncingLibrary: Bool = false
     
     // Catalogs
     @Published var albums: [AlbumItem] = []
@@ -128,6 +131,7 @@ final class PlayerViewModel: ObservableObject {
         let saved = Self.loadConfig()
         self.serverConfig = saved
         self.navidrome = NavidromeService(config: saved)
+        Self.shared = self
         
         // Hydrate library from local disk cache if available to prevent demo content flash
         if let cached = LibraryCacheManager.shared.loadCache() {
@@ -242,7 +246,7 @@ final class PlayerViewModel: ObservableObject {
     func loadLibrary() async {
         guard isConnected else { return }
         
-        async let recent = navidrome.getAlbums(type: "recent", size: 30)
+        async let recent = navidrome.getAlbums(type: "newest", size: 30)
         async let frequent = navidrome.getAlbums(type: "frequent", size: 24)
         async let allAlb = navidrome.getAllAlbums(type: "alphabeticalByArtist")
         async let arts = navidrome.getArtists()
@@ -266,6 +270,24 @@ final class PlayerViewModel: ObservableObject {
             playlists: plList,
             genres: genList
         )
+    }
+    
+    // MARK: - Manual Library Sync
+    func syncLibrary(triggerServerScan: Bool = true) async {
+        guard isConnected else {
+            showToast("Conecta con el servidor para sincronizar la biblioteca.")
+            return
+        }
+        
+        isSyncingLibrary = true
+        defer { isSyncingLibrary = false }
+        
+        if triggerServerScan {
+            _ = await navidrome.startScan()
+        }
+        
+        await loadLibrary()
+        showToast("Biblioteca sincronizada correctamente.")
     }
     
     // MARK: - Search
@@ -345,6 +367,15 @@ final class PlayerViewModel: ObservableObject {
                 self.selectedAlbumTracks = generateSampleTracks(for: album)
             }
             self.isLoadingTracks = false
+        }
+    }
+    
+    func loadTracksForCarPlay(album: AlbumItem) async -> [SongItem] {
+        if isConnected {
+            let (_, songs) = await navidrome.getAlbum(id: album.id)
+            return songs
+        } else {
+            return generateSampleTracks(for: album)
         }
     }
     
@@ -510,6 +541,16 @@ final class PlayerViewModel: ObservableObject {
     
     func clearAudioCache() {
         AudioCacheManager.shared.clearAudioCache()
+        self.objectWillChange.send()
+    }
+    
+    // MARK: - Artwork Cache Management
+    var formattedArtworkCacheSize: String {
+        ArtworkCacheManager.shared.formattedDiskCacheSize()
+    }
+    
+    func clearArtworkCache() {
+        ArtworkCacheManager.shared.clearAllCache()
         self.objectWillChange.send()
     }
     
@@ -735,6 +776,22 @@ final class PlayerViewModel: ObservableObject {
         }
         if let parentId = song.parent, !parentId.isEmpty {
             return coverArtURL(for: parentId)
+        }
+        return nil
+    }
+    
+    func artistAvatarURL(for artist: ArtistItem) -> URL? {
+        if isConnected {
+            if let raw = artist.artistImageUrl, !raw.isEmpty {
+                if let url = URL(string: raw), raw.hasPrefix("http") {
+                    return url
+                } else if raw.hasPrefix("/"), let base = serverConfig.cleanURL {
+                    return base.appendingPathComponent(raw.trimmingCharacters(in: CharacterSet(charactersIn: "/")))
+                }
+            }
+            return coverArtURL(for: artist.id)
+        } else if let raw = artist.artistImageUrl {
+            return URL(string: raw)
         }
         return nil
     }

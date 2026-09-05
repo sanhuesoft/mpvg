@@ -566,6 +566,22 @@
         }
       }
     },
+    "Artwork Cache" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artwork Cache"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caché de Carátulas"
+          }
+        }
+      }
+    },
     "Audio & Output" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1337,6 +1353,9 @@
         }
       }
     },
+    "Library Sync" : {
+
+    },
     "Load Demo" : {
       "localizations" : {
         "en" : {
@@ -1761,6 +1780,7 @@
       }
     },
     "Playing" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1872,6 +1892,9 @@
         }
       }
     },
+    "Queue" : {
+
+    },
     "Queue Preload" : {
       "localizations" : {
         "en" : {
@@ -1919,6 +1942,9 @@
           }
         }
       }
+    },
+    "Rescan server and refresh catalog" : {
+
     },
     "Restart Engine" : {
       "localizations" : {
@@ -2193,6 +2219,21 @@
           }
         }
       }
+    },
+    "Sync" : {
+
+    },
+    "Sync Library Now" : {
+
+    },
+    "Sync Library with Server" : {
+
+    },
+    "Sync Now" : {
+
+    },
+    "Syncing..." : {
+
     },
     "SYSTEM" : {
       "localizations" : {

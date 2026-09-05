@@ -11,23 +11,34 @@ import SwiftUI
 struct AlbumDetailView: View {
     let album: AlbumItem
     @ObservedObject var viewModel: PlayerViewModel
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
+    
+    private var isCompact: Bool {
+        #if os(iOS)
+        return horizontalSizeClass == .compact
+        #else
+        return false
+        #endif
+    }
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
             VStack(alignment: .leading, spacing: 0) {
                 // Hero Header Section
                 heroHeaderView
-                    .padding(.horizontal, 28)
-                    .padding(.top, 20)
-                    .padding(.bottom, 24)
+                    .padding(.horizontal, isCompact ? 18 : 28)
+                    .padding(.top, isCompact ? 14 : 20)
+                    .padding(.bottom, isCompact ? 18 : 24)
                 
                 Divider()
                     .background(ColorTheme.cardBorder)
-                    .padding(.horizontal, 28)
+                    .padding(.horizontal, isCompact ? 18 : 28)
                 
                 // Tracklist Header & Songs
                 tracklistSection
-                    .padding(.horizontal, 28)
+                    .padding(.horizontal, isCompact ? 16 : 28)
                     .padding(.top, 16)
                     .padding(.bottom, 90) // Clear space for the floating player bar
             }
@@ -41,7 +52,164 @@ struct AlbumDetailView: View {
     }
     
     // MARK: - Hero Header View
+    @ViewBuilder
     private var heroHeaderView: some View {
+        if isCompact {
+            compactHeroHeaderView
+        } else {
+            horizontalHeroHeaderView
+        }
+    }
+    
+    // MARK: - Compact Hero Header (iPhone)
+    private var compactHeroHeaderView: some View {
+        VStack(alignment: .center, spacing: 14) {
+            // Prominent Centered Artwork
+            artworkView
+                .frame(width: 200, height: 200)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(ColorTheme.cardBorder, lineWidth: 1.5)
+                )
+                .shadow(color: Color.black.opacity(0.14), radius: 12, x: 0, y: 6)
+            
+            // Metadata Stack
+            VStack(alignment: .center, spacing: 6) {
+                Text("Album")
+                    .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                    .foregroundColor(ColorTheme.terracotta)
+                    .textCase(.uppercase)
+                
+                Text(album.displayTitle)
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                
+                Button(action: {
+                    if let artistItem = viewModel.artists.first(where: { $0.id == album.artistId || $0.name == album.artist }) {
+                        viewModel.navigateToArtist(artistItem)
+                    } else {
+                        let tempArtist = ArtistItem(
+                            id: album.artistId ?? "art-\(album.displayArtist.hashValue)",
+                            name: album.displayArtist,
+                            albumCount: 1,
+                            artistImageUrl: nil
+                        )
+                        viewModel.navigateToArtist(tempArtist)
+                    }
+                }) {
+                    Text(album.displayArtist)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(ColorTheme.terracotta)
+                }
+                .buttonStyle(.plain)
+                
+                // Specs & Metadata Row
+                HStack(spacing: 6) {
+                    if !album.displayYear.isEmpty {
+                        Text(album.displayYear)
+                    }
+                    if let genre = album.genre, !genre.isEmpty {
+                        Text("•")
+                        Text(genre)
+                            .lineLimit(1)
+                    }
+                    if let count = album.songCount {
+                        Text("•")
+                        Text("\(count) \(count == 1 ? "track" : "tracks")")
+                    }
+                    if !album.formattedDuration.isEmpty {
+                        Text("•")
+                        Text(album.formattedDuration)
+                    }
+                }
+                .font(.system(size: 12))
+                .foregroundColor(ColorTheme.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                
+                // Star Rating & Hi-Res Badge
+                HStack(spacing: 8) {
+                    StarRatingView(
+                        rating: viewModel.selectedAlbumForDetail?.rating ?? album.rating,
+                        size: 14,
+                        spacing: 3,
+                        interactive: true
+                    ) { newRating in
+                        viewModel.rateAlbum(album, rating: newRating)
+                    }
+                    
+                    let curRating = viewModel.selectedAlbumForDetail?.rating ?? album.rating
+                    if curRating > 0 {
+                        Text("\(curRating)/5")
+                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                            .foregroundColor(ColorTheme.terracotta)
+                    }
+                    
+                    if let spec = album.suffix, !spec.isEmpty {
+                        Text(spec)
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(ColorTheme.sageGreen)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 2.5)
+                            .background(ColorTheme.sageGreenBg)
+                            .cornerRadius(5)
+                    }
+                }
+                .padding(.top, 2)
+            }
+            .frame(maxWidth: .infinity)
+            
+            // Action Buttons (Equally balanced side-by-side)
+            HStack(spacing: 12) {
+                Button(action: {
+                    viewModel.playAlbum(album)
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 13, weight: .bold))
+                        Text("Play Album")
+                            .font(.system(size: 13, weight: .bold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(.white)
+                    .padding(.vertical, 10)
+                    .background(ColorTheme.terracotta)
+                    .cornerRadius(10)
+                    .shadow(color: ColorTheme.terracotta.opacity(0.35), radius: 6, x: 0, y: 2)
+                }
+                .buttonStyle(.plain)
+                
+                Button(action: {
+                    viewModel.addAlbumToQueue(album)
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "text.badge.plus")
+                            .font(.system(size: 13, weight: .semibold))
+                        Text("Queue")
+                            .font(.system(size: 13, weight: .semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .padding(.vertical, 10)
+                    .background(ColorTheme.inputBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(ColorTheme.cardBorder, lineWidth: 1)
+                    )
+                    .cornerRadius(10)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.top, 4)
+        }
+        .frame(maxWidth: .infinity)
+    }
+    
+    // MARK: - Desktop / Tablet Hero Header
+    private var horizontalHeroHeaderView: some View {
         HStack(alignment: .bottom, spacing: 24) {
             // Large Cover Artwork
             artworkView
