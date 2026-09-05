@@ -44,6 +44,7 @@ struct SettingsView: View {
                 #else
                 // iOS Form Card
                 iOSServerCard
+                iOSTabBarSection
                 iOSAudioSection
                 iOSCacheSection
                 #endif
@@ -681,6 +682,31 @@ struct SettingsView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(ColorTheme.terracotta)
                     .disabled(viewModel.isSyncingLibrary)
+                }
+            }
+            .padding(16)
+        }
+    }
+    
+    // MARK: - iOS Tab Bar Style Card
+    private var iOSTabBarSection: some View {
+        settingsCard(title: "Interface", icon: "dock.rectangle", iconColor: ColorTheme.terracotta) {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(LocalizedStringKey("Tab Bar Style"))
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(ColorTheme.textPrimary)
+                        Text(LocalizedStringKey("Choose whether to display labels below icons"))
+                            .font(.system(size: 11))
+                            .foregroundColor(ColorTheme.textTertiary)
+                    }
+                    Spacer()
+                    Picker("", selection: $viewModel.tabBarShowsLabels) {
+                        Text(LocalizedStringKey("Icons and Text")).tag(true)
+                        Text(LocalizedStringKey("Icons Only")).tag(false)
+                    }
+                    .pickerStyle(.menu)
                 }
             }
             .padding(16)

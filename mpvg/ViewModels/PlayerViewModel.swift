@@ -76,6 +76,11 @@ final class PlayerViewModel: ObservableObject {
     @Published var viewMode: ViewMode = .grid
     @Published var searchQuery: String = ""
     @Published var isSidebarVisible: Bool = true
+    @Published var tabBarShowsLabels: Bool = UserDefaults.standard.object(forKey: "tabBarShowsLabels") as? Bool ?? true {
+        didSet {
+            UserDefaults.standard.set(tabBarShowsLabels, forKey: "tabBarShowsLabels")
+        }
+    }
     
     // In-window Navigation Stack
     @Published var navigationStack: [NavigationDestination] = []

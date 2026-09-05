@@ -32,7 +32,7 @@ struct IOSMainView: View {
                         }
                 }
                 .tabItem {
-                    Label("Browse", systemImage: "sparkles")
+                    tabItemView(title: "Browse", systemImage: "sparkles")
                 }
                 .tag(0)
                 
@@ -49,7 +49,7 @@ struct IOSMainView: View {
                         }
                 }
                 .tabItem {
-                    Label("Playlists", systemImage: "music.note.list")
+                    tabItemView(title: "Listas", systemImage: "music.note.list")
                 }
                 .tag(1)
                 
@@ -66,7 +66,7 @@ struct IOSMainView: View {
                         }
                 }
                 .tabItem {
-                    Label("Albums", systemImage: "opticaldisc")
+                    tabItemView(title: "Albums", systemImage: "opticaldisc")
                 }
                 .tag(2)
                 
@@ -83,7 +83,7 @@ struct IOSMainView: View {
                         }
                 }
                 .tabItem {
-                    Label("Artists", systemImage: "music.mic")
+                    tabItemView(title: "Artists", systemImage: "music.mic")
                 }
                 .tag(3)
                 
@@ -97,10 +97,11 @@ struct IOSMainView: View {
                         }
                 }
                 .tabItem {
-                    Label("Search", systemImage: "magnifyingglass")
+                    tabItemView(title: "Search", systemImage: "magnifyingglass")
                 }
                 .tag(4)
             }
+            .id(viewModel.tabBarShowsLabels)
             .accentColor(ColorTheme.terracotta)
             
             // Docked Mini Player (Visible when a song is loaded)
@@ -159,6 +160,15 @@ struct IOSMainView: View {
                 .foregroundColor(ColorTheme.terracotta)
         }
         .disabled(viewModel.isSyncingLibrary)
+    }
+    
+    @ViewBuilder
+    private func tabItemView(title: LocalizedStringKey, systemImage: String) -> some View {
+        if viewModel.tabBarShowsLabels {
+            Label(title, systemImage: systemImage)
+        } else {
+            Image(systemName: systemImage)
+        }
     }
     
     // MARK: - Mini Player Bar (Liquid Glass Aesthetic)
