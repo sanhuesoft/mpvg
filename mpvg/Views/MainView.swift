@@ -52,9 +52,13 @@ struct MainView: View {
                         insertion: .move(edge: .leading).combined(with: .opacity),
                         removal:   .move(edge: .leading).combined(with: .opacity)
                     ))
+                
+                Rectangle()
+                    .fill(ColorTheme.cardBorder.opacity(0.8))
+                    .frame(width: 1)
             }
             
-            // Main Content Island Card containing the Floating Player Bar inside
+            // Main Content View
             ZStack(alignment: .bottom) {
                 VStack(spacing: 0) {
                     HeaderBarView(viewModel: viewModel)
@@ -83,8 +87,8 @@ struct MainView: View {
                 
                 // Floating Crystal (Liquid Glass) Player Bar — ONLY over the content!
                 PlayerBarView(viewModel: viewModel)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 14)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 16)
                 
                 // Toast Notification Overlay
                 if let message = viewModel.toastMessage {
@@ -100,17 +104,8 @@ struct MainView: View {
                     .zIndex(100)
                 }
             }
-            .background(ColorTheme.cardBackground)
-            .cornerRadius(18)
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(ColorTheme.cardBorder, lineWidth: 1.2)
-            )
-            .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 2)
-            .padding(.trailing, 12)
-            .padding(.top, 10)
-            .padding(.bottom, 12)
-            .padding(.leading, viewModel.isSidebarVisible ? 10 : 12)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ColorTheme.windowBackground)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ColorTheme.windowBackground)
