@@ -1164,6 +1164,7 @@
       }
     },
     "DISCOVER" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1383,6 +1384,9 @@
     "HI-RES LOSSLESS" : {
 
     },
+    "Hide Sidebar" : {
+
+    },
     "https://music.example.com" : {
 
     },
@@ -1455,6 +1459,7 @@
 
     },
     "LIBRARY" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2571,6 +2576,7 @@
       }
     },
     "SYSTEM" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

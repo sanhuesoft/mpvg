@@ -3,8 +3,8 @@
 //  mpvg
 //
 //  Main application container with modern Apple Music / CaskHub layout:
-//  - macOS: Left integrated sidebar, elevated rounded content canvas, and floating crystal player bar
-//  - iPadOS: Split layout for regular size class
+//  - macOS: Left floating island sidebar, elevated content canvas, and floating crystal player bar
+//  - iPadOS: Split layout with floating sidebar for regular size class
 //  - iOS: Native TabView + Mini Player for compact iPhone screens
 //
 
@@ -44,18 +44,15 @@ struct MainView: View {
     // MARK: - Desktop Layout (macOS)
     #if os(macOS)
     private var desktopLayout: some View {
-        HStack(spacing: 0) {
-            // Left Sidebar — Unobstructed, full vertical height
+        HStack(spacing: 8) {
+            // Left Floating Sidebar — Floating island style
             if viewModel.isSidebarVisible {
                 SidebarView(viewModel: viewModel)
+                    .padding([.top, .leading, .bottom], 10)
                     .transition(.asymmetric(
                         insertion: .move(edge: .leading).combined(with: .opacity),
                         removal:   .move(edge: .leading).combined(with: .opacity)
                     ))
-                
-                Rectangle()
-                    .fill(ColorTheme.cardBorder.opacity(0.8))
-                    .frame(width: 1)
             }
             
             // Main Content View
@@ -115,12 +112,9 @@ struct MainView: View {
     // MARK: - Tablet Layout (iPadOS Regular)
     #if os(iOS)
     private var tabletLayout: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 8) {
             SidebarView(viewModel: viewModel)
-            
-            Rectangle()
-                .fill(ColorTheme.cardBorder)
-                .frame(width: 1)
+                .padding([.top, .leading, .bottom], 10)
             
             VStack(spacing: 0) {
                 HeaderBarView(viewModel: viewModel)
