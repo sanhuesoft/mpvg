@@ -225,6 +225,52 @@ struct QueueView: View {
             .padding(.horizontal, 12)
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            Button {
+                viewModel.playQueueItem(at: index)
+            } label: {
+                Label("Reproducir ahora", systemImage: "play.fill")
+            }
+            
+            Divider()
+            
+            Button {
+                viewModel.playNext(song)
+                viewModel.showToast("\"\(song.title)\" añadida a continuación")
+            } label: {
+                Label("Añadir a continuación", systemImage: "text.line.first.and.arrowtriangle.forward")
+            }
+            
+            Divider()
+            
+            if !song.displayArtist.isEmpty && song.displayArtist != "Unknown Artist" {
+                Button {
+                    viewModel.navigateToArtist(for: song)
+                    viewModel.showQueueSheet = false
+                } label: {
+                    Label("Ver artista", systemImage: "music.mic")
+                }
+            }
+            
+            if !song.displayAlbum.isEmpty && song.displayAlbum != "Unknown Album" {
+                Button {
+                    viewModel.navigateToAlbum(for: song)
+                    viewModel.showQueueSheet = false
+                } label: {
+                    Label("Ver álbum", systemImage: "square.stack")
+                }
+            }
+            
+            Divider()
+            
+            Button(role: .destructive) {
+                withAnimation {
+                    viewModel.removeFromQueue(at: index)
+                }
+            } label: {
+                Label("Eliminar de la cola", systemImage: "trash")
+            }
+        }
     }
     
     private func formatDuration(_ seconds: Double?) -> String {

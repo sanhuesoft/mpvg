@@ -430,6 +430,7 @@ struct AlbumDetailView: View {
                         SongRowView(
                             song: song,
                             isPlaying: viewModel.currentSong?.id == song.id && !viewModel.mpv.isPaused,
+                            viewModel: viewModel,
                             onRate: { newRating in
                                 viewModel.rateSong(song, rating: newRating)
                             },

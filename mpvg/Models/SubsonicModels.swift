@@ -134,6 +134,7 @@ struct SongItem: Identifiable, Hashable, Codable {
     let title: String
     let album: String?
     let artist: String?
+    var artistId: String? = nil
     let track: Int?
     let year: Int?
     let genre: String?

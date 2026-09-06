@@ -2,7 +2,8 @@
 //  SongRowView.swift
 //  mpvg
 //
-//  List view row item for tracks in Browse or Album view with interactive rating.
+//  List view row item for tracks in Browse or Album view with interactive rating
+//  and native right-click context menu (Play Next, Add to Queue, Go to Artist, Go to Album).
 //
 
 import SwiftUI
@@ -10,6 +11,7 @@ import SwiftUI
 struct SongRowView: View {
     let song: SongItem
     let isPlaying: Bool
+    var viewModel: PlayerViewModel? = nil
     var onRate: ((Int) -> Void)? = nil
     let onPlay: () -> Void
     @State private var isHovered: Bool = false
@@ -96,5 +98,52 @@ struct SongRowView: View {
             onPlay()
         }
         .pointingHandOnHover()
+        .contextMenu {
+            contextMenuContent
+        }
+    }
+    
+    // MARK: - Context Menu
+    @ViewBuilder
+    private var contextMenuContent: some View {
+        Button {
+            onPlay()
+        } label: {
+            Label("Reproducir", systemImage: "play.fill")
+        }
+        
+        Divider()
+        
+        Button {
+            viewModel?.playNext(song)
+            viewModel?.showToast("\"\(song.title)\" añadida a continuación")
+        } label: {
+            Label("Añadir a continuación", systemImage: "text.line.first.and.arrowtriangle.forward")
+        }
+        
+        Button {
+            viewModel?.addToQueue(song)
+            viewModel?.showToast("\"\(song.title)\" añadida al final de la cola")
+        } label: {
+            Label("Añadir al final de la cola", systemImage: "text.line.last.and.arrowtriangle.forward")
+        }
+        
+        Divider()
+        
+        if !song.displayArtist.isEmpty && song.displayArtist != "Unknown Artist" {
+            Button {
+                viewModel?.navigateToArtist(for: song)
+            } label: {
+                Label("Ver artista", systemImage: "music.mic")
+            }
+        }
+        
+        if !song.displayAlbum.isEmpty && song.displayAlbum != "Unknown Album" {
+            Button {
+                viewModel?.navigateToAlbum(for: song)
+            } label: {
+                Label("Ver álbum", systemImage: "square.stack")
+            }
+        }
     }
 }

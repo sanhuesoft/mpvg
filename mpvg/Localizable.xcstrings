@@ -526,6 +526,12 @@
         }
       }
     },
+    "Añadir a continuación" : {
+
+    },
+    "Añadir al final de la cola" : {
+
+    },
     "artist" : {
       "localizations" : {
         "en" : {
@@ -1195,6 +1201,9 @@
           }
         }
       }
+    },
+    "Eliminar de la cola" : {
+
     },
     "Enable Exclusive Mode" : {
       "localizations" : {
@@ -2173,6 +2182,12 @@
         }
       }
     },
+    "Reproducir" : {
+
+    },
+    "Reproducir ahora" : {
+
+    },
     "Rescan server and refresh catalog" : {
       "localizations" : {
         "en" : {
@@ -2869,6 +2884,12 @@
           }
         }
       }
+    },
+    "Ver álbum" : {
+
+    },
+    "Ver artista" : {
+
     },
     "View All" : {
       "localizations" : {

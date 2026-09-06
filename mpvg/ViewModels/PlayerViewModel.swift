@@ -356,6 +356,77 @@ final class PlayerViewModel: ObservableObject {
         navigationStack.append(.artist(artist))
     }
     
+    func navigateToAlbum(for song: SongItem) {
+        // 1. Match album by parent ID or direct ID in loaded catalog
+        if let parent = song.parent, let match = albums.first(where: { $0.id == parent }) {
+            navigateToAlbum(match)
+            return
+        }
+        
+        // 2. Match album by title and artist
+        if let albumName = song.album, !albumName.isEmpty {
+            if let match = albums.first(where: {
+                $0.displayTitle.localizedCaseInsensitiveCompare(albumName) == .orderedSame &&
+                ($0.displayArtist.localizedCaseInsensitiveCompare(song.displayArtist) == .orderedSame || song.displayArtist == "Unknown Artist")
+            }) ?? albums.first(where: {
+                $0.displayTitle.localizedCaseInsensitiveCompare(albumName) == .orderedSame
+            }) {
+                navigateToAlbum(match)
+                return
+            }
+        }
+        
+        // 3. Fallback to lightweight AlbumItem
+        let albumId = song.parent ?? song.album ?? song.id
+        let albumName = song.album ?? song.title
+        let album = AlbumItem(
+            id: albumId,
+            name: albumName,
+            title: albumName,
+            artist: song.artist,
+            artistId: song.artistId,
+            coverArt: song.coverArt,
+            songCount: nil,
+            duration: nil,
+            year: song.year,
+            genre: song.genre,
+            bitRate: song.bitRate,
+            suffix: song.suffix,
+            playCount: nil,
+            userRating: nil
+        )
+        navigateToAlbum(album)
+    }
+    
+    func navigateToArtist(for song: SongItem) {
+        let artistName = song.displayArtist
+        guard !artistName.isEmpty && artistName != "Unknown Artist" else { return }
+        
+        // 1. Match by artistId if available
+        if let artistId = song.artistId, let match = artists.first(where: { $0.id == artistId }) {
+            navigateToArtist(match)
+            return
+        }
+        
+        // 2. Match by artist name in loaded catalog
+        if let match = artists.first(where: { $0.name.localizedCaseInsensitiveCompare(artistName) == .orderedSame }) {
+            navigateToArtist(match)
+            return
+        }
+        
+        // 3. Match from album metadata
+        if let albumMatch = albums.first(where: { $0.displayArtist.localizedCaseInsensitiveCompare(artistName) == .orderedSame }),
+           let artistId = albumMatch.artistId {
+            let artist = ArtistItem(id: artistId, name: artistName, albumCount: nil, artistImageUrl: nil)
+            navigateToArtist(artist)
+            return
+        }
+        
+        // 4. Fallback with artist name
+        let artist = ArtistItem(id: song.artistId ?? artistName, name: artistName, albumCount: nil, artistImageUrl: nil)
+        navigateToArtist(artist)
+    }
+    
     func navigateBack() {
         guard !navigationStack.isEmpty else { return }
         navigationStack.removeLast()

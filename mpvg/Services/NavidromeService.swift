@@ -341,10 +341,11 @@ actor NavidromeService {
                     if let sid = s["id"] as? String, let title = s["title"] as? String {
                         let song = SongItem(
                             id: sid,
-                            parent: s["parent"] as? String,
+                            parent: (s["parent"] as? String) ?? (s["albumId"] as? String) ?? album.id,
                             title: title,
                             album: s["album"] as? String ?? album.displayTitle,
                             artist: s["artist"] as? String ?? album.displayArtist,
+                            artistId: (s["artistId"] as? String) ?? album.artistId,
                             track: s["track"] as? Int,
                             year: s["year"] as? Int ?? album.year,
                             genre: s["genre"] as? String ?? album.genre,
@@ -421,10 +422,11 @@ actor NavidromeService {
                     if let id = s["id"] as? String, let title = s["title"] as? String {
                         songs.append(SongItem(
                             id: id,
-                            parent: s["parent"] as? String,
+                            parent: (s["parent"] as? String) ?? (s["albumId"] as? String),
                             title: title,
                             album: s["album"] as? String,
                             artist: s["artist"] as? String,
+                            artistId: s["artistId"] as? String,
                             track: s["track"] as? Int,
                             year: s["year"] as? Int,
                             genre: s["genre"] as? String,
@@ -525,10 +527,11 @@ actor NavidromeService {
                     if let sid = s["id"] as? String, let title = s["title"] as? String {
                         let song = SongItem(
                             id: sid,
-                            parent: s["parent"] as? String,
+                            parent: (s["parent"] as? String) ?? (s["albumId"] as? String),
                             title: title,
                             album: s["album"] as? String ?? "",
                             artist: s["artist"] as? String ?? "",
+                            artistId: s["artistId"] as? String,
                             track: s["track"] as? Int,
                             year: s["year"] as? Int,
                             genre: s["genre"] as? String,
