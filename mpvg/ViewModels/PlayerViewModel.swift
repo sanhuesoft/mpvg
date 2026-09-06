@@ -70,11 +70,30 @@ final class PlayerViewModel: ObservableObject {
         didSet {
             if oldValue != activeTab {
                 navigationStack.removeAll()
+                if !searchQuery.isEmpty {
+                    searchQuery = ""
+                }
             }
         }
     }
     @Published var viewMode: ViewMode = .grid
     @Published var searchQuery: String = ""
+    @Published var focusSearchTrigger: Bool = false
+    
+    func focusSearch() {
+        focusSearchTrigger.toggle()
+    }
+    
+    func selectTab(_ tab: SidebarTab) {
+        if !searchQuery.isEmpty {
+            searchQuery = ""
+        }
+        if activeTab != tab {
+            activeTab = tab
+        } else {
+            navigationStack.removeAll()
+        }
+    }
     @Published var isSidebarVisible: Bool = true
     @Published var tabBarShowsLabels: Bool = UserDefaults.standard.object(forKey: "tabBarShowsLabels") as? Bool ?? true {
         didSet {
@@ -427,6 +446,27 @@ final class PlayerViewModel: ObservableObject {
         navigateToArtist(artist)
     }
     
+    func navigateToArtist(for album: AlbumItem) {
+        let artistName = album.displayArtist
+        guard !artistName.isEmpty && artistName != "Unknown Artist" else { return }
+        
+        // 1. Match by artistId
+        if let artistId = album.artistId, let match = artists.first(where: { $0.id == artistId }) {
+            navigateToArtist(match)
+            return
+        }
+        
+        // 2. Match by artist name in loaded catalog
+        if let match = artists.first(where: { $0.name.localizedCaseInsensitiveCompare(artistName) == .orderedSame }) {
+            navigateToArtist(match)
+            return
+        }
+        
+        // 3. Fallback with artist name
+        let artist = ArtistItem(id: album.artistId ?? artistName, name: artistName, albumCount: nil, artistImageUrl: nil)
+        navigateToArtist(artist)
+    }
+    
     func navigateBack() {
         guard !navigationStack.isEmpty else { return }
         navigationStack.removeLast()
@@ -769,6 +809,28 @@ final class PlayerViewModel: ObservableObject {
         queue.insert(song, at: insertIndex)
     }
     
+    func playAlbumNext(_ album: AlbumItem) {
+        Task {
+            var songs: [SongItem] = []
+            if isConnected {
+                let (_, fetched) = await navidrome.getAlbum(id: album.id)
+                songs = fetched
+            } else {
+                songs = generateSampleTracks(for: album)
+            }
+            guard !songs.isEmpty else { return }
+            if queue.isEmpty {
+                if let first = songs.first {
+                    playSong(first, inAlbum: album, queue: songs)
+                }
+            } else {
+                let insertIndex = min(queueIndex + 1, queue.count)
+                queue.insert(contentsOf: songs, at: insertIndex)
+                showToast("\"\(album.displayTitle)\" añadido a continuación")
+            }
+        }
+    }
+    
     func addAlbumToQueue(_ album: AlbumItem) {
         Task {
             var songs: [SongItem] = []
@@ -778,12 +840,14 @@ final class PlayerViewModel: ObservableObject {
             } else {
                 songs = generateSampleTracks(for: album)
             }
+            guard !songs.isEmpty else { return }
             if queue.isEmpty {
                 if let first = songs.first {
                     playSong(first, inAlbum: album, queue: songs)
                 }
             } else {
                 queue.append(contentsOf: songs)
+                showToast("\"\(album.displayTitle)\" añadido al final de la cola")
             }
         }
     }

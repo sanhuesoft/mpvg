@@ -197,10 +197,32 @@ struct HeaderBarView: View {
                     .stroke(isSearchFocused ? ColorTheme.terracotta.opacity(0.6) : ColorTheme.inputBorder, lineWidth: 1)
             )
             .cornerRadius(9)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                isSearchFocused = true
+            }
+            
+            // Invisible button to bind ⌘F directly to search field focus
+            Button(action: {
+                isSearchFocused = true
+            }) {
+                EmptyView()
+            }
             .keyboardShortcut("f", modifiers: .command)
+            .frame(width: 0, height: 0)
+            .opacity(0)
+            .allowsHitTesting(false)
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 14)
+        .onChange(of: viewModel.focusSearchTrigger) { _ in
+            isSearchFocused = true
+        }
+        #if os(macOS)
+        .onExitCommand {
+            isSearchFocused = false
+        }
+        #endif
     }
     
     private var itemCountLabel: LocalizedStringKey {

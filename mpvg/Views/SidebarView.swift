@@ -120,7 +120,7 @@ struct SidebarView: View {
                             iconBgTint: ColorTheme.terracottaLight,
                             isSelected: viewModel.activeTab == .browse
                         ) {
-                            viewModel.activeTab = .browse
+                            viewModel.selectTab(.browse)
                         }
                         
                         SidebarRowItem(
@@ -131,7 +131,7 @@ struct SidebarView: View {
                             iconBgTint: ColorTheme.blueBg,
                             isSelected: viewModel.activeTab == .recentlyAdded
                         ) {
-                            viewModel.activeTab = .recentlyAdded
+                            viewModel.selectTab(.recentlyAdded)
                         }
                         
                         SidebarRowItem(
@@ -142,7 +142,7 @@ struct SidebarView: View {
                             iconBgTint: ColorTheme.sageGreenBg,
                             isSelected: viewModel.activeTab == .recentlyPlayed
                         ) {
-                            viewModel.activeTab = .recentlyPlayed
+                            viewModel.selectTab(.recentlyPlayed)
                         }
                         
                         SidebarRowItem(
@@ -153,7 +153,7 @@ struct SidebarView: View {
                             iconBgTint: ColorTheme.amberBg,
                             isSelected: viewModel.activeTab == .topRated
                         ) {
-                            viewModel.activeTab = .topRated
+                            viewModel.selectTab(.topRated)
                         }
                     }
                     
@@ -167,7 +167,7 @@ struct SidebarView: View {
                             iconBgTint: ColorTheme.terracottaLight,
                             isSelected: viewModel.activeTab == .albums
                         ) {
-                            viewModel.activeTab = .albums
+                            viewModel.selectTab(.albums)
                         }
                         
                         SidebarRowItem(
@@ -178,7 +178,7 @@ struct SidebarView: View {
                             iconBgTint: ColorTheme.blueBg,
                             isSelected: viewModel.activeTab == .artists
                         ) {
-                            viewModel.activeTab = .artists
+                            viewModel.selectTab(.artists)
                         }
                         
                         SidebarRowItem(
@@ -189,7 +189,7 @@ struct SidebarView: View {
                             iconBgTint: ColorTheme.sageGreenBg,
                             isSelected: viewModel.activeTab == .playlists
                         ) {
-                            viewModel.activeTab = .playlists
+                            viewModel.selectTab(.playlists)
                         }
                         
                         SidebarRowItem(
@@ -200,7 +200,7 @@ struct SidebarView: View {
                             iconBgTint: ColorTheme.amberBg,
                             isSelected: viewModel.activeTab == .genres
                         ) {
-                            viewModel.activeTab = .genres
+                            viewModel.selectTab(.genres)
                         }
                     }
                     
@@ -214,7 +214,7 @@ struct SidebarView: View {
                             iconBgTint: ColorTheme.cardBorder,
                             isSelected: viewModel.activeTab == .settings
                         ) {
-                            viewModel.activeTab = .settings
+                            viewModel.selectTab(.settings)
                         }
                     }
                 }

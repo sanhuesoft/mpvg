@@ -703,6 +703,41 @@ struct AlbumTableRowView: View {
             viewModel.navigateToAlbum(album)
         }
         .pointingHandOnHover()
+        .contextMenu {
+            Button {
+                if isThisAlbumLoaded {
+                    viewModel.togglePlayPause()
+                } else {
+                    viewModel.playAlbum(album)
+                }
+            } label: {
+                Label(isCurrentlyPlaying ? "Pausar álbum" : "Reproducir álbum", systemImage: isCurrentlyPlaying ? "pause.fill" : "play.fill")
+            }
+            
+            Divider()
+            
+            Button {
+                viewModel.playAlbumNext(album)
+            } label: {
+                Label("Añadir a continuación", systemImage: "text.line.first.and.arrowtriangle.forward")
+            }
+            
+            Button {
+                viewModel.addAlbumToQueue(album)
+            } label: {
+                Label("Añadir al final de la cola", systemImage: "text.line.last.and.arrowtriangle.forward")
+            }
+            
+            Divider()
+            
+            if !album.displayArtist.isEmpty && album.displayArtist != "Unknown Artist" {
+                Button {
+                    viewModel.navigateToArtist(for: album)
+                } label: {
+                    Label("Ver artista", systemImage: "music.mic")
+                }
+            }
+        }
     }
 }
 
