@@ -114,6 +114,12 @@ final class PlayerViewModel: ObservableObject {
     @Published var connectionStatusMessage: String = "Not connected"
     @Published var isTestingConnection: Bool = false
     @Published var isSyncingLibrary: Bool = false
+    @Published var isDisconnectedOverlayVisible: Bool = false
+    @Published var showSettingsSheet: Bool = false
+    
+    // Internal grace period and health check management
+    private var isInitialGracePeriodActive: Bool = true
+    private var periodicHealthCheckTask: Task<Void, Never>? = nil
     
     // Catalogs
     @Published var albums: [AlbumItem] = []
@@ -198,6 +204,13 @@ final class PlayerViewModel: ObservableObject {
             }
         }
         
+        // Playback failure notification from audio engine
+        processManager.onPlaybackError = { [weak self] _ in
+            Task { @MainActor [weak self] in
+                await self?.handlePlaybackFailure()
+            }
+        }
+        
         // Forward discrete state changes from mpv (do NOT forward high-frequency currentTime ticks)
         processManager.$isPaused
             .dropFirst()
@@ -235,6 +248,21 @@ final class PlayerViewModel: ObservableObject {
                 await testConnection()
             }
         }
+        
+        // Startup grace period: suppress disconnected overlay for 10 seconds during launch
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds
+            guard let self = self else { return }
+            self.isInitialGracePeriodActive = false
+            if !self.isConnected && !self.serverConfig.urlString.isEmpty && !self.serverConfig.password.isEmpty {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                    self.isDisconnectedOverlayVisible = true
+                }
+            }
+        }
+        
+        // Start background periodic health check (every 30 seconds)
+        startPeriodicHealthCheck()
         
         // Listen to search query changes with debounce
         $searchQuery
@@ -279,10 +307,94 @@ final class PlayerViewModel: ObservableObject {
         case .success(let msg):
             self.isConnected = true
             self.connectionStatusMessage = msg
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                self.isDisconnectedOverlayVisible = false
+            }
             await loadLibrary()
         case .failure(let err):
             self.isConnected = false
             self.connectionStatusMessage = "Error: \(err.localizedDescription)"
+            if !self.isInitialGracePeriodActive && !self.serverConfig.urlString.isEmpty {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                    self.isDisconnectedOverlayVisible = true
+                }
+            }
+        }
+    }
+    
+    // MARK: - Periodic Health Check
+    private func startPeriodicHealthCheck() {
+        periodicHealthCheckTask?.cancel()
+        periodicHealthCheckTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 30_000_000_000) // 30 seconds
+                guard let self = self, !Task.isCancelled else { break }
+                await self.performPeriodicConnectionCheck()
+            }
+        }
+    }
+    
+    func performPeriodicConnectionCheck() async {
+        guard !serverConfig.urlString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        
+        let result = await navidrome.ping()
+        switch result {
+        case .success(let msg):
+            let wasDisconnected = !self.isConnected
+            self.isConnected = true
+            self.connectionStatusMessage = msg
+            if wasDisconnected || self.isDisconnectedOverlayVisible {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                    self.isDisconnectedOverlayVisible = false
+                }
+                if albums.isEmpty {
+                    await loadLibrary()
+                }
+            }
+        case .failure(let err):
+            self.isConnected = false
+            self.connectionStatusMessage = "Error: \(err.localizedDescription)"
+            if !self.isInitialGracePeriodActive {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                    self.isDisconnectedOverlayVisible = true
+                }
+            }
+        }
+    }
+    
+    // MARK: - Playback Failure Handling
+    func handlePlaybackFailure(for song: SongItem? = nil) async {
+        self.isLoadingTrack = false
+        guard !serverConfig.urlString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        
+        let result = await navidrome.ping()
+        switch result {
+        case .success:
+            let targetSong = song ?? currentSong
+            if let title = targetSong?.title {
+                showToast("No se pudo reproducir \"\(title)\". Verifica el archivo en el servidor.")
+            }
+        case .failure(let err):
+            self.isConnected = false
+            self.connectionStatusMessage = "Error: \(err.localizedDescription)"
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                self.isDisconnectedOverlayVisible = true
+            }
+        }
+    }
+    
+    // MARK: - Navigation & Overlay Helpers
+    func openSettings() {
+        #if os(macOS)
+        selectTab(.settings)
+        #else
+        showSettingsSheet = true
+        #endif
+    }
+    
+    func dismissDisconnectedOverlay() {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+            self.isDisconnectedOverlayVisible = false
         }
     }
     
@@ -607,6 +719,7 @@ final class PlayerViewModel: ObservableObject {
                 } else {
                     self.isLoadingTrack = false
                     self.showToast("No se pudo obtener el audio de \"\(song.title)\". Revisa la conexión al servidor.")
+                    await self.handlePlaybackFailure(for: song)
                 }
                 
                 // Preload the next N tracks in the queue in background

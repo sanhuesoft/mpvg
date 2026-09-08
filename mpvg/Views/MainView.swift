@@ -18,27 +18,37 @@ struct MainView: View {
     #endif
     
     var body: some View {
-        #if os(macOS)
-        desktopLayout
-            .frame(minWidth: 980, minHeight: 640)
+        ZStack {
+            #if os(macOS)
+            desktopLayout
+                .frame(minWidth: 980, minHeight: 640)
+                .task {
+                    viewModel.mpv.start()
+                }
+                .onDisappear {
+                    viewModel.mpv.stop()
+                }
+            #else
+            Group {
+                if horizontalSizeClass == .compact {
+                    IOSMainView(viewModel: viewModel)
+                } else {
+                    tabletLayout
+                }
+            }
             .task {
                 viewModel.mpv.start()
             }
-            .onDisappear {
-                viewModel.mpv.stop()
-            }
-        #else
-        Group {
-            if horizontalSizeClass == .compact {
-                IOSMainView(viewModel: viewModel)
-            } else {
-                tabletLayout
+            #endif
+            
+            // Server Disconnected Overlay
+            if viewModel.isDisconnectedOverlayVisible && viewModel.activeTab != .settings && !viewModel.showSettingsSheet {
+                ConnectionOverlayView(viewModel: viewModel)
+                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                    .zIndex(200)
             }
         }
-        .task {
-            viewModel.mpv.start()
-        }
-        #endif
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: viewModel.isDisconnectedOverlayVisible)
     }
     
     // MARK: - Desktop Layout (macOS)

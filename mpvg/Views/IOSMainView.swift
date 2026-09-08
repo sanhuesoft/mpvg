@@ -13,7 +13,6 @@ struct IOSMainView: View {
     @ObservedObject var viewModel: PlayerViewModel
     @State private var selectedTab: Int = 0
     @State private var showNowPlayingSheet: Bool = false
-    @State private var showSettingsSheet: Bool = false
     
     var body: some View {
         if #available(iOS 26.0, *) {
@@ -36,7 +35,7 @@ struct IOSMainView: View {
                 .sheet(isPresented: $viewModel.showQueueSheet) {
                     QueueView(viewModel: viewModel)
                 }
-                .sheet(isPresented: $showSettingsSheet) { settingsSheet }
+                .sheet(isPresented: $viewModel.showSettingsSheet) { settingsSheet }
         } else {
             // Fallback for iOS 17-25: manual ZStack positioning
             ZStack(alignment: .bottom) {
@@ -59,7 +58,7 @@ struct IOSMainView: View {
             .sheet(isPresented: $viewModel.showQueueSheet) {
                 QueueView(viewModel: viewModel)
             }
-            .sheet(isPresented: $showSettingsSheet) { settingsSheet }
+            .sheet(isPresented: $viewModel.showSettingsSheet) { settingsSheet }
         }
     }
     
@@ -130,7 +129,7 @@ struct IOSMainView: View {
             SettingsView(viewModel: viewModel)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Done") { showSettingsSheet = false }
+                        Button("Done") { viewModel.showSettingsSheet = false }
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(ColorTheme.terracotta)
                     }
@@ -139,7 +138,7 @@ struct IOSMainView: View {
     }
     
     private var settingsToolbarButton: some View {
-        Button(action: { showSettingsSheet = true }) {
+        Button(action: { viewModel.showSettingsSheet = true }) {
             Image(systemName: "gearshape")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(ColorTheme.textSecondary)

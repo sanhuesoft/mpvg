@@ -46,7 +46,10 @@ final class MPVProcessManager: ObservableObject {
     @Published var binaryPath: String = "/opt/homebrew/bin/mpv"
     
     var onTrackFinished: (() -> Void)?
+    var onPlaybackError: ((Error?) -> Void)?
     private var hasHandledEOF: Bool = false
+    private var isAwaitingPlayback: Bool = false
+    private var playbackStartTimer: Task<Void, Never>?
     
     init() {
         if let savedDevice = UserDefaults.standard.string(forKey: Self.selectedDeviceKey) {
@@ -384,19 +387,36 @@ final class MPVProcessManager: ObservableObject {
                     try? await Task.sleep(nanoseconds: 20_000_000) // 20ms
                 }
                 self.isPaused = false
+                self.isAwaitingPlayback = true
                 self.objectWillChange.send()
                 self.sendCommand(["loadfile", url, "replace"])
                 self.sendCommand(["set_property", "pause", false])
+                self.schedulePlaybackTimeoutCheck(for: url)
             }
             return
         }
         
         hasHandledEOF = false
+        isAwaitingPlayback = true
         self.isPaused = false
         self.objectWillChange.send()
         
         sendCommand(["loadfile", url, "replace"])
         sendCommand(["set_property", "pause", false])
+        schedulePlaybackTimeoutCheck(for: url)
+    }
+    
+    private func schedulePlaybackTimeoutCheck(for url: String) {
+        playbackStartTimer?.cancel()
+        guard url.hasPrefix("http://") || url.hasPrefix("https://") else { return }
+        playbackStartTimer = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 6_000_000_000) // 6 seconds
+            guard let self = self, !Task.isCancelled else { return }
+            if self.isAwaitingPlayback && self.currentTime == 0.0 && self.duration == 0.0 {
+                self.isAwaitingPlayback = false
+                self.onPlaybackError?(nil)
+            }
+        }
     }
     
     func togglePause() {
@@ -512,17 +532,32 @@ final class MPVProcessManager: ObservableObject {
                 self.currentTime = time
                 changed = true
             }
+            if time > 0.5 && self.isAwaitingPlayback {
+                self.isAwaitingPlayback = false
+                self.playbackStartTimer?.cancel()
+            }
         }
         if let dur = await queryProperty("duration") as? Double {
             if abs(self.duration - dur) > 0.5 {
                 self.duration = dur
                 changed = true
             }
+            if dur > 0.5 && self.isAwaitingPlayback {
+                self.isAwaitingPlayback = false
+                self.playbackStartTimer?.cancel()
+            }
         }
         if let eof = await queryProperty("eof-reached") as? Bool {
-            if eof && !self.hasHandledEOF && !self.isPaused && self.duration > 0 && self.currentTime > 1.0 {
-                self.hasHandledEOF = true
-                self.onTrackFinished?()
+            if eof && !self.hasHandledEOF && !self.isPaused {
+                if self.duration > 0 && self.currentTime > 1.0 {
+                    self.hasHandledEOF = true
+                    self.onTrackFinished?()
+                } else if self.isAwaitingPlayback {
+                    self.hasHandledEOF = true
+                    self.isAwaitingPlayback = false
+                    self.playbackStartTimer?.cancel()
+                    self.onPlaybackError?(nil)
+                }
             } else if !eof {
                 self.hasHandledEOF = false
             }

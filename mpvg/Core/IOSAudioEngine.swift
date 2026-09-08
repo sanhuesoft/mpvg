@@ -19,7 +19,9 @@ final class IOSAudioEngine: ObservableObject {
     private var timeObserverToken: Any?
     private var itemStatusObserver: AnyCancellable?
     private var endObserverToken: Any?
+    private var errorObserverToken: Any?
     var onTrackFinished: (() -> Void)?
+    var onPlaybackError: ((Error?) -> Void)?
     
     @Published var isRunning = true
     @Published var isPaused = true
@@ -171,6 +173,12 @@ final class IOSAudioEngine: ObservableObject {
             endObserverToken = nil
         }
         
+        if let token = errorObserverToken {
+            NotificationCenter.default.removeObserver(token)
+            errorObserverToken = nil
+        }
+        itemStatusObserver?.cancel()
+        
         let item = AVPlayerItem(url: streamURL)
         endObserverToken = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
@@ -179,6 +187,22 @@ final class IOSAudioEngine: ObservableObject {
         ) { [weak self] _ in
             self?.onTrackFinished?()
         }
+        
+        errorObserverToken = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemFailedToPlayToEndTime,
+            object: item,
+            queue: .main
+        ) { [weak self] notif in
+            let error = notif.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error
+            self?.onPlaybackError?(error)
+        }
+        
+        itemStatusObserver = item.publisher(for: \.status)
+            .sink { [weak self] status in
+                if status == .failed {
+                    self?.onPlaybackError?(self?.player?.currentItem?.error)
+                }
+            }
         
         if player == nil {
             player = AVPlayer(playerItem: item)
