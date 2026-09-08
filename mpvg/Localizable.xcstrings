@@ -1924,6 +1924,9 @@
         }
       }
     },
+    "Pausar álbum" : {
+
+    },
     "PLAY" : {
       "localizations" : {
         "en" : {
@@ -2186,6 +2189,9 @@
 
     },
     "Reproducir ahora" : {
+
+    },
+    "Reproducir álbum" : {
 
     },
     "Rescan server and refresh catalog" : {
