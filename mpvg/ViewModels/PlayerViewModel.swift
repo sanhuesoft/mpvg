@@ -1106,6 +1106,11 @@ final class PlayerViewModel: ObservableObject {
             ArtistItem(id: "art-6", name: "The Beatles", albumCount: 13, artistImageUrl: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=300&q=80"),
             ArtistItem(id: "art-7", name: "John Coltrane", albumCount: 8, artistImageUrl: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=300&q=80")
         ]
+        
+        if let firstAlbum = self.albums.first, let firstTrack = generateSampleTracks(for: firstAlbum).first {
+            self.currentSong = firstTrack
+            self.currentAlbum = firstAlbum
+        }
     }
     
     private func generateSampleTracks(for album: AlbumItem) -> [SongItem] {
