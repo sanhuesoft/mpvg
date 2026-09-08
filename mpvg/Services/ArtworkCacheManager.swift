@@ -20,29 +20,52 @@ final class ArtworkCacheManager {
     static let shared = ArtworkCacheManager()
     
     private let memoryCache = NSCache<NSString, PlatformImage>()
-    private let diskQueue = DispatchQueue(label: "com.sanhuesoft.mpvg.artworkcache", qos: .utility)
+    private let diskQueue = DispatchQueue(label: "com.sanhuesoft.mpvg.artworkcache", qos: .userInitiated, attributes: .concurrent)
     private let fileManager = FileManager.default
     private let diskCacheDirectory: URL
+    
+    // In-flight network request deduplication
+    private var inFlightTasks: [String: Task<PlatformImage?, Never>] = [:]
+    private let tasksLock = NSLock()
     
     private init() {
         // 1. Configure In-Memory Cache
         memoryCache.countLimit = 600
         memoryCache.totalCostLimit = 1024 * 1024 * 256 // 256 MB RAM limit
         
-        // 2. Setup Persistent Disk Directory
-        let baseDir = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first
-            ?? fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+        // 2. Setup Persistent Disk Directory in Application Support (immune to OS purge)
+        let appSupportDir = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? URL(fileURLWithPath: NSTemporaryDirectory())
         
-        let artDir = baseDir.appendingPathComponent("mpvg/artwork_cache", isDirectory: true)
-        if !fileManager.fileExists(atPath: artDir.path) {
-            try? fileManager.createDirectory(at: artDir, withIntermediateDirectories: true)
+        let persistentArtDir = appSupportDir.appendingPathComponent("mpvg/artwork_cache", isDirectory: true)
+        if !fileManager.fileExists(atPath: persistentArtDir.path) {
+            try? fileManager.createDirectory(at: persistentArtDir, withIntermediateDirectories: true)
         }
-        self.diskCacheDirectory = artDir
+        
+        // Exclude from iCloud backup
+        var resourceValues = URLResourceValues()
+        resourceValues.isExcludedFromBackup = true
+        var mutableURL = persistentArtDir
+        try? mutableURL.setResourceValues(resourceValues)
+        self.diskCacheDirectory = persistentArtDir
+        
+        // Migrate any existing files from legacy .cachesDirectory so existing caches are not lost
+        if let legacyCaches = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first {
+            let legacyArtDir = legacyCaches.appendingPathComponent("mpvg/artwork_cache", isDirectory: true)
+            if fileManager.fileExists(atPath: legacyArtDir.path),
+               let legacyFiles = try? fileManager.contentsOfDirectory(at: legacyArtDir, includingPropertiesForKeys: nil) {
+                for file in legacyFiles {
+                    let dest = persistentArtDir.appendingPathComponent(file.lastPathComponent)
+                    if !fileManager.fileExists(atPath: dest.path) {
+                        try? fileManager.moveItem(at: file, to: dest)
+                    }
+                }
+            }
+        }
     }
     
     // MARK: - Canonical Cache Key
-    /// Normalizes URLs by removing transient query params (s, t, salt, token) so cached artwork matches permanently.
+    /// Normalizes URLs by removing transient query params (s, t, salt, token) and sorting the rest so cached artwork matches permanently.
     func cacheKey(for url: URL) -> String {
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return sha256Hex(url.absoluteString)
@@ -54,7 +77,7 @@ final class ArtworkCacheManager {
                 let name = item.name.lowercased()
                 return name != "t" && name != "s" && name != "salt" && name != "token"
             }
-            components.queryItems = filtered.isEmpty ? nil : filtered
+            components.queryItems = filtered.isEmpty ? nil : filtered.sorted(by: { $0.name < $1.name })
         }
         
         let normalized = components.string ?? url.absoluteString
@@ -70,9 +93,32 @@ final class ArtworkCacheManager {
         diskCacheDirectory.appendingPathComponent(key + ".dat")
     }
     
-    // MARK: - Synchronous Memory Lookup
+    // MARK: - Synchronous Memory / Fast Disk Lookup
     func imageFromMemory(for key: String) -> PlatformImage? {
         memoryCache.object(forKey: key as NSString)
+    }
+    
+    /// Synchronous lookup: checks memory, and if not present, performs an immediate fast disk check
+    /// and populates memory cache so SwiftUI views render without a placeholder flash on launch.
+    func syncImage(for url: URL) -> PlatformImage? {
+        let key = cacheKey(for: url)
+        if let memImage = memoryCache.object(forKey: key as NSString) {
+            return memImage
+        }
+        let fileURL = diskFileURL(for: key)
+        if fileManager.fileExists(atPath: fileURL.path),
+           let data = try? Data(contentsOf: fileURL),
+           let diskImage = PlatformImage(data: data) {
+            memoryCache.setObject(diskImage, forKey: key as NSString)
+            return diskImage
+        }
+        return nil
+    }
+    
+    func hasImage(for url: URL) -> Bool {
+        let key = cacheKey(for: url)
+        if memoryCache.object(forKey: key as NSString) != nil { return true }
+        return fileManager.fileExists(atPath: diskFileURL(for: key).path)
     }
     
     // MARK: - Asynchronous Retrieve (Memory -> Disk)
@@ -87,12 +133,55 @@ final class ArtworkCacheManager {
         // 2. Check Persistent Disk Cache
         let fileURL = diskFileURL(for: key)
         if let diskImage = await loadFromDisk(fileURL: fileURL) {
-            // Populate memory cache
             memoryCache.setObject(diskImage, forKey: key as NSString)
             return diskImage
         }
         
         return nil
+    }
+    
+    // MARK: - Deduplicated Network Loading
+    func loadImage(for url: URL) async -> PlatformImage? {
+        // 1. Check cache first
+        if let cached = await image(for: url) {
+            return cached
+        }
+        
+        let key = cacheKey(for: url)
+        
+        // 2. Reuse in-flight task if already downloading this artwork
+        tasksLock.lock()
+        if let existing = inFlightTasks[key] {
+            tasksLock.unlock()
+            return await existing.value
+        }
+        
+        let task = Task<PlatformImage?, Never> {
+            do {
+                let request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 15)
+                let (data, response) = try await URLSession.shared.data(for: request)
+                if Task.isCancelled { return nil }
+                if let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode),
+                   let img = PlatformImage(data: data) {
+                    self.storeImage(img, for: url, rawData: data)
+                    return img
+                }
+            } catch {
+                // Handled silently
+            }
+            return nil
+        }
+        
+        inFlightTasks[key] = task
+        tasksLock.unlock()
+        
+        let result = await task.value
+        
+        tasksLock.lock()
+        inFlightTasks.removeValue(forKey: key)
+        tasksLock.unlock()
+        
+        return result
     }
     
     // MARK: - Store (Memory + Disk)
@@ -142,7 +231,7 @@ final class ArtworkCacheManager {
     // MARK: - Cache Maintenance
     func clearAllCache() {
         memoryCache.removeAllObjects()
-        diskQueue.async { [weak self] in
+        diskQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
             if let files = try? self.fileManager.contentsOfDirectory(at: self.diskCacheDirectory, includingPropertiesForKeys: nil) {
                 for file in files {

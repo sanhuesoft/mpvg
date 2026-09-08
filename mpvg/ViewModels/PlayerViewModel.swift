@@ -1021,7 +1021,7 @@ final class PlayerViewModel: ObservableObject {
             return cached
         }
         
-        if isConnected, let base = serverConfig.cleanURL {
+        if let base = serverConfig.cleanURL, !serverConfig.password.isEmpty {
             if sessionToken.isEmpty {
                 updateSessionAuth()
             }
@@ -1059,17 +1059,18 @@ final class PlayerViewModel: ObservableObject {
     }
     
     func artistAvatarURL(for artist: ArtistItem) -> URL? {
-        if isConnected {
-            if let raw = artist.artistImageUrl, !raw.isEmpty {
-                if let url = URL(string: raw), raw.hasPrefix("http") {
-                    return url
-                } else if raw.hasPrefix("/"), let base = serverConfig.cleanURL {
-                    return base.appendingPathComponent(raw.trimmingCharacters(in: CharacterSet(charactersIn: "/")))
-                }
+        if let raw = artist.artistImageUrl, !raw.isEmpty {
+            if let url = URL(string: raw), raw.hasPrefix("http") {
+                return url
+            } else if raw.hasPrefix("/"), let base = serverConfig.cleanURL {
+                return base.appendingPathComponent(raw.trimmingCharacters(in: CharacterSet(charactersIn: "/")))
             }
-            return coverArtURL(for: artist.id)
-        } else if let raw = artist.artistImageUrl {
-            return URL(string: raw)
+        }
+        if let cover = coverArtURL(for: artist.id) {
+            return cover
+        }
+        if let raw = artist.artistImageUrl, let url = URL(string: raw) {
+            return url
         }
         return nil
     }

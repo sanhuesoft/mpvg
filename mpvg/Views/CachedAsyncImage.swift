@@ -19,8 +19,7 @@ struct CachedAsyncImage<Placeholder: View>: View {
         self.url = url
         self.placeholder = placeholder
         if let url = url {
-            let key = ArtworkCacheManager.shared.cacheKey(for: url)
-            if let cached = ArtworkCacheManager.shared.imageFromMemory(for: key) {
+            if let cached = ArtworkCacheManager.shared.syncImage(for: url) {
                 self._loadedImage = State(initialValue: cached)
             } else {
                 self._loadedImage = State(initialValue: nil)
@@ -45,32 +44,17 @@ struct CachedAsyncImage<Placeholder: View>: View {
                 return
             }
             
-            // 1. Check Memory or Disk Cache via ArtworkCacheManager
-            if let cached = await ArtworkCacheManager.shared.image(for: targetURL) {
-                self.loadedImage = cached
+            // If already displaying this image from synchronous cache, skip redundant load
+            if loadedImage != nil && ArtworkCacheManager.shared.hasImage(for: targetURL) {
                 return
             }
             
-            // 2. Fetch from Network if not cached
-            self.loadedImage = nil
-            await loadImage(for: targetURL)
-        }
-    }
-    
-    private func loadImage(for targetURL: URL) async {
-        do {
-            let request = URLRequest(url: targetURL, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 15)
-            let (data, response) = try await URLSession.shared.data(for: request)
-            if Task.isCancelled { return }
-            if let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode),
-               let img = PlatformImage(data: data) {
-                ArtworkCacheManager.shared.storeImage(img, for: targetURL, rawData: data)
+            // Load from cache or fetch via deduplicated network loader
+            if let img = await ArtworkCacheManager.shared.loadImage(for: targetURL) {
                 if self.url == targetURL {
                     self.loadedImage = img
                 }
             }
-        } catch {
-            // Silently handle cancelled or offline network requests
         }
     }
 }
