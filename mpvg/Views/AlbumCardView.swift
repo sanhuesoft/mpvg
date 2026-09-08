@@ -36,10 +36,11 @@ struct AlbumCardView: View {
                             .stroke(ColorTheme.cardBorder, lineWidth: 1)
                     )
                 
-                // Hover Overlay with Play Button
-                if isHovered || isCurrentlyPlaying {
+                // Hover Overlay with Play Button (macOS only on hover)
+                #if os(macOS)
+                if isHovered {
                     ZStack {
-                        Color.black.opacity(isHovered ? 0.35 : 0.15)
+                        Color.black.opacity(0.35)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                         
                         // Center Play / Pause Button
@@ -68,15 +69,28 @@ struct AlbumCardView: View {
                     }
                     .transition(.opacity)
                 }
+                #endif
             }
             .frame(maxWidth: .infinity)
             
             // Metadata Strip Below Cover
             VStack(alignment: .leading, spacing: 3) {
-                Text(album.displayTitle)
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(ColorTheme.textPrimary)
-                    .lineLimit(1)
+                HStack(alignment: .center, spacing: 5) {
+                    Text(album.displayTitle)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(ColorTheme.textPrimary)
+                        .lineLimit(1)
+                    
+                    if isCurrentlyPlaying {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 7, weight: .bold))
+                            .foregroundColor(ColorTheme.sageGreen)
+                            .frame(width: 15, height: 15)
+                            .background(ColorTheme.sageGreenBg)
+                            .cornerRadius(3.5)
+                            .fixedSize()
+                    }
+                }
                 
                 Text(album.displayArtist)
                     .font(.system(size: 11, weight: .medium))
@@ -124,14 +138,7 @@ struct AlbumCardView: View {
                             .cornerRadius(4)
                         }
                         
-                        if isCurrentlyPlaying {
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 7.5, weight: .bold))
-                                .foregroundColor(ColorTheme.sageGreen)
-                                .frame(width: 16, height: 16)
-                                .background(ColorTheme.sageGreenBg)
-                                .cornerRadius(4)
-                        } else if let suffix = album.suffix, !suffix.isEmpty {
+                        if let suffix = album.suffix, !suffix.isEmpty {
                             Text(suffix)
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundColor(ColorTheme.terracotta)
