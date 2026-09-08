@@ -14,7 +14,10 @@ struct ArtistCardView: View {
     @State private var isHovered: Bool = false
     
     var body: some View {
-        VStack(spacing: 10) {
+        Button(action: {
+            viewModel.navigateToArtist(artist)
+        }) {
+            VStack(spacing: 10) {
             // Circular Artist Portrait (Hero Element)
             ZStack {
                 avatarView
@@ -66,15 +69,21 @@ struct ArtistCardView: View {
         .cornerRadius(14)
         .shadow(color: Color.black.opacity(isHovered ? 0.06 : 0.02), radius: isHovered ? 8 : 3, x: 0, y: isHovered ? 3 : 1)
         .contentShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 self.isHovered = hovering
             }
         }
-        .onTapGesture {
-            viewModel.navigateToArtist(artist)
-        }
         .pointingHandOnHover()
+        .contextMenu {
+            Button {
+                viewModel.navigateToArtist(artist)
+            } label: {
+                Label("Ver artista", systemImage: "music.mic")
+            }
+        }
     }
     
     @ViewBuilder

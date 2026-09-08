@@ -22,7 +22,10 @@ struct AlbumCardView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        Button(action: {
+            viewModel.navigateToAlbum(album)
+        }) {
+            VStack(alignment: .leading, spacing: 8) {
             // Hero Cover Art (Perfect 1:1 Square)
             ZStack(alignment: .center) {
                 artworkView
@@ -156,13 +159,12 @@ struct AlbumCardView: View {
         .cornerRadius(14)
         .shadow(color: Color.black.opacity(isHovered ? 0.06 : 0.02), radius: isHovered ? 8 : 3, x: 0, y: isHovered ? 3 : 1)
         .contentShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 self.isHovered = hovering
             }
-        }
-        .onTapGesture {
-            viewModel.navigateToAlbum(album)
         }
         .pointingHandOnHover()
         .contextMenu {

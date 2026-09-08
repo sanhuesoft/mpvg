@@ -111,6 +111,25 @@ struct QueueView: View {
                             .background(ColorTheme.terracottaLight.opacity(0.4))
                             .cornerRadius(10)
                             .padding(.horizontal, 12)
+                            .contextMenu {
+                                if !current.displayArtist.isEmpty && current.displayArtist != "Unknown Artist" {
+                                    Button {
+                                        viewModel.navigateToArtist(for: current)
+                                        viewModel.showQueueSheet = false
+                                    } label: {
+                                        Label("Ver artista", systemImage: "music.mic")
+                                    }
+                                }
+                                
+                                if !current.displayAlbum.isEmpty && current.displayAlbum != "Unknown Album" {
+                                    Button {
+                                        viewModel.navigateToAlbum(for: current)
+                                        viewModel.showQueueSheet = false
+                                    } label: {
+                                        Label("Ver álbum", systemImage: "square.stack")
+                                    }
+                                }
+                            }
                         }
                     }
                     

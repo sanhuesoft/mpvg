@@ -551,7 +551,10 @@ struct AlbumTableRowView: View {
     }
     
     var body: some View {
-        HStack(spacing: 12) {
+        Button(action: {
+            viewModel.navigateToAlbum(album)
+        }) {
+            HStack(spacing: 12) {
             // Index # or Waveform
             ZStack {
                 if isCurrentlyPlaying {
@@ -694,13 +697,12 @@ struct AlbumTableRowView: View {
         )
         .cornerRadius(6)
         .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.1)) {
                 self.isHovered = hovering
             }
-        }
-        .onTapGesture {
-            viewModel.navigateToAlbum(album)
         }
         .pointingHandOnHover()
         .contextMenu {
@@ -749,7 +751,10 @@ struct ArtistTableRowView: View {
     @State private var isHovered: Bool = false
     
     var body: some View {
-        HStack(spacing: 12) {
+        Button(action: {
+            viewModel.navigateToArtist(artist)
+        }) {
+            HStack(spacing: 12) {
             // Index #
             Text("\(index)")
                 .font(.system(size: 12, weight: .medium, design: .monospaced))
@@ -805,15 +810,21 @@ struct ArtistTableRowView: View {
         )
         .cornerRadius(6)
         .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.1)) {
                 self.isHovered = hovering
             }
         }
-        .onTapGesture {
-            viewModel.navigateToArtist(artist)
-        }
         .pointingHandOnHover()
+        .contextMenu {
+            Button {
+                viewModel.navigateToArtist(artist)
+            } label: {
+                Label("Ver artista", systemImage: "music.mic")
+            }
+        }
     }
 }
 
