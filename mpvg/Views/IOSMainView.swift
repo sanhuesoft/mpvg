@@ -235,22 +235,22 @@ struct IOSMainView: View {
     private var miniPlayerBar: some View {
         miniPlayerControls
             .background(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .fill(.ultraThinMaterial)
             )
             .background(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .fill(ColorTheme.cardBackground.opacity(0.35))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 0.8)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .shadow(color: Color.black.opacity(0.12), radius: 14, x: 0, y: 5)
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .shadow(color: Color.black.opacity(0.14), radius: 16, x: 0, y: 6)
     }
     
-    // MARK: - Shared player controls layout
+    // MARK: - Shared player controls layout (Expanded Height ~1.6x)
     private var miniPlayerControls: some View {
         Button(action: { showNowPlayingSheet = true }) {
             VStack(spacing: 0) {
@@ -260,17 +260,17 @@ struct IOSMainView: View {
                     ZStack(alignment: .leading) {
                         Rectangle()
                             .fill(Color.primary.opacity(0.12))
-                            .frame(height: 2.5)
+                            .frame(height: 3)
                         
                         Rectangle()
                             .fill(ColorTheme.terracotta)
-                            .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 2.5)
+                            .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 3)
                     }
                 }
-                .frame(height: 2.5)
+                .frame(height: 3)
                 
-                HStack(spacing: 10) {
-                    // Mini Album Cover
+                HStack(spacing: 12) {
+                    // Mini Album Cover (Enlarged to 66x66)
                     let artURL: URL? = {
                         if let coverId = viewModel.currentSong?.coverArt ?? viewModel.currentAlbum?.coverArt {
                             return viewModel.coverArtURL(for: coverId)
@@ -282,50 +282,73 @@ struct IOSMainView: View {
                         ZStack {
                             ColorTheme.cardBorder.opacity(0.5)
                             Image(systemName: "opticaldisc")
-                                .font(.system(size: 18))
+                                .font(.system(size: 24))
                                 .foregroundColor(ColorTheme.terracotta)
                         }
                     }
-                    .frame(width: 46, height: 46)
-                    .cornerRadius(10)
-                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(ColorTheme.cardBorder, lineWidth: 0.8))
+                    .frame(width: 66, height: 66)
+                    .cornerRadius(14)
+                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(ColorTheme.cardBorder, lineWidth: 0.8))
+                    .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 3)
                     
-                    // Metadata
-                    VStack(alignment: .leading, spacing: 2) {
+                    // Metadata & Audio Format Badge
+                    VStack(alignment: .leading, spacing: 3) {
                         Text(viewModel.currentSong?.title ?? "")
-                            .font(.system(size: 13.5, weight: .bold))
+                            .font(.system(size: 15, weight: .bold))
                             .foregroundColor(ColorTheme.textPrimary)
                             .lineLimit(1)
                         
                         Text(viewModel.currentSong?.displayArtist ?? "")
-                            .font(.system(size: 11.5, weight: .medium))
-                            .foregroundColor(ColorTheme.textPrimary)
+                            .font(.system(size: 12.5, weight: .medium))
+                            .foregroundColor(ColorTheme.textSecondary)
                             .lineLimit(1)
+                        
+                        HStack(spacing: 5) {
+                            if let suffix = viewModel.currentSong?.suffix?.uppercased(), !suffix.isEmpty {
+                                Text(suffix)
+                                    .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                                    .foregroundColor(ColorTheme.terracotta)
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 1.5)
+                                    .background(ColorTheme.terracottaLight.opacity(0.6))
+                                    .cornerRadius(4)
+                            }
+                            
+                            if let rate = viewModel.mpv.audioSampleRate {
+                                Text("\(rate / 1000)kHz")
+                                    .font(.system(size: 9.5, weight: .semibold, design: .monospaced))
+                                    .foregroundColor(ColorTheme.textTertiary)
+                            } else if let bitRate = viewModel.currentSong?.bitRate {
+                                Text("\(bitRate)kbps")
+                                    .font(.system(size: 9.5, weight: .semibold, design: .monospaced))
+                                    .foregroundColor(ColorTheme.textTertiary)
+                            }
+                        }
                     }
                     
                     Spacer(minLength: 8)
                     
-                    // Mini Controls
-                    HStack(spacing: 2) {
+                    // Touch-Friendly Playback Controls
+                    HStack(spacing: 4) {
                         Button(action: { viewModel.togglePlayPause() }) {
                             Image(systemName: viewModel.mpv.isPaused ? "play.fill" : "pause.fill")
-                                .font(.system(size: 19, weight: .semibold))
+                                .font(.system(size: 22, weight: .semibold))
                                 .foregroundColor(ColorTheme.textPrimary)
-                                .frame(width: 36, height: 40)
+                                .frame(width: 44, height: 44)
                         }
                         .buttonStyle(.plain)
                         
                         Button(action: { viewModel.nextTrack() }) {
                             Image(systemName: "forward.fill")
-                                .font(.system(size: 17, weight: .medium))
+                                .font(.system(size: 19, weight: .medium))
                                 .foregroundColor(ColorTheme.textPrimary)
-                                .frame(width: 36, height: 40)
+                                .frame(width: 44, height: 44)
                         }
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 11)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 14)
             }
         }
         .buttonStyle(.plain)

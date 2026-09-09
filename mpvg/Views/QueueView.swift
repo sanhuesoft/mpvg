@@ -108,8 +108,19 @@ struct QueueView: View {
                             }
                             .padding(.horizontal, 14)
                             .padding(.vertical, 10)
-                            .background(ColorTheme.terracottaLight.opacity(0.4))
-                            .cornerRadius(10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(.ultraThinMaterial)
+                            )
+                            .background(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(ColorTheme.terracottaLight.opacity(0.45))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .stroke(ColorTheme.terracotta.opacity(0.35), lineWidth: 0.8)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .padding(.horizontal, 12)
                             .contextMenu {
                                 if !current.displayArtist.isEmpty && current.displayArtist != "Unknown Artist" {
@@ -171,10 +182,12 @@ struct QueueView: View {
         }
         #if os(macOS)
         .frame(width: 380, height: 480)
+        .background(.ultraThinMaterial)
+        .background(ColorTheme.windowBackground.opacity(0.7))
         #else
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        #endif
         .background(ColorTheme.windowBackground)
+        #endif
     }
     
     // MARK: - Queue Row
@@ -239,8 +252,19 @@ struct QueueView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 6)
-            .background(ColorTheme.cardBackground.opacity(0.6))
-            .cornerRadius(8)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(ColorTheme.cardBackground.opacity(0.4))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(Color.white.opacity(0.35), lineWidth: 0.7)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .padding(.horizontal, 12)
         }
         .buttonStyle(.plain)

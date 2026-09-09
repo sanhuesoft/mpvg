@@ -28,12 +28,19 @@ struct HeaderBarView: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(ColorTheme.textSecondary)
                         .frame(width: 28, height: 26)
-                        .background(ColorTheme.inputBackground)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(ColorTheme.inputBorder, lineWidth: 1)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(.ultraThinMaterial)
                         )
-                        .cornerRadius(8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(ColorTheme.inputBackground.opacity(0.4))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .pointingHandOnHover()
@@ -142,12 +149,19 @@ struct HeaderBarView: View {
                     .pointingHandOnHover()
                 }
                 .padding(2)
-                .background(ColorTheme.inputBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(ColorTheme.inputBorder, lineWidth: 1)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(.ultraThinMaterial)
                 )
-                .cornerRadius(8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(ColorTheme.inputBackground.opacity(0.4))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             }
             
             // Search Bar Pill
@@ -191,12 +205,19 @@ struct HeaderBarView: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(ColorTheme.inputBackground)
-            .overlay(
-                RoundedRectangle(cornerRadius: 9)
-                    .stroke(isSearchFocused ? ColorTheme.terracotta.opacity(0.6) : ColorTheme.inputBorder, lineWidth: 1)
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(.ultraThinMaterial)
             )
-            .cornerRadius(9)
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(ColorTheme.inputBackground.opacity(0.4))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .stroke(isSearchFocused ? ColorTheme.terracotta.opacity(0.7) : Color.white.opacity(0.35), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
             .contentShape(Rectangle())
             .onTapGesture {
                 isSearchFocused = true
@@ -215,6 +236,11 @@ struct HeaderBarView: View {
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 14)
+        .background(
+            Rectangle()
+                .fill(.ultraThinMaterial)
+        )
+        .background(ColorTheme.windowBackground.opacity(0.75))
         .onChange(of: viewModel.focusSearchTrigger) { _ in
             isSearchFocused = true
         }

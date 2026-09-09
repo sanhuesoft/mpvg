@@ -194,41 +194,35 @@ struct PlayerBarView: View {
                             }
                         }
                     } label: {
-                        HStack(spacing: 4) {
+                        Group {
                             if !viewModel.mpv.isDeviceConnected && !viewModel.mpv.preferredDeviceName.isEmpty {
                                 Image(systemName: "exclamationmark.triangle.fill")
-                                    .font(.system(size: 9))
-                                    .foregroundColor(ColorTheme.terracotta)
-                                
-                                Text("DAC OFF")
-                                    .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                                    .font(.system(size: 11, weight: .bold))
                                     .foregroundColor(ColorTheme.terracotta)
                             } else if viewModel.mpv.isExclusive {
                                 Image(systemName: "bolt.fill")
-                                    .font(.system(size: 9))
-                                    .foregroundColor(ColorTheme.terracotta)
-                                
-                                Text("EXCLUSIVE")
-                                    .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                                    .font(.system(size: 11, weight: .bold))
                                     .foregroundColor(ColorTheme.terracotta)
                             } else {
-                                Text("SHARED")
-                                    .font(.system(size: 9, weight: .bold, design: .monospaced))
-                                    .foregroundColor(ColorTheme.textTertiary)
-                            }
-                            
-                            if let rate = viewModel.mpv.audioSampleRate {
-                                Text("• \(rate / 1000)kHz")
-                                    .font(.system(size: 9, weight: .semibold, design: .monospaced))
-                                    .foregroundColor(ColorTheme.textSecondary)
+                                Image(systemName: "bolt")
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(ColorTheme.textSecondary.opacity(0.75))
                             }
                         }
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 4)
-                        .background(viewModel.mpv.isExclusive ? ColorTheme.terracottaLight.opacity(0.8) : ColorTheme.cardBorder.opacity(0.4))
-                        .cornerRadius(6)
+                        .frame(width: 26, height: 26)
+                        .background(
+                            viewModel.mpv.isExclusive
+                                ? ColorTheme.terracottaLight.opacity(0.8)
+                                : ColorTheme.cardBorder.opacity(0.35)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .stroke(viewModel.mpv.isExclusive ? ColorTheme.terracotta.opacity(0.3) : Color.white.opacity(0.3), lineWidth: 0.8)
+                        )
                     }
                     .menuStyle(.borderlessButton)
+                    .help(viewModel.mpv.isExclusive ? "CoreAudio Exclusive Mode (Bit-Perfect)" : "Shared Audio Mode")
                     
                     // Volume Control with Terracotta Accent
                     HStack(spacing: 4) {
