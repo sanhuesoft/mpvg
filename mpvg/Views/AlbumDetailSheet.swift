@@ -44,6 +44,10 @@ struct AlbumDetailView: View {
             }
         }
         .background(ColorTheme.windowBackground)
+        .navigationTitle(album.displayTitle)
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
         .task {
             if viewModel.selectedAlbumTracks.isEmpty || viewModel.selectedAlbumForDetail?.id != album.id {
                 viewModel.selectAlbumForDetail(album)

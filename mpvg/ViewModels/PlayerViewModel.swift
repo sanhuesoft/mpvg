@@ -44,7 +44,7 @@ enum ViewMode: String {
     case list
 }
 
-enum NavigationDestination: Identifiable, Equatable {
+enum NavigationDestination: Identifiable, Equatable, Hashable {
     case album(AlbumItem)
     case artist(ArtistItem)
     
@@ -103,6 +103,7 @@ final class PlayerViewModel: ObservableObject {
     
     // In-window Navigation Stack
     @Published var navigationStack: [NavigationDestination] = []
+    @Published var requestedDestination: NavigationDestination? = nil
     
     // Connection
     @Published var serverConfig: ServerConfig {
@@ -474,17 +475,21 @@ final class PlayerViewModel: ObservableObject {
         selectAlbumForDetail(album)
         // Avoid duplicate pushes of same album
         if case .album(let current) = navigationStack.last, current.id == album.id {
+            requestedDestination = .album(album)
             return
         }
         navigationStack.append(.album(album))
+        requestedDestination = .album(album)
     }
     
     func navigateToArtist(_ artist: ArtistItem) {
         selectArtistForDetail(artist)
         if case .artist(let current) = navigationStack.last, current.id == artist.id {
+            requestedDestination = .artist(artist)
             return
         }
         navigationStack.append(.artist(artist))
+        requestedDestination = .artist(artist)
     }
     
     func navigateToAlbum(for song: SongItem) {

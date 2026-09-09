@@ -49,6 +49,10 @@ struct ArtistDetailView: View {
             }
         }
         .background(ColorTheme.windowBackground)
+        .navigationTitle(artist.name)
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
         .task {
             if viewModel.selectedArtistAlbums.isEmpty || viewModel.selectedArtistForDetail?.id != artist.id {
                 viewModel.selectArtistForDetail(artist)

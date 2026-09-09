@@ -14,60 +14,101 @@ struct IOSMainView: View {
     @State private var selectedTab: Int = 0
     @State private var showNowPlayingSheet: Bool = false
     
+    // Per-tab navigation stacks for native iOS push transitions
+    @State private var browsePath: [NavigationDestination] = []
+    @State private var playlistsPath: [NavigationDestination] = []
+    @State private var albumsPath: [NavigationDestination] = []
+    @State private var artistsPath: [NavigationDestination] = []
+    @State private var searchPath: [NavigationDestination] = []
+    
     var body: some View {
-        if #available(iOS 26.0, *) {
-            mainTabView
-                // Native Liquid Glass Now Playing bar — system matches tab bar width & material
-                .tabViewBottomAccessory {
+        Group {
+            if #available(iOS 26.0, *) {
+                mainTabView
+                    // Native Liquid Glass Now Playing bar — system matches tab bar width & material
+                    .tabViewBottomAccessory {
+                        if viewModel.currentSong != nil {
+                            miniPlayerContent
+                        }
+                    }
+                    .sheet(isPresented: $showNowPlayingSheet) {
+                        NowPlayingSheetView(viewModel: viewModel)
+                    }
+                    .sheet(isPresented: $viewModel.showQueueSheet) {
+                        QueueView(viewModel: viewModel)
+                    }
+                    .sheet(isPresented: $viewModel.showSettingsSheet) { settingsSheet }
+            } else {
+                // Fallback for iOS 17-25: manual ZStack positioning
+                ZStack(alignment: .bottom) {
+                    mainTabView
                     if viewModel.currentSong != nil {
-                        miniPlayerContent
+                        miniPlayerBar
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 58)
                     }
                 }
                 .sheet(isPresented: $showNowPlayingSheet) {
                     NowPlayingSheetView(viewModel: viewModel)
                 }
-                .sheet(item: $viewModel.selectedAlbumForDetail) { album in
-                    AlbumDetailSheet(album: album, viewModel: viewModel)
-                }
-                .sheet(item: $viewModel.selectedArtistForDetail) { artist in
-                    ArtistDetailSheet(artist: artist, viewModel: viewModel)
-                }
                 .sheet(isPresented: $viewModel.showQueueSheet) {
                     QueueView(viewModel: viewModel)
                 }
                 .sheet(isPresented: $viewModel.showSettingsSheet) { settingsSheet }
-        } else {
-            // Fallback for iOS 17-25: manual ZStack positioning
-            ZStack(alignment: .bottom) {
-                mainTabView
-                if viewModel.currentSong != nil {
-                    miniPlayerBar
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 58)
-                }
             }
-            .sheet(isPresented: $showNowPlayingSheet) {
-                NowPlayingSheetView(viewModel: viewModel)
-            }
-            .sheet(item: $viewModel.selectedAlbumForDetail) { album in
-                AlbumDetailSheet(album: album, viewModel: viewModel)
-            }
-            .sheet(item: $viewModel.selectedArtistForDetail) { artist in
-                ArtistDetailSheet(artist: artist, viewModel: viewModel)
-            }
-            .sheet(isPresented: $viewModel.showQueueSheet) {
-                QueueView(viewModel: viewModel)
-            }
-            .sheet(isPresented: $viewModel.showSettingsSheet) { settingsSheet }
+        }
+        .onChange(of: viewModel.requestedDestination) { destination in
+            guard let dest = destination else { return }
+            pushDestination(dest)
+            viewModel.requestedDestination = nil
+        }
+    }
+    
+    private func pushDestination(_ destination: NavigationDestination) {
+        switch selectedTab {
+        case 0: browsePath.append(destination)
+        case 1: playlistsPath.append(destination)
+        case 2: albumsPath.append(destination)
+        case 3: artistsPath.append(destination)
+        default: searchPath.append(destination)
+        }
+    }
+    
+    @ViewBuilder
+    private func destinationView(for destination: NavigationDestination) -> some View {
+        switch destination {
+        case .album(let album):
+            AlbumDetailView(album: album, viewModel: viewModel)
+        case .artist(let artist):
+            ArtistDetailView(artist: artist, viewModel: viewModel)
         }
     }
     
     // MARK: - Shared Tab View
     private var mainTabView: some View {
-        TabView(selection: $selectedTab) {
-            NavigationStack {
+        TabView(selection: Binding(
+            get: { selectedTab },
+            set: { newTab in
+                if newTab == selectedTab {
+                    // Tap active tab to pop to root
+                    switch newTab {
+                    case 0: browsePath.removeAll()
+                    case 1: playlistsPath.removeAll()
+                    case 2: albumsPath.removeAll()
+                    case 3: artistsPath.removeAll()
+                    case 4: searchPath.removeAll()
+                    default: break
+                    }
+                }
+                selectedTab = newTab
+            }
+        )) {
+            NavigationStack(path: $browsePath) {
                 BrowseView(viewModel: viewModel)
                     .navigationTitle("Browse")
+                    .navigationDestination(for: NavigationDestination.self) { dest in
+                        destinationView(for: dest)
+                    }
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) { settingsToolbarButton }
                         ToolbarItem(placement: .topBarTrailing) { syncToolbarButton }
@@ -76,9 +117,12 @@ struct IOSMainView: View {
             .tabItem { tabItemView(title: "Browse", systemImage: "sparkles") }
             .tag(0)
             
-            NavigationStack {
+            NavigationStack(path: $playlistsPath) {
                 IOSPlaylistsView(viewModel: viewModel)
                     .navigationTitle("Playlists")
+                    .navigationDestination(for: NavigationDestination.self) { dest in
+                        destinationView(for: dest)
+                    }
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) { settingsToolbarButton }
                         ToolbarItem(placement: .topBarTrailing) { syncToolbarButton }
@@ -87,9 +131,12 @@ struct IOSMainView: View {
             .tabItem { tabItemView(title: "Listas", systemImage: "music.note.list") }
             .tag(1)
             
-            NavigationStack {
+            NavigationStack(path: $albumsPath) {
                 AlbumsGridView(viewModel: viewModel)
                     .navigationTitle("Albums")
+                    .navigationDestination(for: NavigationDestination.self) { dest in
+                        destinationView(for: dest)
+                    }
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) { settingsToolbarButton }
                         ToolbarItem(placement: .topBarTrailing) { syncToolbarButton }
@@ -98,9 +145,12 @@ struct IOSMainView: View {
             .tabItem { tabItemView(title: "Albums", systemImage: "opticaldisc") }
             .tag(2)
             
-            NavigationStack {
+            NavigationStack(path: $artistsPath) {
                 ArtistsGridView(viewModel: viewModel)
                     .navigationTitle("Artists")
+                    .navigationDestination(for: NavigationDestination.self) { dest in
+                        destinationView(for: dest)
+                    }
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) { settingsToolbarButton }
                         ToolbarItem(placement: .topBarTrailing) { syncToolbarButton }
@@ -109,9 +159,12 @@ struct IOSMainView: View {
             .tabItem { tabItemView(title: "Artists", systemImage: "music.mic") }
             .tag(3)
             
-            NavigationStack {
+            NavigationStack(path: $searchPath) {
                 IOSSearchView(viewModel: viewModel)
                     .navigationTitle("Search")
+                    .navigationDestination(for: NavigationDestination.self) { dest in
+                        destinationView(for: dest)
+                    }
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) { settingsToolbarButton }
                     }
