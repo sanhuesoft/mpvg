@@ -13,9 +13,34 @@ struct PlayerBarView: View {
     @ObservedObject var viewModel: PlayerViewModel
     @State private var isDraggingSlider: Bool = false
     @State private var dragValue: Double = 0.0
+    @State private var barWidth: CGFloat = 800
     
     var body: some View {
-        HStack(spacing: 16) {
+        let showTimeSlider = barWidth >= 640
+        let showVolumeControl = barWidth >= 780
+        let showStars = barWidth >= 520
+        
+        VStack(spacing: 0) {
+            // Micro progress line at top of capsule when full scrubber is hidden
+            if !showTimeSlider && viewModel.mpv.duration > 0 {
+                GeometryReader { pGeo in
+                    let progress = viewModel.mpv.duration > 0 ? (viewModel.mpv.currentTime / viewModel.mpv.duration) : 0.0
+                    ZStack(alignment: .leading) {
+                        Rectangle()
+                            .fill(Color.primary.opacity(0.08))
+                            .frame(height: 2)
+                        
+                        Rectangle()
+                            .fill(ColorTheme.terracotta)
+                            .frame(width: max(0, min(pGeo.size.width, pGeo.size.width * CGFloat(progress))), height: 2)
+                    }
+                }
+                .frame(height: 2)
+                .padding(.horizontal, 4)
+                .padding(.bottom, 2)
+            }
+            
+            HStack(spacing: 14) {
                 // ── Left: Mini Artwork & Track Metadata ──
                 HStack(spacing: 10) {
                     let artURL = viewModel.currentArtworkURL
@@ -64,7 +89,7 @@ struct PlayerBarView: View {
                                 .foregroundColor(ColorTheme.textSecondary)
                                 .lineLimit(1)
                             
-                            if let song = viewModel.currentSong {
+                            if showStars, let song = viewModel.currentSong {
                                 Text("•")
                                     .font(.system(size: 8))
                                     .foregroundColor(ColorTheme.textTertiary)
@@ -81,7 +106,7 @@ struct PlayerBarView: View {
                         }
                     }
                 }
-                .frame(minWidth: 130, idealWidth: 180, alignment: .leading)
+                .frame(minWidth: 120, idealWidth: 170, alignment: .leading)
                 
                 Spacer(minLength: 6)
                 
@@ -121,42 +146,50 @@ struct PlayerBarView: View {
                         .pointingHandOnHover()
                     }
                     
-                    // Track Scrubber with Live Elapsed & Duration counters
-                    HStack(spacing: 6) {
-                        let displayedTime = isDraggingSlider ? dragValue : viewModel.mpv.currentTime
-                        
-                        Text(formatTime(displayedTime))
-                            .font(.system(size: 10, weight: .medium, design: .monospaced))
-                            .foregroundColor(ColorTheme.textTertiary)
-                            .frame(width: 32, alignment: .trailing)
-                            .monospacedDigit()
-                        
-                        Slider(
-                            value: Binding(
-                                get: { isDraggingSlider ? dragValue : viewModel.mpv.currentTime },
-                                set: { val in
-                                    dragValue = val
-                                    if !isDraggingSlider {
-                                        viewModel.mpv.seek(to: val)
+                    if showTimeSlider {
+                        // Track Scrubber with Live Elapsed & Duration counters
+                        HStack(spacing: 6) {
+                            let displayedTime = isDraggingSlider ? dragValue : viewModel.mpv.currentTime
+                            
+                            Text(formatTime(displayedTime))
+                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .foregroundColor(ColorTheme.textTertiary)
+                                .frame(width: 32, alignment: .trailing)
+                                .monospacedDigit()
+                            
+                            Slider(
+                                value: Binding(
+                                    get: { isDraggingSlider ? dragValue : viewModel.mpv.currentTime },
+                                    set: { val in
+                                        dragValue = val
+                                        if !isDraggingSlider {
+                                            viewModel.mpv.seek(to: val)
+                                        }
+                                    }
+                                ),
+                                in: 0...max(viewModel.mpv.duration, 1.0),
+                                onEditingChanged: { editing in
+                                    isDraggingSlider = editing
+                                    if !editing {
+                                        viewModel.mpv.seek(to: dragValue)
                                     }
                                 }
-                            ),
-                            in: 0...max(viewModel.mpv.duration, 1.0),
-                            onEditingChanged: { editing in
-                                isDraggingSlider = editing
-                                if !editing {
-                                    viewModel.mpv.seek(to: dragValue)
-                                }
-                            }
-                        )
-                        .accentColor(ColorTheme.terracotta)
-                        .tint(ColorTheme.terracotta)
-                        .frame(minWidth: 70, idealWidth: 120, maxWidth: 160)
-                        
-                        Text(formatTime(viewModel.mpv.duration))
-                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            )
+                            .accentColor(ColorTheme.terracotta)
+                            .tint(ColorTheme.terracotta)
+                            .frame(minWidth: 70, idealWidth: 120, maxWidth: 160)
+                            
+                            Text(formatTime(viewModel.mpv.duration))
+                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .foregroundColor(ColorTheme.textTertiary)
+                                .frame(width: 32, alignment: .leading)
+                                .monospacedDigit()
+                        }
+                    } else if viewModel.mpv.duration > 0 {
+                        // Compact time indicator when scrubber is hidden
+                        Text(formatTime(viewModel.mpv.currentTime))
+                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
                             .foregroundColor(ColorTheme.textTertiary)
-                            .frame(width: 32, alignment: .leading)
                             .monospacedDigit()
                     }
                 }
@@ -224,22 +257,24 @@ struct PlayerBarView: View {
                     .menuStyle(.borderlessButton)
                     .help(viewModel.mpv.isExclusive ? "CoreAudio Exclusive Mode (Bit-Perfect)" : "Shared Audio Mode")
                     
-                    // Volume Control with Terracotta Accent
-                    HStack(spacing: 4) {
-                        Image(systemName: viewModel.mpv.volume == 0 ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                            .font(.system(size: 11))
-                            .foregroundColor(ColorTheme.textSecondary)
-                        
-                        Slider(
-                            value: Binding(
-                                get: { viewModel.mpv.volume },
-                                set: { viewModel.mpv.setVolume($0) }
-                            ),
-                            in: 0...100
-                        )
-                        .accentColor(ColorTheme.terracotta)
-                        .tint(ColorTheme.terracotta)
-                        .frame(minWidth: 40, idealWidth: 50, maxWidth: 65)
+                    if showVolumeControl {
+                        // Volume Control with Terracotta Accent
+                        HStack(spacing: 4) {
+                            Image(systemName: viewModel.mpv.volume == 0 ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                                .font(.system(size: 11))
+                                .foregroundColor(ColorTheme.textSecondary)
+                            
+                            Slider(
+                                value: Binding(
+                                    get: { viewModel.mpv.volume },
+                                    set: { viewModel.mpv.setVolume($0) }
+                                ),
+                                in: 0...100
+                            )
+                            .accentColor(ColorTheme.terracotta)
+                            .tint(ColorTheme.terracotta)
+                            .frame(minWidth: 40, idealWidth: 50, maxWidth: 65)
+                        }
                     }
                     
                     // Queue Button (Opens Playing Queue Popover)
@@ -265,10 +300,20 @@ struct PlayerBarView: View {
                         QueueView(viewModel: viewModel)
                     }
                 }
-                .frame(minWidth: 140, idealWidth: 180, alignment: .trailing)
+                .frame(minWidth: showVolumeControl ? 140 : 60, idealWidth: showVolumeControl ? 180 : 80, alignment: .trailing)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .preference(key: BarWidthPreferenceKey.self, value: geo.size.width)
+            }
+        )
+        .onPreferenceChange(BarWidthPreferenceKey.self) { newWidth in
+            self.barWidth = newWidth
+        }
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(.ultraThinMaterial)
@@ -291,5 +336,12 @@ struct PlayerBarView: View {
         let min = total / 60
         let sec = total % 60
         return String(format: "%02d:%02d", min, sec)
+    }
+}
+
+private struct BarWidthPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 800
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }

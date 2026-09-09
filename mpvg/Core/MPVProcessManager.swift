@@ -11,12 +11,25 @@ import Foundation
 import Combine
 import CoreAudio
 import AppKit
+import AVFoundation
 
 @MainActor
 final class MPVProcessManager: ObservableObject {
     private var process: Process?
     let socketPath = "/tmp/mpv_player.sock"
     private var pollTimer: Timer?
+    
+    // Native fallback engine (AVFoundation) when mpv binary cannot be executed (e.g. App Sandbox)
+    @Published var isUsingNativeEngine = false
+    private var nativePlayer: AVPlayer?
+    private var nativeTimeObserverToken: Any?
+    private var nativeItemStatusObserver: AnyCancellable?
+    private var nativeEndObserverToken: Any?
+    private var nativeErrorObserverToken: Any?
+    
+    static var isSandboxed: Bool {
+        ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
+    }
     
     private static let selectedDeviceKey = "MPVSelectedAudioDevice"
     private static let selectedDeviceNameKey = "MPVSelectedAudioDeviceName"
@@ -84,6 +97,17 @@ final class MPVProcessManager: ObservableObject {
     
     deinit {
         pollTimer?.invalidate()
+        if let token = nativeTimeObserverToken {
+            nativePlayer?.removeTimeObserver(token)
+        }
+        if let token = nativeEndObserverToken {
+            NotificationCenter.default.removeObserver(token)
+        }
+        if let token = nativeErrorObserverToken {
+            NotificationCenter.default.removeObserver(token)
+        }
+        nativeItemStatusObserver?.cancel()
+        nativePlayer?.pause()
         if let proc = process, proc.isRunning {
             let pid = proc.processIdentifier
             proc.terminate()
@@ -95,7 +119,25 @@ final class MPVProcessManager: ObservableObject {
         try? FileManager.default.removeItem(atPath: socketPath)
     }
     
+    private func cleanupNativeObservers() {
+        if let token = nativeTimeObserverToken {
+            nativePlayer?.removeTimeObserver(token)
+            nativeTimeObserverToken = nil
+        }
+        if let token = nativeEndObserverToken {
+            NotificationCenter.default.removeObserver(token)
+            nativeEndObserverToken = nil
+        }
+        if let token = nativeErrorObserverToken {
+            NotificationCenter.default.removeObserver(token)
+            nativeErrorObserverToken = nil
+        }
+        nativeItemStatusObserver?.cancel()
+        nativeItemStatusObserver = nil
+    }
+    
     nonisolated static func killStaleMpvProcesses() {
+        guard ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] == nil else { return }
         // 1. Kill any mpv associated with our IPC socket
         let pkill = Process()
         pkill.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
@@ -142,6 +184,11 @@ final class MPVProcessManager: ObservableObject {
     
     // MARK: - Binary Location
     func findMpvBinary() {
+        if Self.isSandboxed {
+            self.isUsingNativeEngine = true
+            self.binaryPath = "Apple CoreAudio / AVFoundation (Native)"
+            return
+        }
         let candidates = [
             "/opt/homebrew/bin/mpv",
             "/usr/local/bin/mpv",
@@ -150,13 +197,24 @@ final class MPVProcessManager: ObservableObject {
         for path in candidates {
             if FileManager.default.fileExists(atPath: path) {
                 self.binaryPath = path
+                self.isUsingNativeEngine = false
                 return
             }
         }
+        self.isUsingNativeEngine = true
+        self.binaryPath = "Apple CoreAudio / AVFoundation (Native)"
     }
     
     // MARK: - Audio Device Detection & Resolution
     func detectAudioDevices() {
+        if isUsingNativeEngine || Self.isSandboxed || !FileManager.default.fileExists(atPath: binaryPath) {
+            if self.availableDevices.isEmpty {
+                self.availableDevices = [
+                    AudioDeviceInfo(id: "auto", name: "Default System Device", driver: "CoreAudio", isExclusiveCapable: false)
+                ]
+            }
+            return
+        }
         guard FileManager.default.fileExists(atPath: binaryPath) else { return }
         
         let proc = Process()
@@ -291,11 +349,12 @@ final class MPVProcessManager: ObservableObject {
     
     // MARK: - Process Management
     func start() {
-        guard process == nil || !(process?.isRunning ?? false) else { return }
-        guard FileManager.default.fileExists(atPath: binaryPath) else {
-            print("mpv no encontrado en \(binaryPath)")
+        if isUsingNativeEngine || Self.isSandboxed || !FileManager.default.fileExists(atPath: binaryPath) {
+            setupNativeEngine()
             return
         }
+        
+        guard process == nil || !(process?.isRunning ?? false) else { return }
         
         Self.killStaleMpvProcesses()
         try? FileManager.default.removeItem(atPath: socketPath)
@@ -338,14 +397,37 @@ final class MPVProcessManager: ObservableObject {
             self.isRunning = true
             startPolling()
         } catch {
-            print("Error iniciando mpv: \(error.localizedDescription)")
-            self.isRunning = false
+            print("mpv subprocess failed to launch: \(error.localizedDescription). Falling back to native AVPlayer engine.")
+            self.isUsingNativeEngine = true
+            setupNativeEngine()
+        }
+    }
+    
+    private func setupNativeEngine() {
+        self.isRunning = true
+        self.binaryPath = "Apple CoreAudio / AVFoundation (Native)"
+        if nativePlayer == nil {
+            nativePlayer = AVPlayer()
+            nativePlayer?.automaticallyWaitsToMinimizeStalling = true
+            nativePlayer?.volume = Float(volume / 100.0)
         }
     }
     
     func stop() {
         pollTimer?.invalidate()
         pollTimer = nil
+        
+        if isUsingNativeEngine {
+            nativePlayer?.pause()
+            cleanupNativeObservers()
+            self.isRunning = false
+            self.isPaused = true
+            self.currentTime = 0.0
+            self.duration = 0.0
+            self.objectWillChange.send()
+            return
+        }
+        
         if let proc = process, proc.isRunning {
             let pid = proc.processIdentifier
             sendCommand(["quit"])
@@ -365,6 +447,9 @@ final class MPVProcessManager: ObservableObject {
     }
     
     func restart() {
+        if isUsingNativeEngine {
+            return
+        }
         stop()
         // Wait 400ms for macOS coreaudiod to completely release exclusive hog mode lock
         Task { @MainActor in
@@ -376,15 +461,30 @@ final class MPVProcessManager: ObservableObject {
     
     // MARK: - Playback Commands
     func play(url: String) {
+        if isUsingNativeEngine {
+            playNative(url: url)
+            return
+        }
+        
         // Ensure process and socket are ready before sending loadfile
         if !isRunning || !FileManager.default.fileExists(atPath: socketPath) {
             start()
+            if isUsingNativeEngine {
+                playNative(url: url)
+                return
+            }
             Task {
                 for _ in 0..<25 {
                     if FileManager.default.fileExists(atPath: self.socketPath) {
                         break
                     }
                     try? await Task.sleep(nanoseconds: 20_000_000) // 20ms
+                }
+                if !FileManager.default.fileExists(atPath: self.socketPath) {
+                    print("Socket failed to open. Falling back to native player.")
+                    self.isUsingNativeEngine = true
+                    self.playNative(url: url)
+                    return
                 }
                 self.isPaused = false
                 self.isAwaitingPlayback = true
@@ -406,6 +506,99 @@ final class MPVProcessManager: ObservableObject {
         schedulePlaybackTimeoutCheck(for: url)
     }
     
+    private func playNative(url: String) {
+        setupNativeEngine()
+        cleanupNativeObservers()
+        
+        playbackStartTimer?.cancel()
+        playbackStartTimer = nil
+        hasHandledEOF = false
+        isAwaitingPlayback = true
+        
+        let streamURL: URL
+        if url.hasPrefix("/") {
+            streamURL = URL(fileURLWithPath: url)
+        } else if let parsed = URL(string: url) {
+            streamURL = parsed
+        } else {
+            onPlaybackError?(nil)
+            return
+        }
+        
+        let item = AVPlayerItem(url: streamURL)
+        
+        nativeEndObserverToken = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: item,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.onTrackFinished?()
+            }
+        }
+        
+        nativeErrorObserverToken = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemFailedToPlayToEndTime,
+            object: item,
+            queue: .main
+        ) { [weak self] notif in
+            let error = notif.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error
+            Task { @MainActor [weak self] in
+                self?.isAwaitingPlayback = false
+                self?.onPlaybackError?(error)
+            }
+        }
+        
+        nativeItemStatusObserver = item.publisher(for: \.status)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                guard let self = self else { return }
+                if status == .readyToPlay {
+                    self.isPaused = false
+                    self.isAwaitingPlayback = false
+                    let dur = item.duration.seconds
+                    if !dur.isNaN && dur > 0 {
+                        self.duration = dur
+                    }
+                    self.objectWillChange.send()
+                } else if status == .failed {
+                    self.isAwaitingPlayback = false
+                    self.onPlaybackError?(item.error)
+                }
+            }
+        
+        if nativePlayer == nil {
+            nativePlayer = AVPlayer(playerItem: item)
+        } else {
+            nativePlayer?.replaceCurrentItem(with: item)
+        }
+        
+        nativePlayer?.automaticallyWaitsToMinimizeStalling = true
+        nativePlayer?.volume = Float(volume / 100.0)
+        nativePlayer?.play()
+        
+        self.isPaused = false
+        self.isRunning = true
+        self.objectWillChange.send()
+        
+        let interval = CMTime(seconds: 0.25, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        nativeTimeObserverToken = nativePlayer?.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                let s = time.seconds
+                if !s.isNaN && s >= 0 {
+                    self.currentTime = s
+                }
+                if let curItem = self.nativePlayer?.currentItem {
+                    let d = curItem.duration.seconds
+                    if !d.isNaN && d > 0 {
+                        self.duration = d
+                    }
+                }
+            }
+        }
+    }
+    
     private func schedulePlaybackTimeoutCheck(for url: String) {
         playbackStartTimer?.cancel()
         guard url.hasPrefix("http://") || url.hasPrefix("https://") else { return }
@@ -424,24 +617,45 @@ final class MPVProcessManager: ObservableObject {
         self.isPaused = targetState
         self.objectWillChange.send()
         
+        if isUsingNativeEngine {
+            if targetState {
+                nativePlayer?.pause()
+            } else {
+                nativePlayer?.play()
+            }
+            return
+        }
+        
         sendCommand(["set_property", "pause", targetState])
     }
     
     func resume() {
         self.isPaused = false
         self.objectWillChange.send()
+        if isUsingNativeEngine {
+            nativePlayer?.play()
+            return
+        }
         sendCommand(["set_property", "pause", false])
     }
     
     func pause() {
         self.isPaused = true
         self.objectWillChange.send()
+        if isUsingNativeEngine {
+            nativePlayer?.pause()
+            return
+        }
         sendCommand(["set_property", "pause", true])
     }
     
     func seek(to seconds: Double) {
         currentTime = seconds
         self.objectWillChange.send()
+        if isUsingNativeEngine {
+            nativePlayer?.seek(to: CMTime(seconds: seconds, preferredTimescale: 600))
+            return
+        }
         sendCommand(["seek", seconds, "absolute"])
     }
     
@@ -449,6 +663,10 @@ final class MPVProcessManager: ObservableObject {
         let clamped = max(0.0, min(100.0, newVolume))
         self.volume = clamped
         self.objectWillChange.send()
+        if isUsingNativeEngine {
+            nativePlayer?.volume = Float(clamped / 100.0)
+            return
+        }
         sendCommand(["set_property", "volume", clamped])
     }
     

@@ -46,9 +46,13 @@ actor NavidromeService {
             URLQueryItem(name: "t", value: sessionToken),
             URLQueryItem(name: "s", value: sessionSalt),
             URLQueryItem(name: "v", value: "1.16.1"),
-            URLQueryItem(name: "c", value: "mpvg"),
-            URLQueryItem(name: "f", value: "json")
+            URLQueryItem(name: "c", value: "mpvg")
         ]
+        
+        let isBinaryEndpoint = endpoint.contains("stream") || endpoint.contains("CoverArt") || endpoint.contains("Avatar")
+        if !isBinaryEndpoint {
+            queryItems.append(URLQueryItem(name: "f", value: "json"))
+        }
         
         for (key, value) in extraParams {
             queryItems.append(URLQueryItem(name: key, value: value))

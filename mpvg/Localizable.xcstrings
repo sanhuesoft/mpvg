@@ -4,86 +4,6 @@
     "" : {
 
     },
-    "No Connection to Server" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Connection to Server"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin conexión al servidor"
-          }
-        }
-      }
-    },
-    "Could not establish connection to the music server. Check your settings or network status." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could not establish connection to the music server. Check your settings or network status."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se pudo establecer conexión con el servidor de música. Revisa tu configuración o el estado de la red."
-          }
-        }
-      }
-    },
-    "Retry Connection" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retry Connection"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reintentar conexión"
-          }
-        }
-      }
-    },
-    "Edit Connection" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Connection"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar conexión"
-          }
-        }
-      }
-    },
-    "Continue Offline" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue Offline"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continuar sin conexión"
-          }
-        }
-      }
-    },
     "-" : {
 
     },
@@ -1102,6 +1022,22 @@
         }
       }
     },
+    "Continue Offline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue Offline"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar sin conexión"
+          }
+        }
+      }
+    },
     "CoreAudio Exclusive Mode" : {
       "localizations" : {
         "en" : {
@@ -1114,6 +1050,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modo Exclusivo CoreAudio"
+          }
+        }
+      }
+    },
+    "CoreAudio Exclusive Mode (Bit-Perfect)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CoreAudio Exclusive Mode (Bit-Perfect)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo Exclusivo CoreAudio (Bit-Perfect)"
           }
         }
       }
@@ -1152,7 +1104,24 @@
         }
       }
     },
+    "Could not establish connection to the music server. Check your settings or network status." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not establish connection to the music server. Check your settings or network status."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo establecer conexión con el servidor de música. Revisa tu configuración o el estado de la red."
+          }
+        }
+      }
+    },
     "DAC OFF" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1278,6 +1247,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Listo"
+          }
+        }
+      }
+    },
+    "Edit Connection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Connection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar conexión"
           }
         }
       }
@@ -1843,6 +1828,22 @@
         }
       }
     },
+    "No Connection to Server" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Connection to Server"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión al servidor"
+          }
+        }
+      }
+    },
     "No genres found" : {
       "localizations" : {
         "en" : {
@@ -2322,6 +2323,22 @@
         }
       }
     },
+    "Retry Connection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry Connection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar conexión"
+          }
+        }
+      }
+    },
     "Save & Test Connection" : {
       "localizations" : {
         "en" : {
@@ -2500,6 +2517,7 @@
       }
     },
     "SHARED" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2511,6 +2529,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "COMPARTIDO"
+          }
+        }
+      }
+    },
+    "Shared Audio Mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared Audio Mode"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo de Audio Compartido"
           }
         }
       }
