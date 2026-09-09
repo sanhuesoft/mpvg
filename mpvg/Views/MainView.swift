@@ -21,7 +21,8 @@ struct MainView: View {
         ZStack {
             #if os(macOS)
             desktopLayout
-                .frame(minWidth: 980, minHeight: 640)
+                .frame(minWidth: 800, minHeight: 520)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .task {
                     viewModel.mpv.start()
                 }

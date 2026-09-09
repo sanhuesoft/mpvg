@@ -81,7 +81,7 @@ struct PlayerBarView: View {
                         }
                     }
                 }
-                .frame(minWidth: 200, alignment: .leading)
+                .frame(minWidth: 130, idealWidth: 180, alignment: .leading)
                 
                 Spacer(minLength: 6)
                 
@@ -151,7 +151,7 @@ struct PlayerBarView: View {
                         )
                         .accentColor(ColorTheme.terracotta)
                         .tint(ColorTheme.terracotta)
-                        .frame(width: 140)
+                        .frame(minWidth: 70, idealWidth: 120, maxWidth: 160)
                         
                         Text(formatTime(viewModel.mpv.duration))
                             .font(.system(size: 10, weight: .medium, design: .monospaced))
@@ -245,7 +245,7 @@ struct PlayerBarView: View {
                         )
                         .accentColor(ColorTheme.terracotta)
                         .tint(ColorTheme.terracotta)
-                        .frame(width: 60)
+                        .frame(minWidth: 40, idealWidth: 50, maxWidth: 65)
                     }
                     
                     // Queue Button (Opens Playing Queue Popover)
@@ -271,7 +271,7 @@ struct PlayerBarView: View {
                         QueueView(viewModel: viewModel)
                     }
                 }
-                .frame(minWidth: 220, alignment: .trailing)
+                .frame(minWidth: 140, idealWidth: 180, alignment: .trailing)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)

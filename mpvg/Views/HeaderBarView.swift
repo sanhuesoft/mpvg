@@ -167,7 +167,7 @@ struct HeaderBarView: View {
                         hideKeyboard()
                         #endif
                     }
-                    .frame(width: 180)
+                    .frame(minWidth: 90, idealWidth: 150, maxWidth: 200)
                 
                 if !viewModel.searchQuery.isEmpty {
                     Button(action: { viewModel.searchQuery = "" }) {

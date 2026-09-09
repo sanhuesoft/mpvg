@@ -41,6 +41,7 @@ struct mpvgApp: App {
         }
         #if os(macOS)
         .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
         .defaultSize(width: 1120, height: 740)
         #endif
     }
