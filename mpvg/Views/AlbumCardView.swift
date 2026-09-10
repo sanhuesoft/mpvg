@@ -71,7 +71,8 @@ struct AlbumCardView: View {
                 }
                 #endif
             }
-            .frame(maxWidth: .infinity)
+            .aspectRatio(1.0, contentMode: .fit)
+            .frame(minWidth: 0, maxWidth: .infinity)
             
             // Metadata Strip Below Cover
             VStack(alignment: .leading, spacing: 3) {
@@ -80,6 +81,8 @@ struct AlbumCardView: View {
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(ColorTheme.textPrimary)
                         .lineLimit(1)
+                        .truncationMode(.tail)
+                        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                     
                     if isCurrentlyPlaying {
                         Image(systemName: "play.fill")
@@ -91,11 +94,14 @@ struct AlbumCardView: View {
                             .fixedSize()
                     }
                 }
+                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                 
                 Text(album.displayArtist)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(ColorTheme.textSecondary)
                     .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                 
                 HStack(spacing: 4) {
                     HStack(spacing: 4) {
@@ -104,21 +110,25 @@ struct AlbumCardView: View {
                                 .font(.system(size: 10, weight: .medium))
                                 .foregroundColor(ColorTheme.textTertiary)
                                 .lineLimit(1)
+                                .fixedSize(horizontal: true, vertical: false)
                         }
                         
                         if let genre = album.genre, !genre.isEmpty {
                             Text("•")
                                 .font(.system(size: 8))
                                 .foregroundColor(ColorTheme.textTertiary)
+                                .fixedSize(horizontal: true, vertical: false)
                             Text(genre)
                                 .font(.system(size: 10, weight: .medium))
                                 .foregroundColor(ColorTheme.textTertiary)
                                 .lineLimit(1)
                                 .truncationMode(.tail)
+                                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                         }
                     }
                     .lineLimit(1)
                     .layoutPriority(0)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                     
                     Spacer(minLength: 4)
                     
@@ -153,10 +163,13 @@ struct AlbumCardView: View {
                     .layoutPriority(1)
                 }
                 .frame(height: 18)
+                .frame(minWidth: 0, maxWidth: .infinity)
                 .padding(.top, 1)
             }
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 2)
         }
+        .frame(minWidth: 0, maxWidth: .infinity)
         .padding(10)
         .background(ColorTheme.cardBackground)
         .overlay(
@@ -168,6 +181,7 @@ struct AlbumCardView: View {
         .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+        .frame(minWidth: 0, maxWidth: .infinity)
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 self.isHovered = hovering

@@ -47,6 +47,7 @@ struct BrowseView: View {
                     }
                 }
             }
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 24)
             .padding(.top, 10)
             .padding(.bottom, 80)
@@ -877,15 +878,21 @@ struct PlaylistCardView: View {
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(ColorTheme.textPrimary)
                     .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                 
                 if let count = playlist.songCount {
                     Text("\(count) \(count == 1 ? String(localized: "track") : String(localized: "tracks"))")
                         .font(.system(size: 11))
                         .foregroundColor(ColorTheme.textTertiary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         }
+        .frame(minWidth: 0, maxWidth: .infinity)
         .padding(10)
         .background(ColorTheme.cardBackground)
         .overlay(
@@ -1021,25 +1028,30 @@ struct GenreCardView: View {
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(ColorTheme.textPrimary)
                     .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                 
                 HStack(spacing: 4) {
                     if let albums = genre.albumCount, albums > 0 {
                         Text("\(albums) \(albums == 1 ? String(localized: "album") : String(localized: "albums"))")
                             .font(.system(size: 11))
                             .foregroundColor(ColorTheme.textSecondary)
+                            .lineLimit(1)
                     } else if let songs = genre.songCount, songs > 0 {
                         Text("\(songs) \(songs == 1 ? String(localized: "track") : String(localized: "tracks"))")
                             .font(.system(size: 11))
                             .foregroundColor(ColorTheme.textSecondary)
+                            .lineLimit(1)
                     } else {
                         Text("Genre")
                             .font(.system(size: 11))
                             .foregroundColor(ColorTheme.textTertiary)
+                            .lineLimit(1)
                     }
                 }
             }
             .padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
             .background(ColorTheme.cardBackground)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
@@ -1049,6 +1061,7 @@ struct GenreCardView: View {
             .shadow(color: Color.black.opacity(isHovered ? 0.06 : 0.02), radius: isHovered ? 8 : 3, x: 0, y: isHovered ? 3 : 1)
         }
         .buttonStyle(.plain)
+        .frame(minWidth: 0, maxWidth: .infinity)
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 self.isHovered = hovering

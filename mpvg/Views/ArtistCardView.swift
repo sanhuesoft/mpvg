@@ -46,20 +46,27 @@ struct ArtistCardView: View {
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(ColorTheme.textPrimary)
                     .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(minWidth: 0, maxWidth: .infinity)
                 
                 if let count = artist.albumCount, count > 0 {
                     Text("\(count) \(count == 1 ? "album" : "albums")")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(ColorTheme.textSecondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .frame(minWidth: 0, maxWidth: .infinity)
                 } else {
                     Text("Artist")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(ColorTheme.textTertiary)
+                        .lineLimit(1)
                 }
             }
-            .frame(maxWidth: .infinity)
+            .frame(minWidth: 0, maxWidth: .infinity)
             .padding(.bottom, 4)
         }
+        .frame(minWidth: 0, maxWidth: .infinity)
         .padding(10)
         .background(ColorTheme.cardBackground)
         .overlay(
@@ -71,6 +78,7 @@ struct ArtistCardView: View {
         .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+        .frame(minWidth: 0, maxWidth: .infinity)
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 self.isHovered = hovering
