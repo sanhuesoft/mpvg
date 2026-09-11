@@ -94,6 +94,19 @@ struct PlayerBarView: View {
                                     .font(.system(size: 8))
                                     .foregroundColor(ColorTheme.textTertiary)
                                 
+                                Button(action: {
+                                    viewModel.toggleStarred(for: song)
+                                }) {
+                                    Image(systemName: song.isStarred ? "heart.fill" : "heart")
+                                        .font(.system(size: 10, weight: .medium))
+                                        .foregroundColor(song.isStarred ? ColorTheme.accent : ColorTheme.textTertiary)
+                                        .frame(width: 14, height: 14)
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                                .pointingHandOnHover()
+                                .help(song.isStarred ? LocalizedStringKey("Remove from Favorites") : LocalizedStringKey("Add to Favorites"))
+                                
                                 StarRatingView(
                                     rating: song.rating,
                                     size: 9,

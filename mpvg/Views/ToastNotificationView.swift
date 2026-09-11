@@ -87,21 +87,38 @@ final class PointingHandNSView: NSView {
 }
 #endif
 
-// MARK: - Pointing Hand Cursor Extension
-extension View {
-    func pointingHandOnHover() -> some View {
-        #if os(macOS)
-        self
+#if os(macOS)
+struct PointingHandAndHoverModifier: ViewModifier {
+    var scale: CGFloat = 1.025
+    var brightness: Double = 0.035
+    @State private var isHovered = false
+    
+    func body(content: Content) -> some View {
+        content
             .overlay(PointingHandCursorHelper().allowsHitTesting(false))
+            .scaleEffect(isHovered ? scale : 1.0)
+            .brightness(isHovered ? brightness : 0.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.75), value: isHovered)
             .onHover { hovering in
+                isHovered = hovering
                 if hovering {
                     NSCursor.pointingHand.push()
                 } else {
                     NSCursor.pop()
                 }
             }
+    }
+}
+#endif
+
+// MARK: - Pointing Hand Cursor & Interactive Hover Extension
+extension View {
+    func pointingHandOnHover(scale: CGFloat = 1.025, brightness: Double = 0.035) -> some View {
+        #if os(macOS)
+        self.modifier(PointingHandAndHoverModifier(scale: scale, brightness: brightness))
         #else
         self
         #endif
     }
 }
+

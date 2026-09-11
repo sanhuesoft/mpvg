@@ -207,6 +207,7 @@ struct SmartPlaylistDetailView: View {
                 .shadow(color: ColorTheme.terracotta.opacity(0.3), radius: 5, x: 0, y: 2)
             }
             .buttonStyle(.plain)
+            .pointingHandOnHover()
             .disabled(songs.isEmpty)
             .opacity(songs.isEmpty ? 0.6 : 1.0)
             
@@ -220,7 +221,7 @@ struct SmartPlaylistDetailView: View {
                     Text("Aleatorio")
                         .font(.system(size: 13, weight: .semibold))
                 }
-                .foregroundColor(ColorTheme.textPrimary)
+                .foregroundColor(ColorTheme.textSecondary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
                 .background(ColorTheme.inputBackground)
@@ -228,6 +229,7 @@ struct SmartPlaylistDetailView: View {
                 .cornerRadius(9)
             }
             .buttonStyle(.plain)
+            .pointingHandOnHover()
             .disabled(songs.isEmpty)
             .opacity(songs.isEmpty ? 0.6 : 1.0)
             
@@ -247,13 +249,14 @@ struct SmartPlaylistDetailView: View {
                             .font(.system(size: 13, weight: .semibold))
                     }
                     .foregroundColor(ColorTheme.textSecondary)
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, 14)
                     .padding(.vertical, 8)
                     .background(ColorTheme.inputBackground)
                     .overlay(RoundedRectangle(cornerRadius: 9).stroke(ColorTheme.cardBorder, lineWidth: 1))
                     .cornerRadius(9)
                 }
                 .buttonStyle(.plain)
+                .pointingHandOnHover()
                 .disabled(isLoading)
             }
         }
@@ -290,7 +293,7 @@ struct SmartPlaylistDetailView: View {
             .padding(.vertical, 50)
         } else {
             VStack(alignment: .leading, spacing: 6) {
-                // Table Columns Header
+                // Table Columns Header (# and TÍTULO only)
                 HStack(spacing: 12) {
                     Text("#")
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
@@ -302,11 +305,6 @@ struct SmartPlaylistDetailView: View {
                         .foregroundColor(ColorTheme.textTertiary)
                     
                     Spacer()
-                    
-                    Image(systemName: "clock")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(ColorTheme.textTertiary)
-                        .padding(.trailing, 14)
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)

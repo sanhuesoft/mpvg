@@ -1121,6 +1121,55 @@ final class PlayerViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Starred / Favorites System
+    func toggleStarred(for song: SongItem) {
+        let newStarred = !song.isStarred
+        let starredTimestamp = newStarred ? ISO8601DateFormatter().string(from: Date()) : nil
+        
+        // 1. Update current song
+        if currentSong?.id == song.id {
+            currentSong?.starred = starredTimestamp
+        }
+        
+        // 2. Update queue
+        for i in queue.indices where queue[i].id == song.id {
+            queue[i].starred = starredTimestamp
+        }
+        
+        // 3. Update selected album tracks
+        for i in selectedAlbumTracks.indices where selectedAlbumTracks[i].id == song.id {
+            selectedAlbumTracks[i].starred = starredTimestamp
+        }
+        
+        // 4. Update all smart playlists
+        for (key, tracks) in smartPlaylistSongs {
+            var updated = tracks
+            var modified = false
+            for i in updated.indices where updated[i].id == song.id {
+                updated[i].starred = starredTimestamp
+                modified = true
+            }
+            if modified {
+                smartPlaylistSongs[key] = updated
+            }
+        }
+        
+        // 5. Update search & spotlight
+        for i in searchSongs.indices where searchSongs[i].id == song.id {
+            searchSongs[i].starred = starredTimestamp
+        }
+        for i in spotlightSongs.indices where spotlightSongs[i].id == song.id {
+            spotlightSongs[i].starred = starredTimestamp
+        }
+        
+        // 6. Send to Navidrome server
+        if isConnected {
+            Task {
+                _ = await navidrome.setStarred(id: song.id, starred: newStarred)
+            }
+        }
+    }
+    
     func rateAlbum(_ album: AlbumItem, rating: Int) {
         let clamped = max(0, min(5, rating))
         

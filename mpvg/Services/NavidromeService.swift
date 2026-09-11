@@ -436,6 +436,26 @@ actor NavidromeService {
         }
     }
     
+    // MARK: - Star / Favorite Songs (star.view / unstar.view)
+    func setStarred(id: String, starred: Bool) async -> Bool {
+        let endpoint = starred ? "star.view" : "unstar.view"
+        guard let url = buildURL(endpoint: endpoint, extraParams: ["id": id]) else {
+            return false
+        }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let sub = json["subsonic-response"] as? [String: Any],
+                  let status = sub["status"] as? String else {
+                return false
+            }
+            return status == "ok"
+        } catch {
+            print("Error setting star: \(error)")
+            return false
+        }
+    }
+    
     // MARK: - Playlists & Genres
     func getPlaylists() async -> [PlaylistItem] {
         guard let url = buildURL(endpoint: "getPlaylists.view") else { return [] }

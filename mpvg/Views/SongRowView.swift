@@ -13,6 +13,7 @@ struct SongRowView: View {
     let isPlaying: Bool
     var viewModel: PlayerViewModel? = nil
     var onRate: ((Int) -> Void)? = nil
+    var onToggleStar: (() -> Void)? = nil
     let onPlay: () -> Void
     @State private var isHovered: Bool = false
     
@@ -21,6 +22,13 @@ struct SongRowView: View {
             return current.rating
         }
         return song.rating
+    }
+    
+    private var effectiveIsStarred: Bool {
+        if let current = viewModel?.currentSong, current.id == song.id {
+            return current.isStarred
+        }
+        return song.isStarred
     }
     
     var body: some View {
@@ -68,20 +76,44 @@ struct SongRowView: View {
                     .background(ColorTheme.cardBorder.opacity(0.5))
                     .cornerRadius(4)
                 
-                // 5-Star Rating (Positioned strictly between format badge and duration)
-                ZStack(alignment: .trailing) {
-                    if effectiveRating > 0 || isHovered {
-                        StarRatingView(
-                            rating: effectiveRating,
-                            size: 11,
-                            spacing: 2,
-                            interactive: true,
-                            onRate: onRate
-                        )
-                        .transition(.opacity)
+                // Heart & 5-Star Rating (Positioned strictly between format badge and duration)
+                HStack(spacing: 4) {
+                    // Heart Button (Favoritos) - always visible next to stars when starred or hovered
+                    Button(action: {
+                        if let onToggleStar = onToggleStar {
+                            onToggleStar()
+                        } else if let vm = viewModel {
+                            vm.toggleStarred(for: song)
+                        }
+                    }) {
+                        Image(systemName: effectiveIsStarred ? "heart.fill" : "heart")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(effectiveIsStarred ? ColorTheme.accent : ColorTheme.textTertiary)
+                            .frame(width: 18, height: 18)
+                            .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
+                    .pointingHandOnHover()
+                    .help(effectiveIsStarred ? LocalizedStringKey("Remove from Favorites") : LocalizedStringKey("Add to Favorites"))
+                    .opacity((effectiveIsStarred || isHovered) ? 1.0 : 0.0)
+                    .animation(.easeInOut(duration: 0.12), value: effectiveIsStarred || isHovered)
+                    
+                    // 5-Star Rating
+                    ZStack(alignment: .trailing) {
+                        if effectiveRating > 0 || isHovered {
+                            StarRatingView(
+                                rating: effectiveRating,
+                                size: 11,
+                                spacing: 2,
+                                interactive: true,
+                                onRate: onRate
+                            )
+                            .transition(.opacity)
+                        }
+                    }
+                    .frame(width: 75, alignment: .trailing)
                 }
-                .frame(width: 75, alignment: .trailing)
+                .frame(width: 100, alignment: .trailing)
                 
                 // Duration
                 Text(song.formattedDuration)

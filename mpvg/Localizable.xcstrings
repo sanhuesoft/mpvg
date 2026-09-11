@@ -428,6 +428,9 @@
         }
       }
     },
+    "Add to Favorites" : {
+
+    },
     "Add to Queue" : {
       "localizations" : {
         "en" : {
@@ -2498,6 +2501,9 @@
       }
     },
     "Regenerar" : {
+
+    },
+    "Remove from Favorites" : {
 
     },
     "Reproducir" : {
