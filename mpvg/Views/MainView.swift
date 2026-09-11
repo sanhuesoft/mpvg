@@ -47,8 +47,30 @@ struct MainView: View {
                     .transition(.opacity.combined(with: .scale(scale: 0.96)))
                     .zIndex(200)
             }
+            
+            #if os(macOS)
+            // Spotlight Search Overlay (⌘K) - Preloaded in hierarchy for instantaneous, fluid animation
+            SpotlightSearchView(viewModel: viewModel)
+                .opacity(viewModel.isSpotlightPresented ? 1 : 0)
+                .scaleEffect(viewModel.isSpotlightPresented ? 1.0 : 0.98)
+                .allowsHitTesting(viewModel.isSpotlightPresented)
+                .animation(.spring(response: 0.26, dampingFraction: 0.84), value: viewModel.isSpotlightPresented)
+                .zIndex(300)
+            #endif
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: viewModel.isDisconnectedOverlayVisible)
+        #if os(macOS)
+        .background(
+            Button(action: {
+                viewModel.toggleSpotlight()
+            }) {
+                EmptyView()
+            }
+            .keyboardShortcut("k", modifiers: .command)
+            .opacity(0)
+            .allowsHitTesting(false)
+        )
+        #endif
     }
     
     // MARK: - Desktop Layout (macOS)

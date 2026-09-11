@@ -68,6 +68,22 @@ enum ViewMode: String {
     case list
 }
 
+enum SpotlightScope: String, CaseIterable, Identifiable {
+    case artists = "Artistas"
+    case albums = "Álbumes"
+    case songs = "Canciones"
+    
+    var id: String { rawValue }
+    
+    var iconName: String {
+        switch self {
+        case .artists: return "music.mic"
+        case .albums: return "square.stack"
+        case .songs: return "music.note"
+        }
+    }
+}
+
 enum NavigationDestination: Identifiable, Equatable, Hashable {
     case album(AlbumItem)
     case artist(ArtistItem)
@@ -196,6 +212,16 @@ final class PlayerViewModel: ObservableObject {
     // Search Results
     @Published var searchAlbums: [AlbumItem] = []
     @Published var searchSongs: [SongItem] = []
+    
+    // Spotlight Search (macOS)
+    @Published var isSpotlightPresented: Bool = false
+    @Published var spotlightQuery: String = ""
+    @Published var spotlightScope: SpotlightScope? = nil
+    @Published var spotlightArtists: [ArtistItem] = []
+    @Published var spotlightAlbums: [AlbumItem] = []
+    @Published var spotlightSongs: [SongItem] = []
+    @Published var isSpotlightLoading: Bool = false
+    private var spotlightSearchTask: Task<Void, Never>? = nil
     
     // Playback
     @Published var currentSong: SongItem?
@@ -331,6 +357,15 @@ final class PlayerViewModel: ObservableObject {
                 Task {
                     await self?.performSearch(query: query)
                 }
+            }
+            .store(in: &cancellables)
+            
+        // Listen to Spotlight search query changes with fast debounce (250ms)
+        $spotlightQuery
+            .debounce(for: .milliseconds(250), scheduler: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] query in
+                self?.performSpotlightSearch(query: query)
             }
             .store(in: &cancellables)
     }
@@ -523,6 +558,64 @@ final class PlayerViewModel: ObservableObject {
                 $0.displayTitle.localizedCaseInsensitiveContains(trimmed) ||
                 $0.displayArtist.localizedCaseInsensitiveContains(trimmed)
             }
+        }
+    }
+    
+    // MARK: - Spotlight Search (macOS)
+    func toggleSpotlight() {
+        if isSpotlightPresented {
+            closeSpotlight()
+        } else {
+            openSpotlight()
+        }
+    }
+    
+    func openSpotlight() {
+        isSpotlightPresented = true
+        if !spotlightQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            performSpotlightSearch(query: spotlightQuery)
+        }
+    }
+    
+    func closeSpotlight() {
+        isSpotlightPresented = false
+    }
+    
+    func performSpotlightSearch(query: String) {
+        spotlightSearchTask?.cancel()
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            self.spotlightArtists = []
+            self.spotlightAlbums = []
+            self.spotlightSongs = []
+            self.isSpotlightLoading = false
+            return
+        }
+        
+        self.isSpotlightLoading = true
+        spotlightSearchTask = Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            
+            if self.isConnected {
+                let res = await self.navidrome.search(query: trimmed)
+                if Task.isCancelled { return }
+                self.spotlightArtists = res.artists
+                self.spotlightAlbums = res.albums
+                self.spotlightSongs = res.songs
+            } else {
+                let filteredArtists = self.artists.filter {
+                    $0.name.localizedCaseInsensitiveContains(trimmed)
+                }
+                let filteredAlbums = self.albums.filter {
+                    $0.displayTitle.localizedCaseInsensitiveContains(trimmed) ||
+                    $0.displayArtist.localizedCaseInsensitiveContains(trimmed)
+                }
+                if Task.isCancelled { return }
+                self.spotlightArtists = filteredArtists
+                self.spotlightAlbums = filteredAlbums
+                self.spotlightSongs = []
+            }
+            self.isSpotlightLoading = false
         }
     }
     

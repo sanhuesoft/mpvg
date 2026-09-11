@@ -166,75 +166,115 @@ struct HeaderBarView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             }
             
-            // Search Bar Pill
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 13))
-                    .foregroundColor(ColorTheme.textTertiary)
-                
-                TextField("Search albums, tracks...", text: $viewModel.searchQuery)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 13))
-                    .foregroundColor(ColorTheme.textPrimary)
-                    .focused($isSearchFocused)
-                    .submitLabel(.search)
-                    .onSubmit {
-                        #if os(iOS)
-                        hideKeyboard()
-                        #endif
-                    }
-                    .frame(minWidth: 90, idealWidth: 150, maxWidth: 200)
-                
-                if !viewModel.searchQuery.isEmpty {
-                    Button(action: { viewModel.searchQuery = "" }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(ColorTheme.textTertiary)
-                    }
-                    .buttonStyle(.plain)
-                } else {
-                    // ⌘F Badge
-                    HStack(spacing: 1) {
-                        Text("⌘F")
-                            .font(.system(size: 10, weight: .medium, design: .monospaced))
-                            .foregroundColor(ColorTheme.textTertiary)
-                    }
-                    .padding(.horizontal, 5)
-                    .padding(.vertical, 2)
-                    .background(ColorTheme.cardBorder.opacity(0.6))
-                    .cornerRadius(4)
-                }
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(.ultraThinMaterial)
-            )
-            .background(
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(ColorTheme.inputBackground.opacity(0.4))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .stroke(isSearchFocused ? ColorTheme.terracotta.opacity(0.7) : ColorTheme.inputBorder, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
-            .contentShape(Rectangle())
-            .onTapGesture {
-                isSearchFocused = true
-            }
-            
-            // Invisible button to bind ⌘F directly to search field focus
+            #if os(macOS)
+            // Spotlight ⌘K Quick Button
             Button(action: {
-                isSearchFocused = true
+                withAnimation(.spring(response: 0.28, dampingFraction: 0.85)) {
+                    viewModel.toggleSpotlight()
+                }
             }) {
-                EmptyView()
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(ColorTheme.textSecondary)
+                    
+                    Text("Buscar")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(ColorTheme.textSecondary)
+                    
+                    Text("⌘K")
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .background(ColorTheme.cardBorder.opacity(0.6))
+                        .cornerRadius(4)
+                }
+                .frame(height: 26)
+                .padding(.horizontal, 9)
+                .background(ColorTheme.inputBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(ColorTheme.inputBorder, lineWidth: 1)
+                )
+                .cornerRadius(8)
             }
-            .keyboardShortcut("f", modifiers: .command)
-            .frame(width: 0, height: 0)
-            .opacity(0)
-            .allowsHitTesting(false)
+            .buttonStyle(.plain)
+            .pointingHandOnHover()
+            .help("Buscador Spotlight (⌘K)")
+            #endif
+
+            // Search Bar Pill (Desactivado a favor del buscador Spotlight ⌘K, código conservado)
+            if false {
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 13))
+                        .foregroundColor(ColorTheme.textTertiary)
+                    
+                    TextField("Search albums, tracks...", text: $viewModel.searchQuery)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 13))
+                        .foregroundColor(ColorTheme.textPrimary)
+                        .focused($isSearchFocused)
+                        .submitLabel(.search)
+                        .onSubmit {
+                            #if os(iOS)
+                            hideKeyboard()
+                            #endif
+                        }
+                        .frame(minWidth: 90, idealWidth: 150, maxWidth: 200)
+                    
+                    if !viewModel.searchQuery.isEmpty {
+                        Button(action: { viewModel.searchQuery = "" }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(ColorTheme.textTertiary)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        // ⌘F Badge
+                        HStack(spacing: 1) {
+                            Text("⌘F")
+                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .foregroundColor(ColorTheme.textTertiary)
+                        }
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 2)
+                        .background(ColorTheme.cardBorder.opacity(0.6))
+                        .cornerRadius(4)
+                    }
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                )
+                .background(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(ColorTheme.inputBackground.opacity(0.4))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke(isSearchFocused ? ColorTheme.terracotta.opacity(0.7) : ColorTheme.inputBorder, lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    isSearchFocused = true
+                }
+                
+                // Invisible button to bind ⌘F directly to search field focus
+                Button(action: {
+                    isSearchFocused = true
+                }) {
+                    EmptyView()
+                }
+                .keyboardShortcut("f", modifiers: .command)
+                .frame(width: 0, height: 0)
+                .opacity(0)
+                .allowsHitTesting(false)
+            }
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 14)

@@ -76,37 +76,39 @@ struct SidebarView: View {
             Color.clear.frame(height: 12)
             #endif
             
-            // Search field shortcut in floating sidebar
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(ColorTheme.textTertiary)
-                
-                TextField("Search...", text: $viewModel.searchQuery)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 12))
-                    .foregroundColor(ColorTheme.textPrimary)
-                
-                if !viewModel.searchQuery.isEmpty {
-                    Button(action: { viewModel.searchQuery = "" }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 11))
-                            .foregroundColor(ColorTheme.textTertiary)
+            // Search field shortcut in floating sidebar (Desactivado a favor de Spotlight ⌘K, código conservado)
+            if false {
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(ColorTheme.textTertiary)
+                    
+                    TextField("Search...", text: $viewModel.searchQuery)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 12))
+                        .foregroundColor(ColorTheme.textPrimary)
+                    
+                    if !viewModel.searchQuery.isEmpty {
+                        Button(action: { viewModel.searchQuery = "" }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 11))
+                                .foregroundColor(ColorTheme.textTertiary)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(ColorTheme.cardBackground.opacity(0.85))
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
+                )
+                .padding(.horizontal, 10)
+                .padding(.top, 6)
+                .padding(.bottom, 12)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(ColorTheme.cardBackground.opacity(0.85))
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
-            )
-            .padding(.horizontal, 10)
-            .padding(.top, 6)
-            .padding(.bottom, 12)
             
             // Navigation Sections with Scrollable Content
             ScrollView(.vertical, showsIndicators: false) {
