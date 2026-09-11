@@ -251,7 +251,7 @@ struct PlayerBarView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                .stroke(viewModel.mpv.isExclusive ? ColorTheme.terracotta.opacity(0.3) : Color.white.opacity(0.3), lineWidth: 0.8)
+                                .stroke(viewModel.mpv.isExclusive ? ColorTheme.terracotta.opacity(0.3) : ColorTheme.cardBorder, lineWidth: 0.8)
                         )
                     }
                     .menuStyle(.borderlessButton)
@@ -324,7 +324,7 @@ struct PlayerBarView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+                .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
         )
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .shadow(color: Color.black.opacity(0.12), radius: 16, x: 0, y: 5)

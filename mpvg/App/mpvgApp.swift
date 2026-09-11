@@ -18,6 +18,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 struct WindowConfigurator: NSViewRepresentable {
+    var appTheme: String
+
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
@@ -39,6 +41,16 @@ struct WindowConfigurator: NSViewRepresentable {
     private func configure(window: NSWindow) {
         let minSize = NSSize(width: 960, height: 620)
         window.minSize = minSize
+        window.titlebarAppearsTransparent = true
+        
+        switch appTheme {
+        case "light":
+            window.appearance = NSAppearance(named: .aqua)
+        case "dark":
+            window.appearance = NSAppearance(named: .darkAqua)
+        default:
+            window.appearance = nil
+        }
         
         var frame = window.frame
         var needsResize = false
@@ -59,6 +71,8 @@ struct WindowConfigurator: NSViewRepresentable {
 
 @main
 struct mpvgApp: App {
+    @AppStorage("appTheme") private var appTheme: String = "system"
+    
     #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     #endif
@@ -73,13 +87,21 @@ struct mpvgApp: App {
         #endif
     }
     
+    private var preferredColorScheme: ColorScheme? {
+        switch appTheme {
+        case "light": return .light
+        case "dark": return .dark
+        default: return nil
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
             MainView()
-                .preferredColorScheme(.light)
+                .preferredColorScheme(preferredColorScheme)
                 #if os(macOS)
                 .frame(minWidth: 960, maxWidth: .infinity, minHeight: 620, maxHeight: .infinity)
-                .background(WindowConfigurator())
+                .background(WindowConfigurator(appTheme: appTheme))
                 #endif
         }
         #if os(macOS)

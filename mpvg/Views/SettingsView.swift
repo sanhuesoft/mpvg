@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var viewModel: PlayerViewModel
+    @AppStorage("appTheme") private var appTheme: String = "system"
     @State private var serverURL: String = ""
     @State private var username: String = ""
     @State private var password: String = ""
@@ -36,14 +37,18 @@ struct SettingsView: View {
                 // Section 1: Server Configuration (macOS Form Style)
                 macOSServerCard
                 
-                // Section 2: Audio Engine (macOS Form Style)
+                // Section 2: Appearance & Theme
+                macOSThemeSection
+                
+                // Section 3: Audio Engine (macOS Form Style)
                 macOSAudioSection
                 
-                // Section 3: Playback & Audio Cache (macOS Form Style)
+                // Section 4: Playback & Audio Cache (macOS Form Style)
                 macOSCacheSection
                 #else
                 // iOS Form Card
                 iOSServerCard
+                iOSThemeSection
                 iOSTabBarSection
                 iOSAudioSection
                 iOSCacheSection
@@ -160,6 +165,23 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
+            }
+        }
+    }
+    
+    // MARK: - macOS Appearance Card
+    private var macOSThemeSection: some View {
+        settingsCard(title: "Appearance", icon: "paintpalette.fill", iconColor: ColorTheme.terracotta) {
+            VStack(spacing: 0) {
+                macOSFormRow(label: "Theme", subtitle: "Choose between automatic system mode, or forced light/dark Primary theme") {
+                    Picker("", selection: $appTheme) {
+                        Text(LocalizedStringKey("System (Automatic)")).tag("system")
+                        Text(LocalizedStringKey("Primary Light")).tag("light")
+                        Text(LocalizedStringKey("Primary Dark")).tag("dark")
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 190)
+                }
             }
         }
     }
@@ -527,6 +549,30 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
                 }
+            }
+            .padding(16)
+        }
+    }
+    
+    // MARK: - iOS Appearance Card
+    private var iOSThemeSection: some View {
+        settingsCard(title: "Appearance", icon: "paintpalette.fill", iconColor: ColorTheme.terracotta) {
+            VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(LocalizedStringKey("Theme"))
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(ColorTheme.textPrimary)
+                    Text(LocalizedStringKey("Adapts automatically to system dark mode or allows manual override"))
+                        .font(.system(size: 11))
+                        .foregroundColor(ColorTheme.textTertiary)
+                }
+                
+                Picker("", selection: $appTheme) {
+                    Text(LocalizedStringKey("System")).tag("system")
+                    Text(LocalizedStringKey("Light")).tag("light")
+                    Text(LocalizedStringKey("Dark")).tag("dark")
+                }
+                .pickerStyle(.segmented)
             }
             .padding(16)
         }

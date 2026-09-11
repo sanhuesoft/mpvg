@@ -38,7 +38,7 @@ struct HeaderBarView: View {
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+                                .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
@@ -161,7 +161,7 @@ struct HeaderBarView: View {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+                        .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             }
@@ -217,7 +217,7 @@ struct HeaderBarView: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .stroke(isSearchFocused ? ColorTheme.terracotta.opacity(0.7) : Color.white.opacity(0.35), lineWidth: 1)
+                    .stroke(isSearchFocused ? ColorTheme.terracotta.opacity(0.7) : ColorTheme.inputBorder, lineWidth: 1)
             )
             .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
             .contentShape(Rectangle())
@@ -238,11 +238,7 @@ struct HeaderBarView: View {
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 14)
-        .background(
-            Rectangle()
-                .fill(.ultraThinMaterial)
-        )
-        .background(ColorTheme.windowBackground.opacity(0.75))
+        .background(ColorTheme.windowBackground)
         .onChange(of: viewModel.focusSearchTrigger) { _ in
             isSearchFocused = true
         }
