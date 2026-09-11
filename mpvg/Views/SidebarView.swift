@@ -111,35 +111,36 @@ struct SidebarView: View {
             // Navigation Sections with Scrollable Content
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 14) {
-                    // DISCOVER
-                    sidebarSection(title: "DISCOVER") {
-                        SidebarRowItem(
-                            iconName: "house.fill",
-                            label: "Browse",
-                            iconTint: ColorTheme.terracotta,
-                            iconBgTint: ColorTheme.terracottaLight,
-                            isSelected: viewModel.activeTab == .browse
-                        ) {
-                            viewModel.selectTab(.browse)
-                        }
-                        
+                    // INICIO (sin encabezado)
+                    SidebarRowItem(
+                        iconName: "house.fill",
+                        label: "Browse",
+                        iconTint: ColorTheme.terracotta,
+                        iconBgTint: ColorTheme.terracottaLight,
+                        isSelected: viewModel.activeTab == .browse
+                    ) {
+                        viewModel.selectTab(.browse)
+                    }
+                    
+                    // SMART PLAYLISTS
+                    sidebarSection(title: "LISTAS INTELIGENTES") {
                         SidebarRowItem(
                             iconName: "clock.arrow.circlepath",
                             label: "Recently Added",
                             count: viewModel.recentAlbums.isEmpty ? nil : "\(viewModel.recentAlbums.count)",
-                            iconTint: ColorTheme.blue,
-                            iconBgTint: ColorTheme.blueBg,
+                            iconTint: Color(hex: "3B82F6"),
+                            iconBgTint: Color(hex: "3B82F6").opacity(0.18),
                             isSelected: viewModel.activeTab == .recentlyAdded
                         ) {
                             viewModel.selectTab(.recentlyAdded)
                         }
                         
                         SidebarRowItem(
-                            iconName: "play.circle",
+                            iconName: "play.circle.fill",
                             label: "Recently Played",
                             count: viewModel.recentlyPlayedAlbums.isEmpty ? nil : "\(viewModel.recentlyPlayedAlbums.count)",
-                            iconTint: ColorTheme.sageGreen,
-                            iconBgTint: ColorTheme.sageGreenBg,
+                            iconTint: Color(hex: "06B6D4"),
+                            iconBgTint: Color(hex: "06B6D4").opacity(0.18),
                             isSelected: viewModel.activeTab == .recentlyPlayed
                         ) {
                             viewModel.selectTab(.recentlyPlayed)
@@ -149,11 +150,66 @@ struct SidebarView: View {
                             iconName: "star.fill",
                             label: "Top Rated",
                             count: viewModel.topRatedAlbums.isEmpty ? nil : "\(viewModel.topRatedAlbums.count)",
-                            iconTint: ColorTheme.amber,
-                            iconBgTint: ColorTheme.amberBg,
+                            iconTint: Color(hex: "F59E0B"),
+                            iconBgTint: Color(hex: "F59E0B").opacity(0.18),
                             isSelected: viewModel.activeTab == .topRated
                         ) {
                             viewModel.selectTab(.topRated)
+                        }
+                        
+                        SidebarRowItem(
+                            iconName: "sparkles",
+                            label: "No escuchadas",
+                            count: viewModel.smartPlaylistSongs[.unplayed]?.isEmpty == false ? "\(viewModel.smartPlaylistSongs[.unplayed]!.count)" : nil,
+                            iconTint: Color(hex: "8B5CF6"),
+                            iconBgTint: Color(hex: "8B5CF6").opacity(0.18),
+                            isSelected: viewModel.activeTab == .unplayed
+                        ) {
+                            viewModel.selectTab(.unplayed)
+                        }
+                        
+                        SidebarRowItem(
+                            iconName: "flame.fill",
+                            label: "Las Más Escuchadas",
+                            count: viewModel.smartPlaylistSongs[.mostPlayed]?.isEmpty == false ? "\(viewModel.smartPlaylistSongs[.mostPlayed]!.count)" : nil,
+                            iconTint: Color(hex: "EF4444"),
+                            iconBgTint: Color(hex: "EF4444").opacity(0.18),
+                            isSelected: viewModel.activeTab == .mostPlayed
+                        ) {
+                            viewModel.selectTab(.mostPlayed)
+                        }
+                        
+                        SidebarRowItem(
+                            iconName: "star.fill",
+                            label: "Favoritas",
+                            count: viewModel.smartPlaylistSongs[.starred]?.isEmpty == false ? "\(viewModel.smartPlaylistSongs[.starred]!.count)" : nil,
+                            iconTint: Color(hex: "EC4899"),
+                            iconBgTint: Color(hex: "EC4899").opacity(0.18),
+                            isSelected: viewModel.activeTab == .starred
+                        ) {
+                            viewModel.selectTab(.starred)
+                        }
+                        
+                        SidebarRowItem(
+                            iconName: "clock.badge.checkmark",
+                            label: "Joyas Olvidadas",
+                            count: viewModel.smartPlaylistSongs[.forgottenFavorites]?.isEmpty == false ? "\(viewModel.smartPlaylistSongs[.forgottenFavorites]!.count)" : nil,
+                            iconTint: Color(hex: "F97316"),
+                            iconBgTint: Color(hex: "F97316").opacity(0.18),
+                            isSelected: viewModel.activeTab == .forgottenFavorites
+                        ) {
+                            viewModel.selectTab(.forgottenFavorites)
+                        }
+                        
+                        SidebarRowItem(
+                            iconName: "shuffle",
+                            label: "Mix Descubrimiento",
+                            count: viewModel.smartPlaylistSongs[.discoveryMix]?.isEmpty == false ? "\(viewModel.smartPlaylistSongs[.discoveryMix]!.count)" : nil,
+                            iconTint: Color(hex: "10B981"),
+                            iconBgTint: Color(hex: "10B981").opacity(0.18),
+                            isSelected: viewModel.activeTab == .discoveryMix
+                        ) {
+                            viewModel.selectTab(.discoveryMix)
                         }
                     }
                     

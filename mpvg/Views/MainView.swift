@@ -21,8 +21,7 @@ struct MainView: View {
         ZStack {
             #if os(macOS)
             desktopLayout
-                .frame(minWidth: 800, minHeight: 520)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(minWidth: 960, maxWidth: .infinity, minHeight: 620, maxHeight: .infinity)
                 .task {
                     viewModel.mpv.start()
                 }
@@ -84,6 +83,9 @@ struct MainView: View {
                             case .artist(let artist):
                                 ArtistDetailView(artist: artist, viewModel: viewModel)
                                     .transition(.opacity)
+                            case .smartPlaylist(let type):
+                                SmartPlaylistDetailView(type: type, viewModel: viewModel)
+                                    .transition(.opacity)
                             }
                         } else {
                             BrowseView(viewModel: viewModel)
@@ -142,6 +144,8 @@ struct MainView: View {
                             AlbumDetailView(album: album, viewModel: viewModel)
                         case .artist(let artist):
                             ArtistDetailView(artist: artist, viewModel: viewModel)
+                        case .smartPlaylist(let type):
+                            SmartPlaylistDetailView(type: type, viewModel: viewModel)
                         }
                     } else {
                         BrowseView(viewModel: viewModel)

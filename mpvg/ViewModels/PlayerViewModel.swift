@@ -16,6 +16,11 @@ enum SidebarTab: String, CaseIterable, Identifiable {
     case recentlyAdded = "Recently Added"
     case recentlyPlayed = "Recently Played"
     case topRated = "Top Rated"
+    case unplayed = "No escuchadas"
+    case forgottenFavorites = "Joyas Olvidadas"
+    case mostPlayed = "Las Más Escuchadas"
+    case starred = "Favoritas"
+    case discoveryMix = "Mix Descubrimiento"
     case albums = "Albums"
     case artists = "Artists"
     case playlists = "Playlists"
@@ -30,11 +35,30 @@ enum SidebarTab: String, CaseIterable, Identifiable {
         case .recentlyAdded: return "clock.arrow.circlepath"
         case .recentlyPlayed: return "play.circle"
         case .topRated: return "star.fill"
+        case .unplayed: return "sparkles"
+        case .forgottenFavorites: return "clock.badge.checkmark"
+        case .mostPlayed: return "flame.fill"
+        case .starred: return "star.fill"
+        case .discoveryMix: return "shuffle"
         case .albums: return "opticaldisc"
         case .artists: return "music.mic"
         case .playlists: return "music.note.list"
         case .genres: return "tag"
         case .settings: return "gearshape"
+        }
+    }
+    
+    var asSmartPlaylistType: SmartPlaylistType? {
+        switch self {
+        case .recentlyAdded: return .recentlyAdded
+        case .recentlyPlayed: return .recentlyPlayed
+        case .topRated: return .topRated
+        case .unplayed: return .unplayed
+        case .forgottenFavorites: return .forgottenFavorites
+        case .mostPlayed: return .mostPlayed
+        case .starred: return .starred
+        case .discoveryMix: return .discoveryMix
+        default: return nil
         }
     }
 }
@@ -47,11 +71,28 @@ enum ViewMode: String {
 enum NavigationDestination: Identifiable, Equatable, Hashable {
     case album(AlbumItem)
     case artist(ArtistItem)
+    case smartPlaylist(SmartPlaylistType)
     
     var id: String {
         switch self {
         case .album(let album): return "album-\(album.id)"
         case .artist(let artist): return "artist-\(artist.id)"
+        case .smartPlaylist(let type): return "smart-\(type.id)"
+        }
+    }
+}
+
+extension SmartPlaylistType {
+    var asSidebarTab: SidebarTab {
+        switch self {
+        case .recentlyAdded: return .recentlyAdded
+        case .recentlyPlayed: return .recentlyPlayed
+        case .topRated: return .topRated
+        case .unplayed: return .unplayed
+        case .forgottenFavorites: return .forgottenFavorites
+        case .mostPlayed: return .mostPlayed
+        case .starred: return .starred
+        case .discoveryMix: return .discoveryMix
         }
     }
 }
@@ -131,6 +172,14 @@ final class PlayerViewModel: ObservableObject {
     @Published var playlists: [PlaylistItem] = []
     @Published var genres: [GenreItem] = []
     
+    // Smart Playlists (Songs)
+    @Published var smartPlaylistSongs: [SmartPlaylistType: [SongItem]] = [:]
+    @Published var isLoadingSmartPlaylist: [SmartPlaylistType: Bool] = [:]
+    
+    var unplayedSongs: [SongItem] {
+        smartPlaylistSongs[.unplayed] ?? []
+    }
+    
     /// Returns albums with a 4 or 5-star rating, sorted by rating descending
     var topRatedAlbums: [AlbumItem] {
         albums.filter { ($0.userRating ?? 0) >= 4 }
@@ -191,6 +240,15 @@ final class PlayerViewModel: ObservableObject {
             self.artists = cached.artists
             self.playlists = cached.playlists
             self.genres = cached.genres
+            if let smart = cached.smartPlaylists {
+                var restored: [SmartPlaylistType: [SongItem]] = [:]
+                for (k, v) in smart {
+                    if let type = SmartPlaylistType(rawValue: k) {
+                        restored[type] = v
+                    }
+                }
+                self.smartPlaylistSongs = restored
+            }
         } else if saved.password.isEmpty {
             // Only populate sample catalog on a fresh unconfigured installation
             loadSampleCatalog()
@@ -420,15 +478,13 @@ final class PlayerViewModel: ObservableObject {
         self.playlists = plList
         self.genres = genList
         
-        LibraryCacheManager.shared.saveCache(
-            albums: allA,
-            featuredAlbums: freq,
-            recentAlbums: rec,
-            recentlyPlayedAlbums: recPlayed,
-            artists: artList,
-            playlists: plList,
-            genres: genList
-        )
+        persistSmartPlaylistsCache()
+        
+        Task {
+            for type in SmartPlaylistType.allCases {
+                await self.loadSmartPlaylist(type)
+            }
+        }
     }
     
     // MARK: - Manual Library Sync
@@ -595,6 +651,8 @@ final class PlayerViewModel: ObservableObject {
                 selectAlbumForDetail(album)
             case .artist(let artist):
                 selectArtistForDetail(artist)
+            case .smartPlaylist:
+                break
             }
         } else {
             selectedAlbumForDetail = nil
@@ -788,6 +846,78 @@ final class PlayerViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    // MARK: - Smart Playlists Loading & Playback
+    func loadSmartPlaylist(_ type: SmartPlaylistType, forceRefresh: Bool = false) async {
+        guard isConnected else { return }
+        if !forceRefresh && !(smartPlaylistSongs[type]?.isEmpty ?? true) {
+            return
+        }
+        
+        await MainActor.run {
+            self.isLoadingSmartPlaylist[type] = true
+        }
+        
+        let songs: [SongItem]
+        switch type {
+        case .recentlyAdded:
+            songs = await navidrome.getRecentlyAddedSongs(cachedAlbums: self.recentAlbums.isEmpty ? self.albums : self.recentAlbums, limit: 50)
+        case .recentlyPlayed:
+            songs = await navidrome.getRecentlyPlayedSongs(cachedAlbums: self.recentlyPlayedAlbums.isEmpty ? self.albums : self.recentlyPlayedAlbums, limit: 50)
+        case .topRated:
+            songs = await navidrome.getTopRatedSongs(cachedAlbums: self.topRatedAlbums.isEmpty ? self.albums : self.topRatedAlbums, limit: 50)
+        case .unplayed:
+            songs = await navidrome.getUnplayedSongs(targetCount: 30)
+        case .forgottenFavorites:
+            songs = await navidrome.getForgottenFavorites(targetCount: 30)
+        case .mostPlayed:
+            songs = await navidrome.getTopTracks(limit: 50, cachedAlbums: self.albums)
+        case .starred:
+            songs = await navidrome.getStarredSongs()
+        case .discoveryMix:
+            songs = await navidrome.getDiscoveryMix(targetCount: 40)
+        }
+        
+        await MainActor.run {
+            self.smartPlaylistSongs[type] = songs
+            self.isLoadingSmartPlaylist[type] = false
+            self.persistSmartPlaylistsCache()
+        }
+    }
+    
+    func persistSmartPlaylistsCache() {
+        var rawMap: [String: [SongItem]] = [:]
+        for (k, v) in smartPlaylistSongs {
+            rawMap[k.rawValue] = v
+        }
+        LibraryCacheManager.shared.saveCache(
+            albums: self.albums,
+            featuredAlbums: self.featuredAlbums,
+            recentAlbums: self.recentAlbums,
+            recentlyPlayedAlbums: self.recentlyPlayedAlbums,
+            artists: self.artists,
+            playlists: self.playlists,
+            genres: self.genres,
+            smartPlaylists: rawMap
+        )
+    }
+    
+    func playSmartPlaylist(_ type: SmartPlaylistType, startingAt index: Int = 0, shuffle: Bool = false) {
+        guard let list = smartPlaylistSongs[type], !list.isEmpty else { return }
+        let playlistQueue: [SongItem]
+        let startIndex: Int
+        if shuffle {
+            playlistQueue = list.shuffled()
+            startIndex = 0
+        } else {
+            playlistQueue = list
+            startIndex = min(max(index, 0), list.count - 1)
+        }
+        
+        let targetSong = playlistQueue[startIndex]
+        let targetAlbum = self.albums.first(where: { $0.id == targetSong.parent || (targetSong.album != nil && $0.name == targetSong.album) })
+        playSong(targetSong, inAlbum: targetAlbum, queue: playlistQueue)
     }
     
     // MARK: - Audio Cache Management

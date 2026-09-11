@@ -510,6 +510,9 @@
         }
       }
     },
+    "Aleatorio" : {
+
+    },
     "All Albums" : {
       "localizations" : {
         "en" : {
@@ -907,6 +910,9 @@
           }
         }
       }
+    },
+    "Cargando lista inteligente..." : {
+
     },
     "Choose whether to display labels below icons" : {
       "localizations" : {
@@ -1565,6 +1571,9 @@
         }
       }
     },
+    "LISTA INTELIGENTE" : {
+
+    },
     "Listas" : {
       "localizations" : {
         "en" : {
@@ -1580,6 +1589,9 @@
           }
         }
       }
+    },
+    "Listas Inteligentes" : {
+
     },
     "Load Demo" : {
       "localizations" : {
@@ -1859,6 +1871,9 @@
           }
         }
       }
+    },
+    "No hay canciones disponibles" : {
+
     },
     "No playlists found" : {
       "localizations" : {
@@ -2153,6 +2168,9 @@
         }
       }
     },
+    "Playlists del Servidor" : {
+
+    },
     "Playlists from your server will appear here." : {
       "localizations" : {
         "en" : {
@@ -2266,6 +2284,9 @@
         }
       }
     },
+    "Regenerar" : {
+
+    },
     "Reproducir" : {
 
     },
@@ -2273,6 +2294,9 @@
 
     },
     "Reproducir álbum" : {
+
+    },
+    "Reproducir Todo" : {
 
     },
     "Rescan server and refresh catalog" : {
@@ -2825,6 +2849,9 @@
         }
       }
     },
+    "TÍTULO" : {
+
+    },
     "Top Rated" : {
       "localizations" : {
         "en" : {
@@ -3026,6 +3053,9 @@
           }
         }
       }
+    },
+    "Vuelve a intentarlo o sincroniza tu biblioteca con el servidor." : {
+
     },
     "YEAR / GENRE" : {
       "localizations" : {

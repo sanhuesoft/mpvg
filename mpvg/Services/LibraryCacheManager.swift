@@ -16,6 +16,7 @@ struct LibraryCacheData: Codable {
     let artists: [ArtistItem]
     let playlists: [PlaylistItem]
     let genres: [GenreItem]
+    let smartPlaylists: [String: [SongItem]]?
     let savedAt: Date
 }
 
@@ -63,7 +64,8 @@ final class LibraryCacheManager {
         recentlyPlayedAlbums: [AlbumItem] = [],
         artists: [ArtistItem],
         playlists: [PlaylistItem],
-        genres: [GenreItem]
+        genres: [GenreItem],
+        smartPlaylists: [String: [SongItem]] = [:]
     ) {
         queue.async { [weak self] in
             guard let self = self else { return }
@@ -75,6 +77,7 @@ final class LibraryCacheManager {
                 artists: artists,
                 playlists: playlists,
                 genres: genres,
+                smartPlaylists: smartPlaylists,
                 savedAt: Date()
             )
             do {

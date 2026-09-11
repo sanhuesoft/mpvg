@@ -29,11 +29,21 @@ struct BrowseView: View {
                     case .browse:
                         defaultBrowseContent
                     case .recentlyAdded:
-                        albumSection(title: "Recently Added", albums: viewModel.recentAlbums)
+                        SmartPlaylistDetailView(type: .recentlyAdded, viewModel: viewModel)
                     case .recentlyPlayed:
-                        albumSection(title: "Recently Played", albums: viewModel.recentlyPlayedAlbums)
+                        SmartPlaylistDetailView(type: .recentlyPlayed, viewModel: viewModel)
                     case .topRated:
-                        albumSection(title: "Top Rated", albums: viewModel.topRatedAlbums)
+                        SmartPlaylistDetailView(type: .topRated, viewModel: viewModel)
+                    case .unplayed:
+                        SmartPlaylistDetailView(type: .unplayed, viewModel: viewModel)
+                    case .forgottenFavorites:
+                        SmartPlaylistDetailView(type: .forgottenFavorites, viewModel: viewModel)
+                    case .mostPlayed:
+                        SmartPlaylistDetailView(type: .mostPlayed, viewModel: viewModel)
+                    case .starred:
+                        SmartPlaylistDetailView(type: .starred, viewModel: viewModel)
+                    case .discoveryMix:
+                        SmartPlaylistDetailView(type: .discoveryMix, viewModel: viewModel)
                     case .albums:
                         albumSection(title: "All Albums", albums: viewModel.albums)
                     case .artists:
@@ -162,34 +172,52 @@ struct BrowseView: View {
     
     // MARK: - Playlists Section
     private var playlistsSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Playlists")
+        VStack(alignment: .leading, spacing: 24) {
+            // Smart Playlists
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Listas Inteligentes")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(ColorTheme.textPrimary)
-                Spacer()
-                if !viewModel.playlists.isEmpty {
-                    Text("\(viewModel.playlists.count) playlists")
-                        .font(.system(size: 12))
-                        .foregroundColor(ColorTheme.textTertiary)
+                
+                LazyVGrid(columns: albumColumns, spacing: 14) {
+                    ForEach(SmartPlaylistType.allCases) { type in
+                        SmartPlaylistCardView(type: type, viewModel: viewModel)
+                    }
                 }
             }
             
-            if viewModel.playlists.isEmpty {
-                emptyStateView(
-                    icon: "music.note.list",
-                    title: "No playlists found",
-                    message: "Playlists from your server will appear here."
-                )
-            } else {
-                if viewModel.viewMode == .grid {
-                    LazyVGrid(columns: albumColumns, spacing: 14) {
-                        ForEach(viewModel.playlists) { playlist in
-                            PlaylistCardView(playlist: playlist, viewModel: viewModel)
-                        }
+            Divider().background(ColorTheme.cardBorder)
+            
+            // Server Playlists
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    Text("Playlists del Servidor")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(ColorTheme.textPrimary)
+                    Spacer()
+                    if !viewModel.playlists.isEmpty {
+                        Text("\(viewModel.playlists.count) playlists")
+                            .font(.system(size: 12))
+                            .foregroundColor(ColorTheme.textTertiary)
                     }
+                }
+                
+                if viewModel.playlists.isEmpty {
+                    emptyStateView(
+                        icon: "music.note.list",
+                        title: "No playlists found",
+                        message: "Playlists from your server will appear here."
+                    )
                 } else {
-                    playlistTableView(playlists: viewModel.playlists)
+                    if viewModel.viewMode == .grid {
+                        LazyVGrid(columns: albumColumns, spacing: 14) {
+                            ForEach(viewModel.playlists) { playlist in
+                                PlaylistCardView(playlist: playlist, viewModel: viewModel)
+                            }
+                        }
+                    } else {
+                        playlistTableView(playlists: viewModel.playlists)
+                    }
                 }
             }
         }
@@ -826,6 +854,94 @@ struct ArtistTableRowView: View {
                 Label("Ver artista", systemImage: "music.mic")
             }
         }
+    }
+}
+
+// MARK: - Smart Playlist Card View
+struct SmartPlaylistCardView: View {
+    let type: SmartPlaylistType
+    @ObservedObject var viewModel: PlayerViewModel
+    @State private var isHovered: Bool = false
+    
+    private var count: Int {
+        viewModel.smartPlaylistSongs[type]?.count ?? 0
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: type.gradientColors,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .aspectRatio(1, contentMode: .fit)
+                    .overlay(
+                        Image(systemName: type.iconName)
+                            .font(.system(size: 42, weight: .semibold))
+                            .foregroundColor(.white)
+                    )
+                    .shadow(color: type.gradientColors.first?.opacity(0.25) ?? Color.black.opacity(0.1), radius: 6, x: 0, y: 3)
+                
+                if isHovered {
+                    Color.black.opacity(0.25)
+                        .cornerRadius(10)
+                    
+                    Button(action: {
+                        viewModel.playSmartPlaylist(type, startingAt: 0, shuffle: false)
+                    }) {
+                        Circle()
+                            .fill(ColorTheme.terracotta)
+                            .frame(width: 44, height: 44)
+                            .overlay(
+                                Image(systemName: "play.fill")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(.white)
+                                    .offset(x: 1.5)
+                            )
+                            .shadow(color: Color.black.opacity(0.3), radius: 6, x: 0, y: 3)
+                    }
+                    .buttonStyle(.plain)
+                    .pointingHandOnHover()
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .aspectRatio(1, contentMode: .fit)
+            
+            VStack(alignment: .leading, spacing: 3) {
+                Text(type.title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(ColorTheme.textPrimary)
+                    .lineLimit(1)
+                
+                Text(count > 0 ? "\(count) canciones" : type.subtitle)
+                    .font(.system(size: 11))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .lineLimit(1)
+            }
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(minWidth: 0, maxWidth: .infinity)
+        .padding(10)
+        .background(ColorTheme.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isHovered ? ColorTheme.cardBorderHover : ColorTheme.cardBorder, lineWidth: 1)
+        )
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(isHovered ? 0.06 : 0.02), radius: isHovered ? 8 : 3, x: 0, y: isHovered ? 3 : 1)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                self.isHovered = hovering
+            }
+        }
+        .onTapGesture {
+            viewModel.selectTab(type.asSidebarTab)
+        }
+        .pointingHandOnHover()
     }
 }
 

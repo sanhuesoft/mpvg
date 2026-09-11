@@ -81,6 +81,8 @@ struct IOSMainView: View {
             AlbumDetailView(album: album, viewModel: viewModel)
         case .artist(let artist):
             ArtistDetailView(artist: artist, viewModel: viewModel)
+        case .smartPlaylist(let type):
+            SmartPlaylistDetailView(type: type, viewModel: viewModel)
         }
     }
     
@@ -375,46 +377,89 @@ struct IOSPlaylistsView: View {
                     
                     VStack(spacing: 10) {
                         // 1. Recently Added
-                        NavigationLink(destination: AlbumsGridView(
-                            viewModel: viewModel,
-                            customAlbums: viewModel.recentAlbums,
-                            title: "Recently Added"
-                        )) {
+                        NavigationLink(value: NavigationDestination.smartPlaylist(.recentlyAdded)) {
                             smartCollectionRow(
-                                title: "Recently Added",
-                                subtitle: "\(viewModel.recentAlbums.count) \(viewModel.recentAlbums.count == 1 ? String(localized: "album") : String(localized: "albums"))",
-                                iconName: "clock.arrow.circlepath",
-                                gradientColors: [Color(hex: "E07A5F"), Color(hex: "B45309")]
+                                title: SmartPlaylistType.recentlyAdded.title,
+                                subtitle: "\(viewModel.smartPlaylistSongs[.recentlyAdded]?.count ?? viewModel.recentAlbums.count) canciones",
+                                iconName: SmartPlaylistType.recentlyAdded.iconName,
+                                gradientColors: SmartPlaylistType.recentlyAdded.gradientColors
                             )
                         }
                         .buttonStyle(.plain)
                         
                         // 2. Recently Played
-                        NavigationLink(destination: AlbumsGridView(
-                            viewModel: viewModel,
-                            customAlbums: viewModel.recentlyPlayedAlbums,
-                            title: "Recently Played"
-                        )) {
+                        NavigationLink(value: NavigationDestination.smartPlaylist(.recentlyPlayed)) {
                             smartCollectionRow(
-                                title: "Recently Played",
-                                subtitle: "\(viewModel.recentlyPlayedAlbums.count) \(viewModel.recentlyPlayedAlbums.count == 1 ? String(localized: "album") : String(localized: "albums"))",
-                                iconName: "play.circle.fill",
-                                gradientColors: [Color(hex: "D97706"), Color(hex: "9A3412")]
+                                title: SmartPlaylistType.recentlyPlayed.title,
+                                subtitle: "\(viewModel.smartPlaylistSongs[.recentlyPlayed]?.count ?? viewModel.recentlyPlayedAlbums.count) canciones",
+                                iconName: SmartPlaylistType.recentlyPlayed.iconName,
+                                gradientColors: SmartPlaylistType.recentlyPlayed.gradientColors
                             )
                         }
                         .buttonStyle(.plain)
                         
                         // 3. Top Rated (4 & 5 stars)
-                        NavigationLink(destination: AlbumsGridView(
-                            viewModel: viewModel,
-                            customAlbums: viewModel.topRatedAlbums,
-                            title: "Top Rated"
-                        )) {
+                        NavigationLink(value: NavigationDestination.smartPlaylist(.topRated)) {
                             smartCollectionRow(
-                                title: "Top Rated",
-                                subtitle: "\(viewModel.topRatedAlbums.count) \(viewModel.topRatedAlbums.count == 1 ? String(localized: "album") : String(localized: "albums")) (4 & 5 stars)",
-                                iconName: "star.fill",
-                                gradientColors: [Color(hex: "F59E0B"), Color(hex: "D97706")]
+                                title: SmartPlaylistType.topRated.title,
+                                subtitle: "\(viewModel.smartPlaylistSongs[.topRated]?.count ?? viewModel.topRatedAlbums.count) canciones",
+                                iconName: SmartPlaylistType.topRated.iconName,
+                                gradientColors: SmartPlaylistType.topRated.gradientColors
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        // 4. No escuchadas
+                        NavigationLink(value: NavigationDestination.smartPlaylist(.unplayed)) {
+                            smartCollectionRow(
+                                title: SmartPlaylistType.unplayed.title,
+                                subtitle: "\(viewModel.smartPlaylistSongs[.unplayed]?.count ?? 30) canciones",
+                                iconName: SmartPlaylistType.unplayed.iconName,
+                                gradientColors: SmartPlaylistType.unplayed.gradientColors
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        // 5. Las Más Escuchadas
+                        NavigationLink(value: NavigationDestination.smartPlaylist(.mostPlayed)) {
+                            smartCollectionRow(
+                                title: SmartPlaylistType.mostPlayed.title,
+                                subtitle: "\(viewModel.smartPlaylistSongs[.mostPlayed]?.count ?? 50) canciones",
+                                iconName: SmartPlaylistType.mostPlayed.iconName,
+                                gradientColors: SmartPlaylistType.mostPlayed.gradientColors
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        // 6. Favoritas
+                        NavigationLink(value: NavigationDestination.smartPlaylist(.starred)) {
+                            smartCollectionRow(
+                                title: SmartPlaylistType.starred.title,
+                                subtitle: "\(viewModel.smartPlaylistSongs[.starred]?.count ?? 0) canciones",
+                                iconName: SmartPlaylistType.starred.iconName,
+                                gradientColors: SmartPlaylistType.starred.gradientColors
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        // 7. Joyas Olvidadas
+                        NavigationLink(value: NavigationDestination.smartPlaylist(.forgottenFavorites)) {
+                            smartCollectionRow(
+                                title: SmartPlaylistType.forgottenFavorites.title,
+                                subtitle: "\(viewModel.smartPlaylistSongs[.forgottenFavorites]?.count ?? 0) canciones",
+                                iconName: SmartPlaylistType.forgottenFavorites.iconName,
+                                gradientColors: SmartPlaylistType.forgottenFavorites.gradientColors
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        // 8. Mix Descubrimiento
+                        NavigationLink(value: NavigationDestination.smartPlaylist(.discoveryMix)) {
+                            smartCollectionRow(
+                                title: SmartPlaylistType.discoveryMix.title,
+                                subtitle: "\(viewModel.smartPlaylistSongs[.discoveryMix]?.count ?? 40) canciones",
+                                iconName: SmartPlaylistType.discoveryMix.iconName,
+                                gradientColors: SmartPlaylistType.discoveryMix.gradientColors
                             )
                         }
                         .buttonStyle(.plain)

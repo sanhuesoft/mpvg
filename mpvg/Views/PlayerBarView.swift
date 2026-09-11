@@ -16,9 +16,9 @@ struct PlayerBarView: View {
     @State private var barWidth: CGFloat = 800
     
     var body: some View {
-        let showTimeSlider = barWidth >= 640
-        let showVolumeControl = barWidth >= 780
-        let showStars = barWidth >= 520
+        let showTimeSlider = barWidth >= 540
+        let showVolumeControl = barWidth >= 600
+        let showStars = barWidth >= 500
         
         VStack(spacing: 0) {
             // Micro progress line at top of capsule when full scrubber is hidden

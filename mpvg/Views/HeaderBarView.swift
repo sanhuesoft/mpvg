@@ -83,10 +83,12 @@ struct HeaderBarView: View {
                     Text(LocalizedStringKey(viewModel.activeTab.rawValue))
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(ColorTheme.textPrimary)
+                        .lineLimit(1)
                     
                     Text(itemCountLabel)
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(ColorTheme.textTertiary)
+                        .lineLimit(1)
                 }
             }
             
@@ -267,6 +269,12 @@ struct HeaderBarView: View {
             return viewModel.topRatedAlbums.isEmpty ? "" : "\(viewModel.topRatedAlbums.count) albums"
         case .albums:
             return viewModel.albums.isEmpty ? "" : "\(viewModel.albums.count) albums"
+        case .unplayed, .forgottenFavorites, .mostPlayed, .starred, .discoveryMix:
+            if let type = viewModel.activeTab.asSmartPlaylistType,
+               let count = viewModel.smartPlaylistSongs[type]?.count, count > 0 {
+                return "\(count) tracks"
+            }
+            return ""
         case .browse, .settings:
             return ""
         }
@@ -278,6 +286,8 @@ struct HeaderBarView: View {
             return album.displayTitle
         case .artist(let artist):
             return artist.name
+        case .smartPlaylist(let type):
+            return type.title
         }
     }
 }

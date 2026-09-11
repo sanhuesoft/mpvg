@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 // MARK: - Server Configuration
 struct ServerConfig: Codable, Equatable, Sendable {
@@ -146,9 +147,57 @@ struct SongItem: Identifiable, Hashable, Codable {
     let bitRate: Int?
     let path: String?
     var userRating: Int?
+    var playCount: Int? = 0
+    var starred: String? = nil
+    
+    init(
+        id: String,
+        parent: String? = nil,
+        title: String,
+        album: String? = nil,
+        artist: String? = nil,
+        artistId: String? = nil,
+        track: Int? = nil,
+        year: Int? = nil,
+        genre: String? = nil,
+        coverArt: String? = nil,
+        size: Int64? = nil,
+        contentType: String? = nil,
+        suffix: String? = nil,
+        duration: Double? = nil,
+        bitRate: Int? = nil,
+        path: String? = nil,
+        userRating: Int? = nil,
+        playCount: Int? = 0,
+        starred: String? = nil
+    ) {
+        self.id = id
+        self.parent = parent
+        self.title = title
+        self.album = album
+        self.artist = artist
+        self.artistId = artistId
+        self.track = track
+        self.year = year
+        self.genre = genre
+        self.coverArt = coverArt
+        self.size = size
+        self.contentType = contentType
+        self.suffix = suffix
+        self.duration = duration
+        self.bitRate = bitRate
+        self.path = path
+        self.userRating = userRating
+        self.playCount = playCount
+        self.starred = starred
+    }
     
     var rating: Int {
         userRating ?? 0
+    }
+    
+    var isStarred: Bool {
+        starred != nil
     }
     
     var displayArtist: String {
@@ -177,6 +226,97 @@ struct SongItem: Identifiable, Hashable, Codable {
             return "\(suf) Hi-Res"
         }
         return suf
+    }
+}
+
+// MARK: - Smart Playlist Types
+enum SmartPlaylistType: String, CaseIterable, Identifiable, Codable {
+    case recentlyAdded = "Recently Added"
+    case recentlyPlayed = "Recently Played"
+    case topRated = "Top Rated"
+    case unplayed = "No escuchadas"
+    case mostPlayed = "Las Más Escuchadas"
+    case starred = "Favoritas"
+    case forgottenFavorites = "Joyas Olvidadas"
+    case discoveryMix = "Mix Descubrimiento"
+    
+    var id: String { rawValue }
+    
+    var title: String {
+        switch self {
+        case .recentlyAdded:
+            return String(localized: "Recently Added")
+        case .recentlyPlayed:
+            return String(localized: "Recently Played")
+        case .topRated:
+            return String(localized: "Top Rated")
+        case .unplayed, .mostPlayed, .starred, .forgottenFavorites, .discoveryMix:
+            return rawValue
+        }
+    }
+    
+    var subtitle: String {
+        switch self {
+        case .recentlyAdded:
+            return "Canciones añadidas recientemente a tu biblioteca"
+        case .recentlyPlayed:
+            return "Canciones reproducidas recientemente"
+        case .topRated:
+            return "Pistas mejor valoradas con 4 y 5 estrellas"
+        case .unplayed:
+            return "30 canciones aleatorias que nunca has reproducido"
+        case .forgottenFavorites:
+            return "Tus pistas favoritas o de alta calificación poco escuchadas"
+        case .mostPlayed:
+            return "Las 50 canciones más reproducidas de tu biblioteca"
+        case .starred:
+            return "Pistas marcadas como favoritas en tu colección"
+        case .discoveryMix:
+            return "Mix variado de 40 canciones aleatorias de tu biblioteca"
+        }
+    }
+    
+    var iconName: String {
+        switch self {
+        case .recentlyAdded: return "clock.arrow.circlepath"
+        case .recentlyPlayed: return "play.circle.fill"
+        case .topRated: return "star.fill"
+        case .unplayed: return "sparkles"
+        case .forgottenFavorites: return "clock.badge.checkmark"
+        case .mostPlayed: return "flame.fill"
+        case .starred: return "star.fill"
+        case .discoveryMix: return "shuffle"
+        }
+    }
+    
+    var gradientColors: [Color] {
+        switch self {
+        case .recentlyAdded:
+            return [Color(hex: "3B82F6"), Color(hex: "1D4ED8")] // Blue
+        case .recentlyPlayed:
+            return [Color(hex: "06B6D4"), Color(hex: "0E7490")] // Cyan
+        case .topRated:
+            return [Color(hex: "F59E0B"), Color(hex: "B45309")] // Amber / Gold
+        case .unplayed:
+            return [Color(hex: "8B5CF6"), Color(hex: "6D28D9")] // Purple / Violet
+        case .forgottenFavorites:
+            return [Color(hex: "F97316"), Color(hex: "C2410C")] // Orange
+        case .mostPlayed:
+            return [Color(hex: "EF4444"), Color(hex: "B91C1C")] // Red / Crimson
+        case .starred:
+            return [Color(hex: "EC4899"), Color(hex: "BE185D")] // Pink / Rose
+        case .discoveryMix:
+            return [Color(hex: "10B981"), Color(hex: "047857")] // Emerald / Teal
+        }
+    }
+    
+    var canRegenerate: Bool {
+        switch self {
+        case .unplayed, .discoveryMix, .recentlyAdded, .recentlyPlayed, .topRated:
+            return true
+        case .forgottenFavorites, .mostPlayed, .starred:
+            return false
+        }
     }
 }
 

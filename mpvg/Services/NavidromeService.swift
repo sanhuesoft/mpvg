@@ -342,26 +342,7 @@ actor NavidromeService {
             var songs: [SongItem] = []
             if let songList = albumDict["song"] as? [[String: Any]] {
                 for s in songList {
-                    if let sid = s["id"] as? String, let title = s["title"] as? String {
-                        let song = SongItem(
-                            id: sid,
-                            parent: (s["parent"] as? String) ?? (s["albumId"] as? String) ?? album.id,
-                            title: title,
-                            album: s["album"] as? String ?? album.displayTitle,
-                            artist: s["artist"] as? String ?? album.displayArtist,
-                            artistId: (s["artistId"] as? String) ?? album.artistId,
-                            track: s["track"] as? Int,
-                            year: s["year"] as? Int ?? album.year,
-                            genre: s["genre"] as? String ?? album.genre,
-                            coverArt: s["coverArt"] as? String ?? album.coverArt,
-                            size: (s["size"] as? NSNumber)?.int64Value,
-                            contentType: s["contentType"] as? String,
-                            suffix: s["suffix"] as? String,
-                            duration: s["duration"] as? Double,
-                            bitRate: s["bitRate"] as? Int,
-                            path: s["path"] as? String,
-                            userRating: (s["userRating"] as? Int) ?? (s["rating"] as? Int)
-                        )
+                    if let song = parseSongItem(s, fallbackCoverArt: album.coverArt, fallbackAlbum: album.displayTitle, fallbackArtist: album.displayArtist, fallbackArtistId: album.artistId) {
                         songs.append(song)
                     }
                 }
@@ -423,26 +404,8 @@ actor NavidromeService {
             var songs: [SongItem] = []
             if let rawSongs = result["song"] as? [[String: Any]] {
                 for s in rawSongs {
-                    if let id = s["id"] as? String, let title = s["title"] as? String {
-                        songs.append(SongItem(
-                            id: id,
-                            parent: (s["parent"] as? String) ?? (s["albumId"] as? String),
-                            title: title,
-                            album: s["album"] as? String,
-                            artist: s["artist"] as? String,
-                            artistId: s["artistId"] as? String,
-                            track: s["track"] as? Int,
-                            year: s["year"] as? Int,
-                            genre: s["genre"] as? String,
-                            coverArt: s["coverArt"] as? String,
-                            size: (s["size"] as? NSNumber)?.int64Value,
-                            contentType: s["contentType"] as? String,
-                            suffix: s["suffix"] as? String,
-                            duration: s["duration"] as? Double,
-                            bitRate: s["bitRate"] as? Int,
-                            path: s["path"] as? String,
-                            userRating: (s["userRating"] as? Int) ?? (s["rating"] as? Int)
-                        ))
+                    if let song = parseSongItem(s) {
+                        songs.append(song)
                     }
                 }
             }
@@ -528,26 +491,7 @@ actor NavidromeService {
             var songs: [SongItem] = []
             if let songList = (playlistDict["entry"] as? [[String: Any]]) ?? (playlistDict["song"] as? [[String: Any]]) {
                 for s in songList {
-                    if let sid = s["id"] as? String, let title = s["title"] as? String {
-                        let song = SongItem(
-                            id: sid,
-                            parent: (s["parent"] as? String) ?? (s["albumId"] as? String),
-                            title: title,
-                            album: s["album"] as? String ?? "",
-                            artist: s["artist"] as? String ?? "",
-                            artistId: s["artistId"] as? String,
-                            track: s["track"] as? Int,
-                            year: s["year"] as? Int,
-                            genre: s["genre"] as? String,
-                            coverArt: s["coverArt"] as? String ?? playlist.coverArt,
-                            size: (s["size"] as? NSNumber)?.int64Value,
-                            contentType: s["contentType"] as? String,
-                            suffix: s["suffix"] as? String,
-                            duration: s["duration"] as? Double,
-                            bitRate: s["bitRate"] as? Int,
-                            path: s["path"] as? String,
-                            userRating: (s["userRating"] as? Int) ?? (s["rating"] as? Int)
-                        )
+                    if let song = parseSongItem(s, fallbackCoverArt: playlist.coverArt) {
                         songs.append(song)
                     }
                 }
@@ -641,5 +585,197 @@ actor NavidromeService {
     func scrobble(songId: String, submission: Bool = true) async {
         guard let url = buildURL(endpoint: "scrobble.view", extraParams: ["id": songId, "submission": submission ? "true" : "false"]) else { return }
         _ = try? await URLSession.shared.data(from: url)
+    }
+    
+    // MARK: - Song Parsing Helper
+    private func parseSongItem(
+        _ s: [String: Any],
+        fallbackCoverArt: String? = nil,
+        fallbackAlbum: String? = nil,
+        fallbackArtist: String? = nil,
+        fallbackArtistId: String? = nil
+    ) -> SongItem? {
+        guard let sid = s["id"] as? String, let title = s["title"] as? String else { return nil }
+        return SongItem(
+            id: sid,
+            parent: (s["parent"] as? String) ?? (s["albumId"] as? String),
+            title: title,
+            album: (s["album"] as? String) ?? fallbackAlbum ?? "",
+            artist: (s["artist"] as? String) ?? fallbackArtist ?? "",
+            artistId: (s["artistId"] as? String) ?? fallbackArtistId,
+            track: s["track"] as? Int,
+            year: s["year"] as? Int,
+            genre: s["genre"] as? String,
+            coverArt: (s["coverArt"] as? String) ?? fallbackCoverArt,
+            size: (s["size"] as? NSNumber)?.int64Value,
+            contentType: s["contentType"] as? String,
+            suffix: s["suffix"] as? String,
+            duration: s["duration"] as? Double,
+            bitRate: s["bitRate"] as? Int,
+            path: s["path"] as? String,
+            userRating: (s["userRating"] as? Int) ?? (s["rating"] as? Int),
+            playCount: s["playCount"] as? Int,
+            starred: s["starred"] as? String
+        )
+    }
+
+    // MARK: - Smart Playlists & Song Endpoints
+    func getRandomSongs(size: Int = 100) async -> [SongItem] {
+        guard let url = buildURL(endpoint: "getRandomSongs.view", extraParams: ["size": "\(size)"]) else { return [] }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let sub = json["subsonic-response"] as? [String: Any],
+                  let randomSongsContainer = sub["randomSongs"] as? [String: Any],
+                  let rawSongs = randomSongsContainer["song"] as? [[String: Any]] else {
+                return []
+            }
+            return rawSongs.compactMap { parseSongItem($0) }
+        } catch {
+            print("Error cargando canciones aleatorias: \(error)")
+            return []
+        }
+    }
+
+    func getStarredSongs() async -> [SongItem] {
+        guard let url = buildURL(endpoint: "getStarred2.view") else { return [] }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let sub = json["subsonic-response"] as? [String: Any] else {
+                return []
+            }
+            let starredContainer = (sub["starred2"] as? [String: Any]) ?? (sub["starred"] as? [String: Any])
+            guard let rawSongs = starredContainer?["song"] as? [[String: Any]] else {
+                return []
+            }
+            return rawSongs.compactMap { parseSongItem($0) }
+        } catch {
+            print("Error cargando canciones favoritas: \(error)")
+            return []
+        }
+    }
+
+    func getUnplayedSongs(targetCount: Int = 30) async -> [SongItem] {
+        let candidates = await getRandomSongs(size: 300)
+        let unplayed = candidates.filter { ($0.playCount ?? 0) == 0 }
+        if unplayed.count >= targetCount {
+            return Array(unplayed.shuffled().prefix(targetCount))
+        }
+        return Array(unplayed.shuffled())
+    }
+
+    func getDiscoveryMix(targetCount: Int = 40) async -> [SongItem] {
+        let songs = await getRandomSongs(size: targetCount)
+        return songs.shuffled()
+    }
+
+    func getForgottenFavorites(targetCount: Int = 30) async -> [SongItem] {
+        let starred = await getStarredSongs()
+        let lowPlay = starred.filter { ($0.playCount ?? 0) <= 2 }
+        if !lowPlay.isEmpty {
+            return Array(lowPlay.shuffled().prefix(targetCount))
+        }
+        return Array(starred.shuffled().prefix(targetCount))
+    }
+
+    func getTopTracks(limit: Int = 50, cachedAlbums: [AlbumItem] = []) async -> [SongItem] {
+        var frequentAlbums = await getAlbums(type: "frequent", size: 10)
+        if frequentAlbums.isEmpty {
+            frequentAlbums = Array(cachedAlbums.prefix(10))
+        }
+        
+        var gatheredSongs: [SongItem] = []
+        await withTaskGroup(of: [SongItem].self) { group in
+            for album in frequentAlbums.prefix(8) {
+                group.addTask {
+                    let (_, tracks) = await self.getAlbum(id: album.id)
+                    return tracks
+                }
+            }
+            for await tracks in group {
+                gatheredSongs.append(contentsOf: tracks)
+            }
+        }
+        
+        var seenIds = Set<String>()
+        let uniqueSongs = gatheredSongs.filter { seenIds.insert($0.id).inserted }
+        let sorted = uniqueSongs.sorted { ($0.playCount ?? 0) > ($1.playCount ?? 0) }
+        let top = sorted.filter { ($0.playCount ?? 0) > 0 }
+        
+        if top.isEmpty {
+            return Array(sorted.prefix(limit))
+        }
+        return Array(top.prefix(limit))
+    }
+
+    func getRecentlyAddedSongs(cachedAlbums: [AlbumItem] = [], limit: Int = 50) async -> [SongItem] {
+        var albums = await getAlbums(type: "newest", size: 10)
+        if albums.isEmpty {
+            albums = Array(cachedAlbums.prefix(10))
+        }
+        var gatheredSongs: [SongItem] = []
+        await withTaskGroup(of: [SongItem].self) { group in
+            for album in albums.prefix(8) {
+                group.addTask {
+                    let (_, tracks) = await self.getAlbum(id: album.id)
+                    return tracks
+                }
+            }
+            for await tracks in group {
+                gatheredSongs.append(contentsOf: tracks)
+            }
+        }
+        var seenIds = Set<String>()
+        let uniqueSongs = gatheredSongs.filter { seenIds.insert($0.id).inserted }
+        return Array(uniqueSongs.prefix(limit))
+    }
+
+    func getRecentlyPlayedSongs(cachedAlbums: [AlbumItem] = [], limit: Int = 50) async -> [SongItem] {
+        var albums = await getAlbums(type: "recent", size: 10)
+        if albums.isEmpty {
+            albums = Array(cachedAlbums.prefix(10))
+        }
+        var gatheredSongs: [SongItem] = []
+        await withTaskGroup(of: [SongItem].self) { group in
+            for album in albums.prefix(8) {
+                group.addTask {
+                    let (_, tracks) = await self.getAlbum(id: album.id)
+                    return tracks
+                }
+            }
+            for await tracks in group {
+                gatheredSongs.append(contentsOf: tracks)
+            }
+        }
+        var seenIds = Set<String>()
+        let uniqueSongs = gatheredSongs.filter { seenIds.insert($0.id).inserted }
+        return Array(uniqueSongs.prefix(limit))
+    }
+
+    func getTopRatedSongs(cachedAlbums: [AlbumItem] = [], limit: Int = 50) async -> [SongItem] {
+        var albums = await getAlbums(type: "highest", size: 10)
+        if albums.isEmpty {
+            albums = Array(cachedAlbums.filter { ($0.userRating ?? 0) >= 4 }.prefix(10))
+        }
+        var gatheredSongs: [SongItem] = []
+        await withTaskGroup(of: [SongItem].self) { group in
+            for album in albums.prefix(8) {
+                group.addTask {
+                    let (_, tracks) = await self.getAlbum(id: album.id)
+                    return tracks
+                }
+            }
+            for await tracks in group {
+                gatheredSongs.append(contentsOf: tracks)
+            }
+        }
+        var seenIds = Set<String>()
+        let uniqueSongs = gatheredSongs.filter { seenIds.insert($0.id).inserted }
+        let highRated = uniqueSongs.filter { ($0.userRating ?? 0) >= 4 }
+        if !highRated.isEmpty {
+            return Array(highRated.sorted { ($0.userRating ?? 0) > ($1.userRating ?? 0) }.prefix(limit))
+        }
+        return Array(uniqueSongs.prefix(limit))
     }
 }
