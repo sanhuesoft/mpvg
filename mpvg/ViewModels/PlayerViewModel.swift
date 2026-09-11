@@ -123,6 +123,14 @@ typealias AudioEngine = IOSAudioEngine
 final class PlayerViewModel: ObservableObject {
     static weak var shared: PlayerViewModel?
     
+    @Published var appAccentColor: String = UserDefaults.standard.string(forKey: "appAccentColor") ?? "terracotta"
+    
+    func setAccentColor(_ accent: PrimaryAccent) {
+        UserDefaults.standard.set(accent.rawValue, forKey: "appAccentColor")
+        self.appAccentColor = accent.rawValue
+        self.objectWillChange.send()
+    }
+    
     @Published var activeTab: SidebarTab = .browse {
         didSet {
             if oldValue != activeTab {
@@ -1082,12 +1090,30 @@ final class PlayerViewModel: ObservableObject {
             selectedAlbumTracks[i].userRating = clamped
         }
         
-        // 4. Update search results
+        // 4. Update all smart playlists (Unplayed, Top Rated, Starred, etc.)
+        for (key, tracks) in smartPlaylistSongs {
+            var updated = tracks
+            var modified = false
+            for i in updated.indices where updated[i].id == song.id {
+                updated[i].userRating = clamped
+                modified = true
+            }
+            if modified {
+                smartPlaylistSongs[key] = updated
+            }
+        }
+        
+        // 5. Update search results
         for i in searchSongs.indices where searchSongs[i].id == song.id {
             searchSongs[i].userRating = clamped
         }
         
-        // 5. Send to Navidrome server
+        // 6. Update spotlight search songs
+        for i in spotlightSongs.indices where spotlightSongs[i].id == song.id {
+            spotlightSongs[i].userRating = clamped
+        }
+        
+        // 7. Send to Navidrome server
         if isConnected {
             Task {
                 _ = await navidrome.setRating(id: song.id, rating: clamped)
@@ -1218,6 +1244,38 @@ final class PlayerViewModel: ObservableObject {
         guard index >= 0 && index < queue.count else { return }
         let targetSong = queue[index]
         playSong(targetSong, inAlbum: currentAlbum, queue: queue)
+    }
+    
+    func moveQueueItem(from sourceIndex: Int, to destinationIndex: Int) {
+        guard sourceIndex >= 0 && sourceIndex < queue.count,
+              destinationIndex >= 0 && destinationIndex < queue.count,
+              sourceIndex != destinationIndex else { return }
+        
+        // Prevent moving items to or before the currently playing song
+        let minUpcoming = queueIndex + 1
+        guard sourceIndex >= minUpcoming && destinationIndex >= minUpcoming else { return }
+        
+        let item = queue.remove(at: sourceIndex)
+        queue.insert(item, at: destinationIndex)
+        
+        if isConnected {
+            AudioCacheManager.shared.preloadQueue(
+                queue: self.queue,
+                startingAfter: self.queueIndex,
+                count: self.serverConfig.preloadQueueCount,
+                navidrome: self.navidrome
+            )
+        }
+    }
+    
+    func moveUpcomingQueueItem(at index: Int, direction: Int) {
+        let newIndex = index + direction
+        moveQueueItem(from: index, to: newIndex)
+    }
+    
+    func moveUpcomingQueueItemToTop(at index: Int) {
+        let topIndex = queueIndex + 1
+        moveQueueItem(from: index, to: topIndex)
     }
     
     func syncNowPlaying() {

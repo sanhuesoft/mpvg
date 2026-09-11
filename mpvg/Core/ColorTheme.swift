@@ -16,6 +16,87 @@ import AppKit
 import UIKit
 #endif
 
+enum PrimaryAccent: String, CaseIterable, Identifiable {
+    case terracotta = "terracotta"
+    case red = "red"
+    case blue = "blue"
+    case green = "green"
+    case yellow = "yellow"
+    case purple = "purple"
+    case brown = "brown"
+    
+    var id: String { rawValue }
+    
+    var displayName: String {
+        switch self {
+        case .terracotta: return String(localized: "Terracotta")
+        case .red: return String(localized: "Red")
+        case .blue: return String(localized: "Blue")
+        case .green: return String(localized: "Green")
+        case .yellow: return String(localized: "Yellow")
+        case .purple: return String(localized: "Purple")
+        case .brown: return String(localized: "Brown")
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .terracotta:
+            return Color.dynamic(light: "D75C28", dark: "EB6A14")
+        case .red:
+            return Color.dynamic(light: "DF453A", dark: "F7685E")
+        case .blue:
+            return Color.dynamic(light: "2A90CB", dark: "4DB2D1")
+        case .green:
+            return Color.dynamic(light: "3EB174", dark: "2EA873")
+        case .yellow:
+            return Color.dynamic(light: "D79719", dark: "E5AA1F")
+        case .purple:
+            return Color.dynamic(light: "9B70C3", dark: "9B93DA")
+        case .brown:
+            return Color.dynamic(light: "9D8062", dark: "D7C0A3")
+        }
+    }
+    
+    var lightColor: Color {
+        switch self {
+        case .terracotta:
+            return Color.dynamic(light: "F6E2D5", dark: "432617")
+        case .red:
+            return Color.dynamic(light: "FCE6E4", dark: "4A1E1B")
+        case .blue:
+            return Color.dynamic(light: "E1EFF8", dark: "1A3240")
+        case .green:
+            return Color.dynamic(light: "DCEDE2", dark: "183627")
+        case .yellow:
+            return Color.dynamic(light: "F9EED7", dark: "382C16")
+        case .purple:
+            return Color.dynamic(light: "F3EDFA", dark: "2F1F40")
+        case .brown:
+            return Color.dynamic(light: "EBE3D6", dark: "342C23")
+        }
+    }
+    
+    var hoverColor: Color {
+        switch self {
+        case .terracotta:
+            return Color.dynamic(light: "AF3704", dark: "F28238")
+        case .red:
+            return Color.dynamic(light: "BF3F36", dark: "FB8479")
+        case .blue:
+            return Color.dynamic(light: "22729B", dark: "6ABFD2")
+        case .green:
+            return Color.dynamic(light: "329562", dark: "4EC68E")
+        case .yellow:
+            return Color.dynamic(light: "B67A02", dark: "E2BD60")
+        case .purple:
+            return Color.dynamic(light: "75509B", dark: "C6A2E1")
+        case .brown:
+            return Color.dynamic(light: "836B49", dark: "EBDAC6")
+        }
+    }
+}
+
 enum ColorTheme {
     // Backgrounds
     static let windowBackground = Color.dynamic(light: "F8F5F1", dark: "1C1712")
@@ -24,11 +105,33 @@ enum ColorTheme {
     static let cardBorder = Color.dynamic(light: "E4D7C3", dark: "3D3227")
     static let cardBorderHover = Color.dynamic(light: "CFB696", dark: "5A4938")
     
-    // Accents (Primary's iconic warm terracotta/orange)
-    static let terracotta = Color.dynamic(light: "D75C28", dark: "EB6A14")
-    static let terracottaLight = Color.dynamic(light: "F6E2D5", dark: "432617")
+    // Dynamic Accent based on Primary theme
+    static var currentAccent: PrimaryAccent {
+        let raw = UserDefaults.standard.string(forKey: "appAccentColor") ?? "terracotta"
+        return PrimaryAccent(rawValue: raw) ?? .terracotta
+    }
+    
+    static var accent: Color {
+        currentAccent.color
+    }
+    static var accentLight: Color {
+        currentAccent.lightColor
+    }
+    static var accentHover: Color {
+        currentAccent.hoverColor
+    }
+    
+    // Aliases to seamlessly maintain backwards compatibility with existing views
+    static var terracotta: Color {
+        accent
+    }
+    static var terracottaLight: Color {
+        accentLight
+    }
     static let selectedPill = Color.dynamic(light: "F2ECE3", dark: "3B3026")
-    static let terracottaHover = Color.dynamic(light: "AF3704", dark: "F28238")
+    static var terracottaHover: Color {
+        accentHover
+    }
     
     // Status & Badges
     static let sageGreen = Color.dynamic(light: "2D6A4F", dark: "2EA873")
@@ -147,3 +250,14 @@ extension UIColor {
     }
 }
 #endif
+
+struct PrimaryAccentKey: EnvironmentKey {
+    static let defaultValue: String = "terracotta"
+}
+
+extension EnvironmentValues {
+    var primaryAccentName: String {
+        get { self[PrimaryAccentKey.self] }
+        set { self[PrimaryAccentKey.self] = newValue }
+    }
+}

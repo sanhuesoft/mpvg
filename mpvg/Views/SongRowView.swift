@@ -16,6 +16,13 @@ struct SongRowView: View {
     let onPlay: () -> Void
     @State private var isHovered: Bool = false
     
+    private var effectiveRating: Int {
+        if let current = viewModel?.currentSong, current.id == song.id {
+            return current.rating
+        }
+        return song.rating
+    }
+    
     var body: some View {
         Button(action: onPlay) {
             HStack(spacing: 12) {
@@ -63,9 +70,9 @@ struct SongRowView: View {
                 
                 // 5-Star Rating (Positioned strictly between format badge and duration)
                 ZStack(alignment: .trailing) {
-                    if song.rating > 0 || isHovered {
+                    if effectiveRating > 0 || isHovered {
                         StarRatingView(
-                            rating: song.rating,
+                            rating: effectiveRating,
                             size: 11,
                             spacing: 2,
                             interactive: true,

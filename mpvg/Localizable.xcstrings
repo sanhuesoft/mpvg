@@ -363,6 +363,22 @@
         }
       }
     },
+    "Accent Color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accent Color"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color de acento"
+          }
+        }
+      }
+    },
     "Active Output Device" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -581,6 +597,9 @@
           }
         }
       }
+    },
+    "Arrastra para reordenar" : {
+
     },
     "artist" : {
       "localizations" : {
@@ -859,6 +878,9 @@
         }
       }
     },
+    "Bajar" : {
+
+    },
     "Bit-Perfect Sample Rate" : {
       "localizations" : {
         "en" : {
@@ -888,6 +910,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Conmutación Bit-Perfect de Frecuencia"
+          }
+        }
+      }
+    },
+    "Blue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blue"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azul"
+          }
+        }
+      }
+    },
+    "Brown" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brown"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cacao"
           }
         }
       }
@@ -973,18 +1027,18 @@
     "Cargando lista inteligente..." : {
 
     },
-    "Choose between automatic system mode, or forced light/dark Primary theme" : {
+    "Choose between automatic system mode, or forced light/dark theme" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose between automatic system mode, or forced light/dark Primary theme"
+            "value" : "Choose between automatic system mode, or forced light/dark theme"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Elige entre modo automático del sistema, o forzar tema Primary claro/oscuro"
+            "value" : "Elige entre modo automático del sistema, o forzar tema claro/oscuro"
           }
         }
       }
@@ -1070,7 +1124,6 @@
       }
     },
     "Connected" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1299,7 +1352,6 @@
       }
     },
     "Disconnected" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1438,9 +1490,6 @@
         }
       }
     },
-    "Fabián Sanhueza" : {
-
-    },
     "Featured" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1473,9 +1522,6 @@
           }
         }
       }
-    },
-    "FS" : {
-
     },
     "Gapless Audio Playback" : {
       "extractionState" : "stale",
@@ -1554,6 +1600,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Géneros"
+          }
+        }
+      }
+    },
+    "Green" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Green"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verde"
           }
         }
       }
@@ -1853,6 +1915,9 @@
           }
         }
       }
+    },
+    "Mover al inicio de la cola" : {
+
     },
     "Music genres defined in your library will appear here." : {
       "localizations" : {
@@ -2319,34 +2384,18 @@
         }
       }
     },
-    "Primary Dark" : {
+    "Purple" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Primary Dark"
+            "value" : "Purple"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Primary Oscuro"
-          }
-        }
-      }
-    },
-    "Primary Light" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Primary Light"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Primary Claro"
+            "value" : "Púrpura"
           }
         }
       }
@@ -2428,6 +2477,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escuchados recientemente"
+          }
+        }
+      }
+    },
+    "Red" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Red"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rojo"
           }
         }
       }
@@ -2624,9 +2689,6 @@
         }
       }
     },
-    "Selecciona un elemento para abrir o reproducir" : {
-
-    },
     "Select a track" : {
       "localizations" : {
         "en" : {
@@ -2655,6 +2717,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Selecciona el DAC físico o salida CoreAudio"
+          }
+        }
+      }
+    },
+    "Select your accent color for buttons and highlights" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select your accent color for buttons and highlights"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige el color de acento para botones y destacados"
           }
         }
       }
@@ -2690,6 +2768,12 @@
           }
         }
       }
+    },
+    "Settings (⌘,)" : {
+
+    },
+    "Settings..." : {
+
     },
     "SHARED" : {
       "extractionState" : "stale",
@@ -2791,6 +2875,9 @@
           }
         }
       }
+    },
+    "Subir" : {
+
     },
     "Subsonic API user" : {
       "localizations" : {
@@ -2965,6 +3052,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Toma el control directo por hardware del DAC conectado, omitiendo el mezclador del sistema macOS y alertas (--audio-exclusive=yes)."
+          }
+        }
+      }
+    },
+    "Terracotta" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terracotta"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terracota"
           }
         }
       }
@@ -3215,6 +3318,9 @@
         }
       }
     },
+    "Usa el teclado o clic para seleccionar" : {
+
+    },
     "username" : {
 
     },
@@ -3277,6 +3383,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "AÑO / GÉNERO"
+          }
+        }
+      }
+    },
+    "Yellow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yellow"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ámbar"
           }
         }
       }

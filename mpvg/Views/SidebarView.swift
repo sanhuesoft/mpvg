@@ -261,20 +261,6 @@ struct SidebarView: View {
                             viewModel.selectTab(.genres)
                         }
                     }
-                    
-                    // SYSTEM
-                    sidebarSection(title: "SYSTEM") {
-                        SidebarRowItem(
-                            iconName: "gearshape.fill",
-                            label: "Settings",
-                            badge: viewModel.mpv.isExclusive ? "⚡ Hi-Res" : nil,
-                            iconTint: ColorTheme.textSecondary,
-                            iconBgTint: ColorTheme.cardBorder,
-                            isSelected: viewModel.activeTab == .settings
-                        ) {
-                            viewModel.selectTab(.settings)
-                        }
-                    }
                 }
                 .padding(.horizontal, 8)
                 .padding(.bottom, 8)
@@ -282,36 +268,22 @@ struct SidebarView: View {
             
             Spacer(minLength: 0)
             
-            // Anchored User Profile Card at the bottom
-            HStack(spacing: 9) {
-                ZStack {
+            // Anchored Server Status & Settings Card at the bottom
+            HStack(spacing: 8) {
+                // Server Status Indicator
+                HStack(spacing: 7) {
                     Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(hex: "B45309"), ColorTheme.terracotta],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 26, height: 26)
+                        .fill(viewModel.isConnected ? ColorTheme.sageGreen : ColorTheme.amber)
+                        .frame(width: 7, height: 7)
                     
-                    Text("FS")
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                }
-                
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("Fabián Sanhueza")
-                        .font(.system(size: 11.5, weight: .semibold))
-                        .foregroundColor(ColorTheme.textPrimary)
-                        .lineLimit(1)
-                    
-                    HStack(spacing: 4) {
-                        Circle()
-                            .fill(viewModel.isConnected ? ColorTheme.sageGreen : ColorTheme.amber)
-                            .frame(width: 5, height: 5)
+                    VStack(alignment: .leading, spacing: 1.5) {
+                        Text(serverDisplayText)
+                            .font(.system(size: 11.5, weight: .semibold))
+                            .foregroundColor(ColorTheme.textPrimary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
                         
-                        Text(viewModel.isConnected ? "music.ssft.cl" : "Local Library")
+                        Text(viewModel.isConnected ? LocalizedStringKey("Connected") : LocalizedStringKey("Disconnected"))
                             .font(.system(size: 9.5))
                             .foregroundColor(ColorTheme.textTertiary)
                             .lineLimit(1)
@@ -319,9 +291,19 @@ struct SidebarView: View {
                 }
                 
                 Spacer()
+                
+                // Settings Button
+                SidebarSettingsButton(
+                    isSelected: viewModel.activeTab == .settings,
+                    action: {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            viewModel.selectTab(.settings)
+                        }
+                    }
+                )
             }
             .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+            .padding(.vertical, 7)
             .background(ColorTheme.cardBackground.opacity(0.75))
             .cornerRadius(10)
             .overlay(
@@ -339,6 +321,13 @@ struct SidebarView: View {
                 .stroke(ColorTheme.cardBorder.opacity(0.9), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+    }
+    
+    private var serverDisplayText: String {
+        if let host = URL(string: viewModel.serverConfig.urlString)?.host, !host.isEmpty {
+            return host
+        }
+        return viewModel.isConnected ? "music.ssft.cl" : "Local Library"
     }
     
     @ViewBuilder
@@ -441,3 +430,35 @@ private struct SidebarRowItem: View {
         }
     }
 }
+
+// MARK: - Sidebar Settings Button
+private struct SidebarSettingsButton: View {
+    let isSelected: Bool
+    let action: () -> Void
+    @State private var isHovered: Bool = false
+    
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .fill(isSelected ? ColorTheme.accentLight : (isHovered ? ColorTheme.cardBorder.opacity(0.55) : Color.clear))
+                    .frame(width: 28, height: 28)
+                
+                Image(systemName: isSelected ? "gearshape.fill" : "gearshape")
+                    .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
+                    .foregroundColor(isSelected ? ColorTheme.accent : (isHovered ? ColorTheme.textPrimary : ColorTheme.textSecondary))
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .keyboardShortcut(",", modifiers: .command)
+        .pointingHandOnHover()
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.12)) {
+                isHovered = hovering
+            }
+        }
+        .help(LocalizedStringKey("Settings (⌘,)"))
+    }
+}
+

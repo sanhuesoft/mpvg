@@ -8,10 +8,12 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct QueueView: View {
     @ObservedObject var viewModel: PlayerViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var draggingIndex: Int? = nil
     
     var body: some View {
         VStack(spacing: 0) {
@@ -173,6 +175,16 @@ struct QueueView: View {
                             ForEach(Array(upcomingIndices), id: \.self) { idx in
                                 let song = viewModel.queue[idx]
                                 queueRow(song: song, index: idx)
+                                    .opacity(draggingIndex == idx ? 0.6 : 1.0)
+                                    .onDrag {
+                                        self.draggingIndex = idx
+                                        return NSItemProvider(object: "\(idx)" as NSString)
+                                    }
+                                    .onDrop(of: [UTType.text], delegate: QueueDropDelegate(
+                                        targetIndex: idx,
+                                        draggingIndex: $draggingIndex,
+                                        viewModel: viewModel
+                                    ))
                             }
                         }
                     }
@@ -237,6 +249,14 @@ struct QueueView: View {
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundColor(ColorTheme.textTertiary)
                 
+                // Drag Handle for Reordering
+                Image(systemName: "line.3.horizontal")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(ColorTheme.textTertiary)
+                    .frame(width: 18, height: 20)
+                    .contentShape(Rectangle())
+                    .help(LocalizedStringKey("Arrastra para reordenar"))
+                
                 // Remove from queue button
                 Button(action: {
                     withAnimation {
@@ -262,7 +282,7 @@ struct QueueView: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .stroke(Color.white.opacity(0.35), lineWidth: 0.7)
+                    .stroke(ColorTheme.cardBorder.opacity(0.7), lineWidth: 0.8)
             )
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .padding(.horizontal, 12)
@@ -273,6 +293,37 @@ struct QueueView: View {
                 viewModel.playQueueItem(at: index)
             } label: {
                 Label("Reproducir ahora", systemImage: "play.fill")
+            }
+            
+            Divider()
+            
+            // Queue Reordering Options
+            if index > viewModel.queueIndex + 1 {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        viewModel.moveUpcomingQueueItemToTop(at: index)
+                    }
+                } label: {
+                    Label(LocalizedStringKey("Mover al inicio de la cola"), systemImage: "arrow.up.to.line")
+                }
+                
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        viewModel.moveUpcomingQueueItem(at: index, direction: -1)
+                    }
+                } label: {
+                    Label(LocalizedStringKey("Subir"), systemImage: "arrow.up")
+                }
+            }
+            
+            if index < viewModel.queue.count - 1 {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        viewModel.moveUpcomingQueueItem(at: index, direction: 1)
+                    }
+                } label: {
+                    Label(LocalizedStringKey("Bajar"), systemImage: "arrow.down")
+                }
             }
             
             Divider()
@@ -324,3 +375,35 @@ struct QueueView: View {
         return String(format: "%d:%02d", m, s)
     }
 }
+
+// MARK: - Queue Drop Delegate for Reordering
+struct QueueDropDelegate: DropDelegate {
+    let targetIndex: Int
+    @Binding var draggingIndex: Int?
+    let viewModel: PlayerViewModel
+    
+    func dropEntered(info: DropInfo) {
+        guard let fromIndex = draggingIndex, fromIndex != targetIndex else { return }
+        let minUpcoming = viewModel.queueIndex + 1
+        guard fromIndex >= minUpcoming && targetIndex >= minUpcoming,
+              fromIndex < viewModel.queue.count && targetIndex < viewModel.queue.count else { return }
+        
+        withAnimation(.easeInOut(duration: 0.18)) {
+            viewModel.moveQueueItem(from: fromIndex, to: targetIndex)
+            self.draggingIndex = targetIndex
+        }
+    }
+    
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
+    }
+    
+    func performDrop(info: DropInfo) -> Bool {
+        draggingIndex = nil
+        return true
+    }
+    
+    func dropExited(info: DropInfo) {
+    }
+}
+

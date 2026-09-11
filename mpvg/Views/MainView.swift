@@ -12,6 +12,7 @@ import SwiftUI
 
 struct MainView: View {
     @StateObject private var viewModel = PlayerViewModel()
+    @AppStorage("appAccentColor") private var appAccentColor: String = "terracotta"
     
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -58,18 +59,36 @@ struct MainView: View {
                 .zIndex(300)
             #endif
         }
+        .environment(\.primaryAccentName, appAccentColor)
+        .tint(ColorTheme.accent)
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: viewModel.isDisconnectedOverlayVisible)
         #if os(macOS)
         .background(
-            Button(action: {
-                viewModel.toggleSpotlight()
-            }) {
-                EmptyView()
+            Group {
+                Button(action: {
+                    viewModel.toggleSpotlight()
+                }) {
+                    EmptyView()
+                }
+                .keyboardShortcut("k", modifiers: .command)
+                
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.18)) {
+                        viewModel.selectTab(.settings)
+                    }
+                }) {
+                    EmptyView()
+                }
+                .keyboardShortcut(",", modifiers: .command)
             }
-            .keyboardShortcut("k", modifiers: .command)
             .opacity(0)
             .allowsHitTesting(false)
         )
+        .onReceive(NotificationCenter.default.publisher(for: .openSettingsTab)) { _ in
+            withAnimation(.easeInOut(duration: 0.18)) {
+                viewModel.selectTab(.settings)
+            }
+        }
         #endif
     }
     

@@ -11,6 +11,7 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var viewModel: PlayerViewModel
     @AppStorage("appTheme") private var appTheme: String = "system"
+    @AppStorage("appAccentColor") private var appAccentColor: String = "terracotta"
     @State private var serverURL: String = ""
     @State private var username: String = ""
     @State private var password: String = ""
@@ -171,16 +172,56 @@ struct SettingsView: View {
     
     // MARK: - macOS Appearance Card
     private var macOSThemeSection: some View {
-        settingsCard(title: "Appearance", icon: "paintpalette.fill", iconColor: ColorTheme.terracotta) {
+        settingsCard(title: "Appearance", icon: "paintpalette.fill", iconColor: ColorTheme.accent) {
             VStack(spacing: 0) {
-                macOSFormRow(label: "Theme", subtitle: "Choose between automatic system mode, or forced light/dark Primary theme") {
+                // Row 1: Light / Dark Mode
+                macOSFormRow(label: "Theme", subtitle: "Choose between automatic system mode, or forced light/dark theme") {
                     Picker("", selection: $appTheme) {
                         Text(LocalizedStringKey("System (Automatic)")).tag("system")
-                        Text(LocalizedStringKey("Primary Light")).tag("light")
-                        Text(LocalizedStringKey("Primary Dark")).tag("dark")
+                        Text(LocalizedStringKey("Light")).tag("light")
+                        Text(LocalizedStringKey("Dark")).tag("dark")
                     }
                     .pickerStyle(.menu)
                     .frame(width: 190)
+                }
+                
+                Divider().background(ColorTheme.cardBorder)
+                
+                // Row 2: Accent Color Palette Swatches
+                macOSFormRow(label: "Accent Color", subtitle: "Select your accent color for buttons and highlights") {
+                    HStack(spacing: 9) {
+                        ForEach(PrimaryAccent.allCases) { accent in
+                            let isSelected = (appAccentColor == accent.rawValue)
+                            Button(action: {
+                                withAnimation(.spring(response: 0.28, dampingFraction: 0.8)) {
+                                    appAccentColor = accent.rawValue
+                                    viewModel.setAccentColor(accent)
+                                }
+                            }) {
+                                ZStack {
+                                    Circle()
+                                        .fill(accent.color)
+                                        .frame(width: 22, height: 22)
+                                    
+                                    if isSelected {
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 10, weight: .heavy))
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                                .overlay(
+                                    Circle()
+                                        .stroke(isSelected ? ColorTheme.textPrimary.opacity(0.45) : Color.clear, lineWidth: 2)
+                                        .padding(-3)
+                                )
+                                .contentShape(Circle())
+                            }
+                            .buttonStyle(.plain)
+                            .pointingHandOnHover()
+                            .help(accent.displayName)
+                        }
+                    }
+                    .padding(.vertical, 4)
                 }
             }
         }
@@ -556,23 +597,74 @@ struct SettingsView: View {
     
     // MARK: - iOS Appearance Card
     private var iOSThemeSection: some View {
-        settingsCard(title: "Appearance", icon: "paintpalette.fill", iconColor: ColorTheme.terracotta) {
-            VStack(alignment: .leading, spacing: 12) {
-                VStack(alignment: .leading, spacing: 2) {
+        settingsCard(title: "Appearance", icon: "paintpalette.fill", iconColor: ColorTheme.accent) {
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(LocalizedStringKey("Theme"))
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(ColorTheme.textPrimary)
                     Text(LocalizedStringKey("Adapts automatically to system dark mode or allows manual override"))
                         .font(.system(size: 11))
                         .foregroundColor(ColorTheme.textTertiary)
+                    
+                    Picker("", selection: $appTheme) {
+                        Text(LocalizedStringKey("System")).tag("system")
+                        Text(LocalizedStringKey("Light")).tag("light")
+                        Text(LocalizedStringKey("Dark")).tag("dark")
+                    }
+                    .pickerStyle(.segmented)
                 }
                 
-                Picker("", selection: $appTheme) {
-                    Text(LocalizedStringKey("System")).tag("system")
-                    Text(LocalizedStringKey("Light")).tag("light")
-                    Text(LocalizedStringKey("Dark")).tag("dark")
+                Divider().background(ColorTheme.cardBorder)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(LocalizedStringKey("Accent Color"))
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(ColorTheme.textPrimary)
+                    Text(LocalizedStringKey("Select your accent color for buttons and highlights"))
+                        .font(.system(size: 11))
+                        .foregroundColor(ColorTheme.textTertiary)
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(PrimaryAccent.allCases) { accent in
+                                let isSelected = (appAccentColor == accent.rawValue)
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.28, dampingFraction: 0.8)) {
+                                        appAccentColor = accent.rawValue
+                                        viewModel.setAccentColor(accent)
+                                    }
+                                }) {
+                                    VStack(spacing: 4) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(accent.color)
+                                                .frame(width: 32, height: 32)
+                                            
+                                            if isSelected {
+                                                Image(systemName: "checkmark")
+                                                    .font(.system(size: 12, weight: .bold))
+                                                    .foregroundColor(.white)
+                                            }
+                                        }
+                                        .overlay(
+                                            Circle()
+                                                .stroke(isSelected ? ColorTheme.textPrimary.opacity(0.45) : Color.clear, lineWidth: 2)
+                                                .padding(-2)
+                                        )
+                                        
+                                        Text(accent.displayName)
+                                            .font(.system(size: 10, weight: isSelected ? .bold : .regular))
+                                            .foregroundColor(isSelected ? ColorTheme.textPrimary : ColorTheme.textSecondary)
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 2)
+                    }
                 }
-                .pickerStyle(.segmented)
             }
             .padding(16)
         }

@@ -108,6 +108,19 @@ struct mpvgApp: App {
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
         .defaultSize(width: 1120, height: 740)
+        .commands {
+            CommandGroup(replacing: .appSettings) {
+                Button(LocalizedStringKey("Settings...")) {
+                    NotificationCenter.default.post(name: .openSettingsTab, object: nil)
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            }
+        }
         #endif
     }
 }
+
+extension Notification.Name {
+    static let openSettingsTab = Notification.Name("openSettingsTab")
+}
+

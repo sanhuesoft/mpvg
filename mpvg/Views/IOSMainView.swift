@@ -717,6 +717,9 @@ struct IOSSearchView: View {
                                         song: song,
                                         isPlaying: viewModel.currentSong?.id == song.id && !viewModel.mpv.isPaused,
                                         viewModel: viewModel,
+                                        onRate: { rating in
+                                            viewModel.rateSong(song, rating: rating)
+                                        },
                                         onPlay: {
                                             viewModel.playSong(song, inAlbum: nil, queue: viewModel.searchSongs)
                                         }
