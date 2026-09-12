@@ -122,5 +122,6 @@ struct mpvgApp: App {
 
 extension Notification.Name {
     static let openSettingsTab = Notification.Name("openSettingsTab")
+    static let playbackStateDidChange = Notification.Name("playbackStateDidChange")
 }
 

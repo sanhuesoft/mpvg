@@ -3,7 +3,7 @@
 //  mpvg
 //
 //  CarPlay template application scene delegate integrating native CarPlay
-//  playback controls (CPNowPlayingTemplate) and library browsing templates.
+//  playback controls (CPNowPlayingTemplate), player hub, and queue management.
 //
 
 #if canImport(CarPlay) && os(iOS)
@@ -12,8 +12,10 @@ import CarPlay
 import UIKit
 
 @MainActor
-final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
+final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate, CPNowPlayingTemplateObserver {
     private var interfaceController: CPInterfaceController?
+    private var rootListTemplate: CPListTemplate?
+    private var isObserverRegistered = false
     
     func templateApplicationScene(
         _ templateApplicationScene: CPTemplateApplicationScene,
@@ -21,15 +23,26 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
     ) {
         self.interfaceController = interfaceController
         
-        // 1. Configure CarPlay Native Now Playing Template
+        // 1. Ensure audio engine is ready
+        PlayerViewModel.shared.mpv.start()
+        
+        // 2. Configure CarPlay Native Now Playing Template
         configureNowPlayingTemplate()
         
-        // 2. Build Root Browsing Templates with NowPlaying Navigation Button
-        let rootTemplate = buildRootTemplate()
+        // 3. Immediately sync Now Playing metadata & artwork
+        PlayerViewModel.shared.syncNowPlaying()
+        
+        // 4. Build & set Root Player Template
+        let rootTemplate = buildRootPlayerTemplate()
+        self.rootListTemplate = rootTemplate
         interfaceController.setRootTemplate(rootTemplate, animated: false, completion: nil)
         
-        // 3. If audio is actively playing, automatically push the Now Playing screen
-        if let vm = PlayerViewModel.shared, vm.currentSong != nil, !vm.mpv.isPaused {
+        // 5. Register Notification for live playback state updates
+        setupPlaybackObserver()
+        
+        // 5. If audio is actively playing, automatically push the full Now Playing screen
+        let vm = PlayerViewModel.shared
+        if vm.currentSong != nil && !vm.mpv.isPaused {
             interfaceController.pushTemplate(CPNowPlayingTemplate.shared, animated: true, completion: nil)
         }
     }
@@ -39,6 +52,25 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         didDisconnect interfaceController: CPInterfaceController
     ) {
         self.interfaceController = nil
+        self.rootListTemplate = nil
+        NotificationCenter.default.removeObserver(self, name: .playbackStateDidChange, object: nil)
+    }
+    
+    // MARK: - Playback State Observation
+    private func setupPlaybackObserver() {
+        NotificationCenter.default.removeObserver(self, name: .playbackStateDidChange, object: nil)
+        NotificationCenter.default.addObserver(
+            forName: .playbackStateDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handlePlaybackStateChange()
+        }
+    }
+    
+    private func handlePlaybackStateChange() {
+        updateNowPlayingButtons()
+        refreshRootTemplate()
     }
     
     // MARK: - Now Playing Template Setup
@@ -46,192 +78,237 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         let nowPlaying = CPNowPlayingTemplate.shared
         nowPlaying.isAlbumArtistButtonEnabled = true
         nowPlaying.isUpNextButtonEnabled = true
+        nowPlaying.upNextTitle = "Cola"
         
-        // Rating / Like button
-        let rateButton = CPNowPlayingImageButton(
-            image: UIImage(systemName: "star.fill") ?? UIImage()
-        ) { [weak self] _ in
-            guard let vm = PlayerViewModel.shared, let song = vm.currentSong else { return }
-            let currentRating = song.userRating ?? 0
-            let newRating = currentRating >= 5 ? 0 : currentRating + 1
-            vm.rateSong(song, rating: newRating)
-            self?.updateNowPlayingButtons()
+        if !isObserverRegistered {
+            nowPlaying.add(self)
+            isObserverRegistered = true
         }
         
-        // Next track button
-        let nextButton = CPNowPlayingImageButton(
-            image: UIImage(systemName: "forward.end.fill") ?? UIImage()
-        ) { _ in
-            PlayerViewModel.shared?.nextTrack()
-        }
-        
-        nowPlaying.updateNowPlayingButtons([rateButton, nextButton])
+        updateNowPlayingButtons()
     }
     
     private func updateNowPlayingButtons() {
         let nowPlaying = CPNowPlayingTemplate.shared
-        guard let song = PlayerViewModel.shared?.currentSong else { return }
-        let rating = song.userRating ?? 0
-        let iconName = rating > 0 ? "star.fill" : "star"
+        let vm = PlayerViewModel.shared
+        let song = vm.currentSong
         
+        // 1. Rating / Like Button
+        let rating = song?.userRating ?? 0
+        let starIcon = rating > 0 ? "star.fill" : "star"
         let rateButton = CPNowPlayingImageButton(
-            image: UIImage(systemName: iconName) ?? UIImage()
+            image: UIImage(systemName: starIcon) ?? UIImage()
         ) { [weak self] _ in
-            guard let vm = PlayerViewModel.shared, let currentSong = vm.currentSong else { return }
-            let cur = currentSong.userRating ?? 0
-            let nextRate = cur >= 5 ? 0 : 5
-            vm.rateSong(currentSong, rating: nextRate)
+            guard let currentSong = PlayerViewModel.shared.currentSong else { return }
+            let curRating = currentSong.userRating ?? 0
+            let newRating = curRating >= 5 ? 0 : 5
+            PlayerViewModel.shared.rateSong(currentSong, rating: newRating)
             self?.updateNowPlayingButtons()
         }
         
-        let nextButton = CPNowPlayingImageButton(
-            image: UIImage(systemName: "forward.end.fill") ?? UIImage()
-        ) { _ in
-            PlayerViewModel.shared?.nextTrack()
+        // 2. Queue Button
+        let queueButton = CPNowPlayingImageButton(
+            image: UIImage(systemName: "list.bullet") ?? UIImage()
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            let queueTemplate = self.buildQueueTemplate()
+            self.interfaceController?.pushTemplate(queueTemplate, animated: true, completion: nil)
         }
         
-        nowPlaying.updateNowPlayingButtons([rateButton, nextButton])
+        nowPlaying.updateNowPlayingButtons([rateButton, queueButton])
     }
     
-    // MARK: - Root Navigation Template
-    private func buildRootTemplate() -> CPTemplate {
-        let nowPlayingTab = buildNowPlayingTab()
-        let recentTab = buildRecentAlbumsTab()
-        let albumsTab = buildAlbumsTab()
-        let artistsTab = buildArtistsTab()
-        
-        let tabBar = CPTabBarTemplate(templates: [nowPlayingTab, recentTab, albumsTab, artistsTab])
-        return tabBar
+    // MARK: - CPNowPlayingTemplateObserver
+    func nowPlayingTemplateUpNextButtonTapped(_ nowPlayingTemplate: CPNowPlayingTemplate) {
+        let queueTemplate = buildQueueTemplate()
+        interfaceController?.pushTemplate(queueTemplate, animated: true, completion: nil)
     }
     
-    // MARK: - Now Playing Tab / Quick Player Control
-    private func buildNowPlayingTab() -> CPListTemplate {
+    func nowPlayingTemplateAlbumArtistButtonTapped(_ nowPlayingTemplate: CPNowPlayingTemplate) {
         let vm = PlayerViewModel.shared
-        var items: [CPListItem] = []
+        guard let current = vm.currentSong else { return }
         
-        if let current = vm?.currentSong {
+        // If current album exists, display album tracks
+        let targetAlbum = vm.currentAlbum ?? vm.albums.first(where: {
+            $0.id == current.parent || (current.album != nil && $0.name == current.album)
+        })
+        
+        if let album = targetAlbum {
+            openAlbumDetail(album: album)
+        }
+    }
+    
+    // MARK: - Root Player Hub Template
+    private func buildRootPlayerTemplate() -> CPListTemplate {
+        let sections = makePlayerSections()
+        let template = CPListTemplate(title: "Reproductor", sections: sections)
+        template.trailingNavigationBarButtons = [makeNowPlayingNavButton()]
+        return template
+    }
+    
+    private func refreshRootTemplate() {
+        guard let root = rootListTemplate else { return }
+        root.updateSections(makePlayerSections())
+    }
+    
+    private func makePlayerSections() -> [CPListSection] {
+        let vm = PlayerViewModel.shared
+        var sections: [CPListSection] = []
+        
+        // --- SECTION 1: Now Playing Item ---
+        var nowPlayingItems: [CPListItem] = []
+        if let current = vm.currentSong {
             let item = CPListItem(
                 text: current.title,
                 detailText: "\(current.displayArtist) — \(current.displayAlbum)"
             )
+            item.setImage(UIImage(systemName: vm.mpv.isPaused ? "pause.circle.fill" : "play.circle.fill"))
             item.accessoryType = .disclosureIndicator
             item.handler = { [weak self] _, completion in
                 self?.interfaceController?.pushTemplate(CPNowPlayingTemplate.shared, animated: true, completion: nil)
                 completion()
             }
-            items.append(item)
-            
-            let toggleItem = CPListItem(
-                text: (vm?.mpv.isPaused ?? true) ? "Reanudar Reproducción" : "Pausar",
-                detailText: "Control de reproducción actual"
-            )
-            toggleItem.setImage(UIImage(systemName: (vm?.mpv.isPaused ?? true) ? "play.fill" : "pause.fill"))
-            toggleItem.handler = { _, completion in
-                vm?.togglePlayPause()
-                completion()
-            }
-            items.append(toggleItem)
+            nowPlayingItems.append(item)
         } else {
-            let item = CPListItem(text: "No hay reproducción activa", detailText: "Selecciona un álbum o canción para comenzar")
+            let item = CPListItem(
+                text: "No hay reproducción activa",
+                detailText: "Inicia la reproducción desde la cola o tu iPhone"
+            )
             item.isEnabled = false
+            nowPlayingItems.append(item)
+        }
+        sections.append(CPListSection(items: nowPlayingItems, header: "Reproduciendo ahora", sectionIndexTitle: nil))
+        
+        // --- SECTION 2: Playback Controls ---
+        var controlItems: [CPListItem] = []
+        let isPaused = vm.mpv.isPaused
+        let playPauseItem = CPListItem(
+            text: isPaused ? "Reanudar" : "Pausar",
+            detailText: isPaused ? "Toca para reproducir" : "Toca para pausar"
+        )
+        playPauseItem.setImage(UIImage(systemName: isPaused ? "play.fill" : "pause.fill"))
+        playPauseItem.handler = { _, completion in
+            PlayerViewModel.shared.togglePlayPause()
+            completion()
+        }
+        controlItems.append(playPauseItem)
+        
+        let nextItem = CPListItem(
+            text: "Pista siguiente",
+            detailText: nil
+        )
+        nextItem.setImage(UIImage(systemName: "forward.fill"))
+        nextItem.handler = { _, completion in
+            PlayerViewModel.shared.nextTrack()
+            completion()
+        }
+        controlItems.append(nextItem)
+        
+        let prevItem = CPListItem(
+            text: "Pista anterior",
+            detailText: nil
+        )
+        prevItem.setImage(UIImage(systemName: "backward.fill"))
+        prevItem.handler = { _, completion in
+            PlayerViewModel.shared.previousTrack()
+            completion()
+        }
+        controlItems.append(prevItem)
+        
+        sections.append(CPListSection(items: controlItems, header: "Controles", sectionIndexTitle: nil))
+        
+        // --- SECTION 3: Up Next / Queue Preview ---
+        let queue = vm.queue
+        let currentIndex = vm.queueIndex
+        var queueItems: [CPListItem] = []
+        
+        if !queue.isEmpty {
+            let upcoming = Array(queue.enumerated())
+            let slice = upcoming.prefix(20)
+            
+            for (idx, song) in slice {
+                let isCurrent = idx == currentIndex
+                let item = CPListItem(
+                    text: isCurrent ? "▶ \(song.title)" : song.title,
+                    detailText: "\(song.displayArtist) • \(song.formattedDuration)"
+                )
+                if isCurrent {
+                    item.setImage(UIImage(systemName: "speaker.wave.2.fill"))
+                }
+                item.handler = { [weak self] _, completion in
+                    let album = vm.currentAlbum ?? vm.albums.first(where: {
+                        $0.id == song.parent || (song.album != nil && $0.name == song.album)
+                    })
+                    vm.playSong(song, inAlbum: album, queue: queue)
+                    self?.interfaceController?.pushTemplate(CPNowPlayingTemplate.shared, animated: true, completion: nil)
+                    completion()
+                }
+                queueItems.append(item)
+            }
+        }
+        
+        if queueItems.isEmpty {
+            let emptyItem = CPListItem(text: "Cola vacía", detailText: "No hay pistas en espera")
+            emptyItem.isEnabled = false
+            queueItems.append(emptyItem)
+        }
+        
+        sections.append(CPListSection(items: queueItems, header: "A continuación", sectionIndexTitle: nil))
+        
+        return sections
+    }
+    
+    // MARK: - Dedicated Queue Template
+    private func buildQueueTemplate() -> CPListTemplate {
+        let vm = PlayerViewModel.shared
+        let queue = vm.queue
+        let currentIndex = vm.queueIndex
+        var items: [CPListItem] = []
+        
+        for (idx, song) in queue.enumerated() {
+            let isCurrent = idx == currentIndex
+            let item = CPListItem(
+                text: isCurrent ? "▶ \(song.title)" : song.title,
+                detailText: "\(song.displayArtist) • \(song.formattedDuration)"
+            )
+            if isCurrent {
+                item.setImage(UIImage(systemName: "speaker.wave.2.fill"))
+            }
+            item.handler = { [weak self] _, completion in
+                let album = vm.currentAlbum ?? vm.albums.first(where: {
+                    $0.id == song.parent || (song.album != nil && $0.name == song.album)
+                })
+                vm.playSong(song, inAlbum: album, queue: queue)
+                self?.interfaceController?.popTemplate(animated: true, completion: nil)
+                completion()
+            }
             items.append(item)
         }
         
-        let template = CPListTemplate(title: "Reproductor", sections: [CPListSection(items: items)])
-        template.tabImage = UIImage(systemName: "play.circle.fill")
-        template.trailingNavigationBarButtons = [makeNowPlayingNavButton()]
-        return template
-    }
-    
-    // MARK: - Recently Added Albums Tab
-    private func buildRecentAlbumsTab() -> CPListTemplate {
-        let vm = PlayerViewModel.shared
-        let albums = vm?.recentAlbums ?? []
-        
-        let items: [CPListItem] = albums.prefix(25).map { album in
-            let item = CPListItem(text: album.displayTitle, detailText: album.displayArtist)
-            item.accessoryType = .disclosureIndicator
-            item.handler = { [weak self] _, completion in
-                self?.openAlbumDetail(album: album)
-                completion()
-            }
-            return item
+        if items.isEmpty {
+            let emptyItem = CPListItem(text: "Cola de reproducción vacía", detailText: nil)
+            emptyItem.isEnabled = false
+            items.append(emptyItem)
         }
         
-        let template = CPListTemplate(
-            title: "Recientes",
-            sections: [CPListSection(items: items.isEmpty ? [emptyPlaceholderItem(text: "Sin álbumes recientes")] : items)]
-        )
-        template.tabImage = UIImage(systemName: "clock.fill")
+        let template = CPListTemplate(title: "Cola de reproducción", sections: [CPListSection(items: items)])
         template.trailingNavigationBarButtons = [makeNowPlayingNavButton()]
         return template
     }
     
-    // MARK: - All Albums Tab
-    private func buildAlbumsTab() -> CPListTemplate {
-        let vm = PlayerViewModel.shared
-        let albums = vm?.albums ?? []
-        
-        let items: [CPListItem] = albums.prefix(50).map { album in
-            let item = CPListItem(text: album.displayTitle, detailText: album.displayArtist)
-            item.accessoryType = .disclosureIndicator
-            item.handler = { [weak self] _, completion in
-                self?.openAlbumDetail(album: album)
-                completion()
-            }
-            return item
-        }
-        
-        let template = CPListTemplate(
-            title: "Álbumes",
-            sections: [CPListSection(items: items.isEmpty ? [emptyPlaceholderItem(text: "Sin álbumes")] : items)]
-        )
-        template.tabImage = UIImage(systemName: "opticaldisc.fill")
-        template.trailingNavigationBarButtons = [makeNowPlayingNavButton()]
-        return template
-    }
-    
-    // MARK: - Artists Tab
-    private func buildArtistsTab() -> CPListTemplate {
-        let vm = PlayerViewModel.shared
-        let artists = vm?.artists ?? []
-        
-        let items: [CPListItem] = artists.prefix(40).map { artist in
-            let count = artist.albumCount ?? 0
-            let item = CPListItem(
-                text: artist.name,
-                detailText: count > 0 ? "\(count) \(count == 1 ? "álbum" : "álbumes")" : "Artista"
-            )
-            item.accessoryType = .disclosureIndicator
-            item.handler = { [weak self] _, completion in
-                self?.openArtistDetail(artist: artist)
-                completion()
-            }
-            return item
-        }
-        
-        let template = CPListTemplate(
-            title: "Artistas",
-            sections: [CPListSection(items: items.isEmpty ? [emptyPlaceholderItem(text: "Sin artistas")] : items)]
-        )
-        template.tabImage = UIImage(systemName: "music.mic")
-        template.trailingNavigationBarButtons = [makeNowPlayingNavButton()]
-        return template
-    }
-    
-    // MARK: - Album Navigation
+    // MARK: - Album Detail Navigation
     private func openAlbumDetail(album: AlbumItem) {
-        guard let vm = PlayerViewModel.shared else { return }
+        let vm = PlayerViewModel.shared
         
         let loadingTemplate = CPListTemplate(
             title: album.displayTitle,
-            sections: [CPListSection(items: [emptyPlaceholderItem(text: "Cargando canciones...")])]
+            sections: [CPListSection(items: [CPListItem(text: "Cargando canciones...", detailText: nil)])]
         )
         interfaceController?.pushTemplate(loadingTemplate, animated: true, completion: nil)
         
         Task { @MainActor [weak self] in
             let tracks = await vm.loadTracksForCarPlay(album: album)
-            let trackItems: [CPListItem] = tracks.enumerated().map { (idx, song) in
+            let trackItems: [CPListItem] = tracks.map { song in
                 let item = CPListItem(text: song.title, detailText: song.formattedDuration)
                 item.handler = { [weak self] _, completion in
                     vm.playSong(song, inAlbum: album, queue: tracks)
@@ -243,37 +320,13 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
             
             let detailTemplate = CPListTemplate(
                 title: album.displayTitle,
-                sections: [CPListSection(items: trackItems.isEmpty ? [self?.emptyPlaceholderItem(text: "Sin pistas disponibles") ?? CPListItem(text: "Vacío", detailText: nil)] : trackItems)]
+                sections: [CPListSection(items: trackItems.isEmpty ? [CPListItem(text: "Sin pistas disponibles", detailText: nil)] : trackItems)]
             )
             detailTemplate.trailingNavigationBarButtons = [self?.makeNowPlayingNavButton() ?? CPBarButton(type: .image, handler: { _ in })]
             
-            // Pop the loading and push detail
             self?.interfaceController?.popTemplate(animated: false, completion: nil)
             self?.interfaceController?.pushTemplate(detailTemplate, animated: true, completion: nil)
         }
-    }
-    
-    // MARK: - Artist Navigation
-    private func openArtistDetail(artist: ArtistItem) {
-        guard let vm = PlayerViewModel.shared else { return }
-        let artistAlbums = vm.albums.filter { $0.artistId == artist.id || $0.displayArtist.localizedCaseInsensitiveContains(artist.name) }
-        
-        let items: [CPListItem] = artistAlbums.map { album in
-            let item = CPListItem(text: album.displayTitle, detailText: album.displayYear)
-            item.accessoryType = .disclosureIndicator
-            item.handler = { [weak self] _, completion in
-                self?.openAlbumDetail(album: album)
-                completion()
-            }
-            return item
-        }
-        
-        let template = CPListTemplate(
-            title: artist.name,
-            sections: [CPListSection(items: items.isEmpty ? [emptyPlaceholderItem(text: "Sin álbumes disponibles")] : items)]
-        )
-        template.trailingNavigationBarButtons = [makeNowPlayingNavButton()]
-        interfaceController?.pushTemplate(template, animated: true, completion: nil)
     }
     
     // MARK: - Helpers
@@ -283,12 +336,6 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         }
         btn.image = UIImage(systemName: "waveform")
         return btn
-    }
-    
-    private func emptyPlaceholderItem(text: String) -> CPListItem {
-        let item = CPListItem(text: text, detailText: nil)
-        item.isEnabled = false
-        return item
     }
 }
 #endif

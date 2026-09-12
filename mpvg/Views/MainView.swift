@@ -11,7 +11,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @StateObject private var viewModel = PlayerViewModel()
+    @ObservedObject private var viewModel = PlayerViewModel.shared
     @AppStorage("appAccentColor") private var appAccentColor: String = "terracotta"
     
     #if os(iOS)

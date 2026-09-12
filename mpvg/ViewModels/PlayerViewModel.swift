@@ -121,7 +121,7 @@ typealias AudioEngine = IOSAudioEngine
 
 @MainActor
 final class PlayerViewModel: ObservableObject {
-    static weak var shared: PlayerViewModel?
+    static let shared = PlayerViewModel()
     
     @Published var appAccentColor: String = UserDefaults.standard.string(forKey: "appAccentColor") ?? "terracotta"
     
@@ -263,7 +263,6 @@ final class PlayerViewModel: ObservableObject {
         let saved = Self.loadConfig()
         self.serverConfig = saved
         self.navidrome = NavidromeService(config: saved)
-        Self.shared = self
         
         // Hydrate library from local disk cache if available to prevent demo content flash
         if let cached = LibraryCacheManager.shared.loadCache() {
@@ -376,6 +375,9 @@ final class PlayerViewModel: ObservableObject {
                 self?.performSpotlightSearch(query: query)
             }
             .store(in: &cancellables)
+            
+        // Immediately sync now playing info with initial track and artwork
+        syncNowPlaying()
     }
     
     // MARK: - Persistence
@@ -1328,7 +1330,7 @@ final class PlayerViewModel: ObservableObject {
     }
     
     func syncNowPlaying() {
-        let artURL = coverArtURL(for: currentSong?.coverArt ?? currentAlbum?.coverArt)
+        let artURL = currentArtworkURL
         MediaKeyController.shared.updateNowPlaying(
             song: currentSong,
             duration: mpv.duration,
@@ -1336,6 +1338,7 @@ final class PlayerViewModel: ObservableObject {
             isPaused: mpv.isPaused,
             artworkURL: artURL
         )
+        NotificationCenter.default.post(name: .playbackStateDidChange, object: self)
     }
     
     private var sessionSalt: String = "mpvg_salt"
@@ -1351,6 +1354,10 @@ final class PlayerViewModel: ObservableObject {
     
     func coverArtURL(for id: String?) -> URL? {
         guard let id = id, !id.isEmpty else { return nil }
+        
+        if id.hasPrefix("http://") || id.hasPrefix("https://") {
+            return URL(string: id)
+        }
         
         if let cached = coverArtURLCache[id] {
             return cached
