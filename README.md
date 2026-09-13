@@ -34,6 +34,10 @@
 
 Whether you're listening on studio monitors, high-end headphones, or an external USB DAC, mpvg delivers bit-perfect, uncompressed music streaming with zero compromises.
 
+<p align="center">
+  <img src="main_window.png" alt="mpvg Main Window" />
+</p>
+
 ---
 
 ## Features
