@@ -45,7 +45,7 @@ struct SidebarView: View {
             HStack(alignment: .center, spacing: 0) {
                 // Reserved breathing room for native window traffic lights
                 Spacer()
-                    .frame(width: 70)
+                    .frame(width: 76)
                 
                 Spacer()
                 
@@ -55,9 +55,9 @@ struct SidebarView: View {
                     }
                 }) {
                     Image(systemName: "sidebar.leading")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(ColorTheme.textSecondary)
-                        .frame(width: 26, height: 24)
+                        .frame(width: 28, height: 26)
                         .background(ColorTheme.cardBackground.opacity(0.8))
                         .cornerRadius(6)
                         .overlay(
@@ -69,9 +69,8 @@ struct SidebarView: View {
                 .pointingHandOnHover()
                 .help("Hide Sidebar")
             }
-            .frame(height: 38)
-            .padding(.horizontal, 12)
-            .padding(.top, 4)
+            .frame(height: 54)
+            .padding(.horizontal, 14)
             #else
             Color.clear.frame(height: 12)
             #endif
@@ -112,13 +111,12 @@ struct SidebarView: View {
             
             // Navigation Sections with Scrollable Content
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 14) {
-                    // INICIO (sin encabezado)
+                VStack(alignment: .leading, spacing: 2) {
+                    // INICIO
                     SidebarRowItem(
-                        iconName: "house.fill",
+                        iconName: "sparkles",
                         label: "Browse",
-                        iconTint: ColorTheme.terracotta,
-                        iconBgTint: ColorTheme.terracottaLight,
+                        iconTint: ColorTheme.accent,
                         isSelected: viewModel.activeTab == .browse
                     ) {
                         viewModel.selectTab(.browse)
@@ -131,7 +129,6 @@ struct SidebarView: View {
                             label: "Recently Added",
                             count: viewModel.recentAlbums.isEmpty ? nil : "\(viewModel.recentAlbums.count)",
                             iconTint: Color(hex: "3B82F6"),
-                            iconBgTint: Color(hex: "3B82F6").opacity(0.18),
                             isSelected: viewModel.activeTab == .recentlyAdded
                         ) {
                             viewModel.selectTab(.recentlyAdded)
@@ -142,7 +139,6 @@ struct SidebarView: View {
                             label: "Recently Played",
                             count: viewModel.recentlyPlayedAlbums.isEmpty ? nil : "\(viewModel.recentlyPlayedAlbums.count)",
                             iconTint: Color(hex: "06B6D4"),
-                            iconBgTint: Color(hex: "06B6D4").opacity(0.18),
                             isSelected: viewModel.activeTab == .recentlyPlayed
                         ) {
                             viewModel.selectTab(.recentlyPlayed)
@@ -153,7 +149,6 @@ struct SidebarView: View {
                             label: "Top Rated",
                             count: viewModel.topRatedAlbums.isEmpty ? nil : "\(viewModel.topRatedAlbums.count)",
                             iconTint: Color(hex: "F59E0B"),
-                            iconBgTint: Color(hex: "F59E0B").opacity(0.18),
                             isSelected: viewModel.activeTab == .topRated
                         ) {
                             viewModel.selectTab(.topRated)
@@ -164,7 +159,6 @@ struct SidebarView: View {
                             label: "No escuchadas",
                             count: viewModel.smartPlaylistSongs[.unplayed]?.isEmpty == false ? "\(viewModel.smartPlaylistSongs[.unplayed]!.count)" : nil,
                             iconTint: Color(hex: "8B5CF6"),
-                            iconBgTint: Color(hex: "8B5CF6").opacity(0.18),
                             isSelected: viewModel.activeTab == .unplayed
                         ) {
                             viewModel.selectTab(.unplayed)
@@ -175,7 +169,6 @@ struct SidebarView: View {
                             label: "Las Más Escuchadas",
                             count: viewModel.smartPlaylistSongs[.mostPlayed]?.isEmpty == false ? "\(viewModel.smartPlaylistSongs[.mostPlayed]!.count)" : nil,
                             iconTint: Color(hex: "EF4444"),
-                            iconBgTint: Color(hex: "EF4444").opacity(0.18),
                             isSelected: viewModel.activeTab == .mostPlayed
                         ) {
                             viewModel.selectTab(.mostPlayed)
@@ -186,7 +179,6 @@ struct SidebarView: View {
                             label: "Favoritas",
                             count: viewModel.smartPlaylistSongs[.starred]?.isEmpty == false ? "\(viewModel.smartPlaylistSongs[.starred]!.count)" : nil,
                             iconTint: Color(hex: "EC4899"),
-                            iconBgTint: Color(hex: "EC4899").opacity(0.18),
                             isSelected: viewModel.activeTab == .starred
                         ) {
                             viewModel.selectTab(.starred)
@@ -197,7 +189,6 @@ struct SidebarView: View {
                             label: "Joyas Olvidadas",
                             count: viewModel.smartPlaylistSongs[.forgottenFavorites]?.isEmpty == false ? "\(viewModel.smartPlaylistSongs[.forgottenFavorites]!.count)" : nil,
                             iconTint: Color(hex: "F97316"),
-                            iconBgTint: Color(hex: "F97316").opacity(0.18),
                             isSelected: viewModel.activeTab == .forgottenFavorites
                         ) {
                             viewModel.selectTab(.forgottenFavorites)
@@ -208,7 +199,6 @@ struct SidebarView: View {
                             label: "Mix Descubrimiento",
                             count: viewModel.smartPlaylistSongs[.discoveryMix]?.isEmpty == false ? "\(viewModel.smartPlaylistSongs[.discoveryMix]!.count)" : nil,
                             iconTint: Color(hex: "10B981"),
-                            iconBgTint: Color(hex: "10B981").opacity(0.18),
                             isSelected: viewModel.activeTab == .discoveryMix
                         ) {
                             viewModel.selectTab(.discoveryMix)
@@ -216,13 +206,12 @@ struct SidebarView: View {
                     }
                     
                     // LIBRARY
-                    sidebarSection(title: "LIBRARY") {
+                    sidebarSection(title: "BIBLIOTECA") {
                         SidebarRowItem(
                             iconName: "square.stack",
                             label: "Albums",
                             count: "\(viewModel.albums.count)",
-                            iconTint: ColorTheme.terracotta,
-                            iconBgTint: ColorTheme.terracottaLight,
+                            iconTint: ColorTheme.accent,
                             isSelected: viewModel.activeTab == .albums
                         ) {
                             viewModel.selectTab(.albums)
@@ -232,8 +221,7 @@ struct SidebarView: View {
                             iconName: "music.mic",
                             label: "Artists",
                             count: "\(viewModel.artists.count)",
-                            iconTint: ColorTheme.blue,
-                            iconBgTint: ColorTheme.blueBg,
+                            iconTint: Color(hex: "2A90CB"),
                             isSelected: viewModel.activeTab == .artists
                         ) {
                             viewModel.selectTab(.artists)
@@ -243,8 +231,7 @@ struct SidebarView: View {
                             iconName: "music.note.list",
                             label: "Playlists",
                             count: viewModel.playlists.isEmpty ? nil : "\(viewModel.playlists.count)",
-                            iconTint: ColorTheme.sageGreen,
-                            iconBgTint: ColorTheme.sageGreenBg,
+                            iconTint: Color(hex: "3EB174"),
                             isSelected: viewModel.activeTab == .playlists
                         ) {
                             viewModel.selectTab(.playlists)
@@ -254,31 +241,32 @@ struct SidebarView: View {
                             iconName: "guitars",
                             label: "Genres",
                             count: viewModel.genres.isEmpty ? nil : "\(viewModel.genres.count)",
-                            iconTint: ColorTheme.amber,
-                            iconBgTint: ColorTheme.amberBg,
+                            iconTint: Color(hex: "D79719"),
                             isSelected: viewModel.activeTab == .genres
                         ) {
                             viewModel.selectTab(.genres)
                         }
                     }
                 }
-                .padding(.horizontal, 8)
-                .padding(.bottom, 8)
+                .padding(.horizontal, 10)
+                .padding(.bottom, 10)
             }
             
             Spacer(minLength: 0)
             
-            // Anchored Server Status & Settings Card at the bottom
-            HStack(spacing: 8) {
-                // Server Status Indicator
-                HStack(spacing: 7) {
+            // Native Bottom Status Bar (matching HIG)
+            VStack(spacing: 0) {
+                Divider()
+                    .background(ColorTheme.cardBorder.opacity(0.6))
+                
+                HStack(spacing: 8) {
                     Circle()
                         .fill(viewModel.isConnected ? ColorTheme.sageGreen : ColorTheme.amber)
                         .frame(width: 7, height: 7)
                     
-                    VStack(alignment: .leading, spacing: 1.5) {
+                    VStack(alignment: .leading, spacing: 1) {
                         Text(serverDisplayText)
-                            .font(.system(size: 11.5, weight: .semibold))
+                            .font(.system(size: 11.5, weight: .medium))
                             .foregroundColor(ColorTheme.textPrimary)
                             .lineLimit(1)
                             .truncationMode(.middle)
@@ -288,39 +276,29 @@ struct SidebarView: View {
                             .foregroundColor(ColorTheme.textTertiary)
                             .lineLimit(1)
                     }
-                }
-                
-                Spacer()
-                
-                // Settings Button
-                SidebarSettingsButton(
-                    isSelected: viewModel.activeTab == .settings,
-                    action: {
-                        withAnimation(.easeInOut(duration: 0.18)) {
-                            viewModel.selectTab(.settings)
+                    
+                    Spacer()
+                    
+                    SidebarSettingsButton(
+                        isSelected: viewModel.activeTab == .settings,
+                        action: {
+                            withAnimation(.easeInOut(duration: 0.18)) {
+                                viewModel.selectTab(.settings)
+                            }
                         }
-                    }
-                )
+                    )
+                }
+                .padding(.horizontal, 12)
+                .frame(height: 38)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(ColorTheme.cardBackground.opacity(0.75))
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
-            )
-            .padding(.horizontal, 10)
-            .padding(.bottom, 10)
         }
-        .frame(width: 232)
-        .background(sidebarFloatingBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(ColorTheme.cardBorder.opacity(0.9), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+        .frame(width: 240)
+        .frame(maxHeight: .infinity)
+        #if os(macOS)
+        .background(sidebarNativeBackground.ignoresSafeArea(.all, edges: .top))
+        #else
+        .background(sidebarNativeBackground)
+        #endif
     }
     
     private var serverDisplayText: String {
@@ -331,10 +309,10 @@ struct SidebarView: View {
     }
     
     @ViewBuilder
-    private var sidebarFloatingBackground: some View {
+    private var sidebarNativeBackground: some View {
         #if os(macOS)
         VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
-            .overlay(ColorTheme.sidebarBackground.opacity(0.82))
+            .overlay(ColorTheme.sidebarBackground.opacity(0.5))
         #else
         ColorTheme.sidebarBackground
         #endif
@@ -342,12 +320,13 @@ struct SidebarView: View {
     
     // MARK: - Section Header Helper
     private func sidebarSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 2) {
             Text(LocalizedStringKey(title))
                 .font(.system(size: 10.5, weight: .bold))
                 .foregroundColor(ColorTheme.textTertiary)
                 .tracking(0.6)
-                .padding(.horizontal, 10)
+                .padding(.horizontal, 8)
+                .padding(.top, 12)
                 .padding(.bottom, 3)
             
             content()
@@ -355,14 +334,13 @@ struct SidebarView: View {
     }
 }
 
-// MARK: - Individual Sidebar Row
+// MARK: - Individual Sidebar Row (Native macOS Style with App Theme Colors)
 private struct SidebarRowItem: View {
     let iconName: String
     let label: String
     var count: String? = nil
     var badge: String? = nil
-    var iconTint: Color = ColorTheme.terracotta
-    var iconBgTint: Color = ColorTheme.terracottaLight
+    var iconTint: Color = ColorTheme.accent
     let isSelected: Bool
     let action: () -> Void
     
@@ -370,63 +348,49 @@ private struct SidebarRowItem: View {
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 9) {
-                // Circular icon container matching floating sidebar style
-                ZStack {
-                    Circle()
-                        .fill(isSelected ? iconTint : (isHovered ? iconBgTint.opacity(0.8) : iconBgTint.opacity(0.45)))
-                        .frame(width: 26, height: 26)
-                    
-                    Image(systemName: iconName)
-                        .font(.system(size: 11.5, weight: isSelected ? .bold : .medium))
-                        .foregroundColor(isSelected ? .white : iconTint)
-                }
+            HStack(spacing: 8) {
+                // SF Symbol icon with theme tint
+                Image(systemName: iconName)
+                    .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
+                    .foregroundColor(isSelected ? .white : iconTint)
+                    .frame(width: 20, alignment: .center)
                 
                 Text(LocalizedStringKey(label))
                     .font(.system(size: 12.5, weight: isSelected ? .semibold : .regular))
-                    .foregroundColor(isSelected ? ColorTheme.textPrimary : ColorTheme.textSecondary)
+                    .foregroundColor(isSelected ? .white : ColorTheme.textPrimary)
+                    .lineLimit(1)
                 
-                Spacer()
+                Spacer(minLength: 4)
                 
                 if let badge = badge {
                     Text(badge)
                         .font(.system(size: 9, weight: .bold))
-                        .foregroundColor(ColorTheme.terracotta)
+                        .foregroundColor(isSelected ? .white : ColorTheme.accent)
                         .padding(.horizontal, 6)
-                        .padding(.vertical, 2.5)
-                        .background(ColorTheme.terracottaLight.opacity(0.7))
-                        .cornerRadius(5)
+                        .padding(.vertical, 2)
+                        .background(isSelected ? Color.white.opacity(0.25) : ColorTheme.accentLight.opacity(0.8))
+                        .cornerRadius(4)
                 } else if let count = count, !count.isEmpty {
                     Text(count)
                         .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundColor(isSelected ? ColorTheme.terracotta : ColorTheme.textTertiary)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 1.5)
-                        .background(isSelected ? ColorTheme.terracottaLight.opacity(0.5) : Color.clear)
-                        .cornerRadius(4)
+                        .foregroundColor(isSelected ? Color.white.opacity(0.9) : ColorTheme.textTertiary)
+                        .padding(.horizontal, 4)
                 }
             }
             .padding(.horizontal, 8)
-            .padding(.vertical, 5)
+            .frame(height: 28)
             .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
                     .fill(isSelected
-                          ? ColorTheme.cardBackground
-                          : (isHovered ? ColorTheme.cardBackground.opacity(0.55) : Color.clear))
+                          ? ColorTheme.accent
+                          : (isHovered ? ColorTheme.cardBackground.opacity(0.65) : Color.clear))
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(isSelected ? ColorTheme.cardBorder : Color.clear, lineWidth: 0.8)
-            )
-            .shadow(color: isSelected ? Color.black.opacity(0.04) : Color.clear, radius: 3, x: 0, y: 1)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .pointingHandOnHover()
-        .onHover { isHovering in
-            withAnimation(.easeInOut(duration: 0.12)) {
-                self.isHovered = isHovering
-            }
+        .onHover { hovering in
+            self.isHovered = hovering
         }
     }
 }
@@ -439,24 +403,19 @@ private struct SidebarSettingsButton: View {
     
     var body: some View {
         Button(action: action) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(isSelected ? ColorTheme.accentLight : (isHovered ? ColorTheme.cardBorder.opacity(0.55) : Color.clear))
-                    .frame(width: 28, height: 28)
-                
-                Image(systemName: isSelected ? "gearshape.fill" : "gearshape")
-                    .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
-                    .foregroundColor(isSelected ? ColorTheme.accent : (isHovered ? ColorTheme.textPrimary : ColorTheme.textSecondary))
-            }
-            .contentShape(Rectangle())
+            Image(systemName: isSelected ? "gearshape.fill" : "gearshape")
+                .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
+                .foregroundColor(isSelected ? ColorTheme.accent : (isHovered ? ColorTheme.textPrimary : ColorTheme.textSecondary))
+                .frame(width: 24, height: 24)
+                .background(isHovered ? ColorTheme.cardBackground.opacity(0.7) : Color.clear)
+                .cornerRadius(5)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .keyboardShortcut(",", modifiers: .command)
         .pointingHandOnHover()
         .onHover { hovering in
-            withAnimation(.easeInOut(duration: 0.12)) {
-                isHovered = hovering
-            }
+            isHovered = hovering
         }
         .help(LocalizedStringKey("Settings (⌘,)"))
     }

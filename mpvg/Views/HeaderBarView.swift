@@ -17,7 +17,7 @@ struct HeaderBarView: View {
             #if os(macOS)
             if !viewModel.isSidebarVisible {
                 Spacer()
-                    .frame(width: 52)
+                    .frame(width: 68)
                 
                 Button(action: {
                     withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {

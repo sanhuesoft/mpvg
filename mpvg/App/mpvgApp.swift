@@ -42,6 +42,10 @@ struct WindowConfigurator: NSViewRepresentable {
         let minSize = NSSize(width: 960, height: 620)
         window.minSize = minSize
         window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
+        window.titlebarSeparatorStyle = .none
+        window.styleMask.insert(.fullSizeContentView)
+        window.isMovableByWindowBackground = true
         
         switch appTheme {
         case "light":

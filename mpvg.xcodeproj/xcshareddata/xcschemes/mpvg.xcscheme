@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D3251AF03044DC2300739AF9"
-               BuildableName = "mpvg.app"
-               BlueprintName = "mpvg"
+               BuildableName = "Lurr.app"
+               BlueprintName = "Lurr"
                ReferencedContainer = "container:mpvg.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,8 +46,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D3251AF03044DC2300739AF9"
-            BuildableName = "mpvg.app"
-            BlueprintName = "mpvg"
+            BuildableName = "Lurr.app"
+            BlueprintName = "Lurr"
             ReferencedContainer = "container:mpvg.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -63,8 +63,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D3251AF03044DC2300739AF9"
-            BuildableName = "mpvg.app"
-            BlueprintName = "mpvg"
+            BuildableName = "Lurr.app"
+            BlueprintName = "Lurr"
             ReferencedContainer = "container:mpvg.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

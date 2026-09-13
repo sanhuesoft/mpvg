@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		D3251AF13044DC2300739AF9 /* mpvg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mpvg.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3251AF13044DC2300739AF9 /* Lurr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lurr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -40,7 +40,7 @@
 		D3251AF23044DC2300739AF9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D3251AF13044DC2300739AF9 /* mpvg.app */,
+				D3251AF13044DC2300739AF9 /* Lurr.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D3251AF03044DC2300739AF9 /* mpvg */ = {
+		D3251AF03044DC2300739AF9 /* Lurr */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D3251AFC3044DC2300739AF9 /* Build configuration list for PBXNativeTarget "mpvg" */;
+			buildConfigurationList = D3251AFC3044DC2300739AF9 /* Build configuration list for PBXNativeTarget "Lurr" */;
 			buildPhases = (
 				D3251AED3044DC2300739AF9 /* Sources */,
 				D3251AEE3044DC2300739AF9 /* Frameworks */,
@@ -63,11 +63,11 @@
 			fileSystemSynchronizedGroups = (
 				D3251AF33044DC2300739AF9 /* mpvg */,
 			);
-			name = mpvg;
+			name = Lurr;
 			packageProductDependencies = (
 			);
 			productName = mpvg;
-			productReference = D3251AF13044DC2300739AF9 /* mpvg.app */;
+			productReference = D3251AF13044DC2300739AF9 /* Lurr.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -100,7 +100,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D3251AF03044DC2300739AF9 /* mpvg */,
+				D3251AF03044DC2300739AF9 /* Lurr */,
 			);
 		};
 /* End PBXProject section */
@@ -258,7 +258,7 @@
 				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 53;
 				DEVELOPMENT_TEAM = 9X6W8BXR24;
 				"ENABLE_APP_SANDBOX[sdk=macosx*]" = YES;
 				"ENABLE_HARDENED_RUNTIME[sdk=macosx*]" = YES;
@@ -317,7 +317,7 @@
 				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 53;
 				DEVELOPMENT_TEAM = 9X6W8BXR24;
 				"ENABLE_APP_SANDBOX[sdk=macosx*]" = YES;
 				"ENABLE_HARDENED_RUNTIME[sdk=macosx*]" = YES;
@@ -380,7 +380,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D3251AFC3044DC2300739AF9 /* Build configuration list for PBXNativeTarget "mpvg" */ = {
+		D3251AFC3044DC2300739AF9 /* Build configuration list for PBXNativeTarget "Lurr" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D3251AFD3044DC2300739AF9 /* Debug */,

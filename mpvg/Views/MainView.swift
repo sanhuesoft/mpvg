@@ -95,15 +95,17 @@ struct MainView: View {
     // MARK: - Desktop Layout (macOS)
     #if os(macOS)
     private var desktopLayout: some View {
-        HStack(spacing: 8) {
-            // Left Floating Sidebar — Floating island style
+        HStack(spacing: 0) {
+            // Left Native Sidebar (Full-Height & Window-Integrated)
             if viewModel.isSidebarVisible {
                 SidebarView(viewModel: viewModel)
-                    .padding([.top, .leading, .bottom], 10)
                     .transition(.asymmetric(
                         insertion: .move(edge: .leading).combined(with: .opacity),
                         removal:   .move(edge: .leading).combined(with: .opacity)
                     ))
+                
+                Divider()
+                    .background(ColorTheme.cardBorder.opacity(0.6))
             }
             
             // Main Content View
@@ -159,7 +161,7 @@ struct MainView: View {
             .background(ColorTheme.windowBackground)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(ColorTheme.windowBackground)
+        .ignoresSafeArea(.all, edges: .top)
     }
     #endif
     
