@@ -23,14 +23,21 @@ struct IOSMainView: View {
     
     var body: some View {
         Group {
-            if #available(iOS 26.0, *) {
+            if #available(iOS 26.1, *) {
                 mainTabView
-                    // Native Liquid Glass Now Playing bar — system matches tab bar width & material
-                    .tabViewBottomAccessory {
-                        if viewModel.currentSong != nil {
-                            miniPlayerContent
-                        }
+                    // Native Liquid Glass Now Playing bar — hidden when there is no song playing
+                    .tabViewBottomAccessory(isEnabled: viewModel.currentSong != nil) {
+                        miniPlayerContent
                     }
+                    .sheet(isPresented: $showNowPlayingSheet) {
+                        NowPlayingSheetView(viewModel: viewModel)
+                    }
+                    .sheet(isPresented: $viewModel.showQueueSheet) {
+                        QueueView(viewModel: viewModel)
+                    }
+                    .sheet(isPresented: $viewModel.showSettingsSheet) { settingsSheet }
+            } else if #available(iOS 26.0, *) {
+                tabViewWithOptionalAccessory
                     .sheet(isPresented: $showNowPlayingSheet) {
                         NowPlayingSheetView(viewModel: viewModel)
                     }
@@ -46,6 +53,7 @@ struct IOSMainView: View {
                         miniPlayerBar
                             .padding(.horizontal, 16)
                             .padding(.bottom, 58)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                 }
                 .sheet(isPresented: $showNowPlayingSheet) {
@@ -57,6 +65,7 @@ struct IOSMainView: View {
                 .sheet(isPresented: $viewModel.showSettingsSheet) { settingsSheet }
             }
         }
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: viewModel.currentSong != nil)
         .onChange(of: viewModel.requestedDestination) { destination in
             guard let dest = destination else { return }
             pushDestination(dest)
@@ -225,6 +234,19 @@ struct IOSMainView: View {
     }
     
     // MARK: - Mini Player Content (inside tabViewBottomAccessory — no manual background)
+    @available(iOS 26.0, *)
+    @ViewBuilder
+    private var tabViewWithOptionalAccessory: some View {
+        if viewModel.currentSong != nil {
+            mainTabView
+                .tabViewBottomAccessory {
+                    miniPlayerContent
+                }
+        } else {
+            mainTabView
+        }
+    }
+    
     /// Used on iOS 26+ inside tabViewBottomAccessory. The system provides the Liquid Glass
     /// material and sizing automatically, matching the tab bar pill exactly.
     @available(iOS 26.0, *)

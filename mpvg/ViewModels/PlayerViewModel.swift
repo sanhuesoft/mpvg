@@ -1563,8 +1563,7 @@ final class PlayerViewModel: ObservableObject {
             ArtistItem(id: "art-7", name: "John Coltrane", albumCount: 8, artistImageUrl: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=300&q=80")
         ]
         
-        if let firstAlbum = self.albums.first, let firstTrack = generateSampleTracks(for: firstAlbum).first {
-            self.currentSong = firstTrack
+        if let firstAlbum = self.albums.first {
             self.currentAlbum = firstAlbum
         }
     }

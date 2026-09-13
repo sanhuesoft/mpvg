@@ -213,6 +213,9 @@
     "⌘K" : {
 
     },
+    "⌘R" : {
+
+    },
     "⚠️ %@" : {
 
     },
@@ -2934,6 +2937,7 @@
       }
     },
     "Sync Library with Server" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2948,6 +2952,9 @@
           }
         }
       }
+    },
+    "Sync Library with Server (⌘R)" : {
+
     },
     "Sync Now" : {
       "localizations" : {

@@ -94,13 +94,13 @@ struct HeaderBarView: View {
             
             Spacer()
             
-            // Sync Library Button
+            // 1. Sync Library Button (with ⌘R shortcut badge)
             Button(action: {
                 Task {
                     await viewModel.syncLibrary()
                 }
             }) {
-                HStack(spacing: 5) {
+                HStack(spacing: 6) {
                     Image(systemName: "arrow.triangle.2.circlepath")
                         .font(.system(size: 12, weight: .semibold))
                         .rotationEffect(.degrees(viewModel.isSyncingLibrary ? 360 : 0))
@@ -108,6 +108,14 @@ struct HeaderBarView: View {
                     #if os(macOS)
                     Text("Sync")
                         .font(.system(size: 12, weight: .medium))
+                    
+                    Text("⌘R")
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundColor(ColorTheme.textTertiary)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .background(ColorTheme.cardBorder.opacity(0.6))
+                        .cornerRadius(4)
                     #endif
                 }
                 .foregroundColor(viewModel.isSyncingLibrary ? ColorTheme.terracotta : ColorTheme.textSecondary)
@@ -123,51 +131,13 @@ struct HeaderBarView: View {
             .buttonStyle(.plain)
             .pointingHandOnHover()
             .disabled(viewModel.isSyncingLibrary)
-            .help("Sync Library with Server")
-            
-            // Grid / List Toggle (only at root tab view)
-            if viewModel.navigationStack.isEmpty {
-                HStack(spacing: 2) {
-                    Button(action: { viewModel.viewMode = .grid }) {
-                        Image(systemName: "square.grid.2x2")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(viewModel.viewMode == .grid ? ColorTheme.textPrimary : ColorTheme.textTertiary)
-                            .frame(width: 28, height: 26)
-                            .background(viewModel.viewMode == .grid ? ColorTheme.cardBackground : Color.clear)
-                            .cornerRadius(6)
-                    }
-                    .buttonStyle(.plain)
-                    .pointingHandOnHover()
-                    
-                    Button(action: { viewModel.viewMode = .list }) {
-                        Image(systemName: "list.bullet")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(viewModel.viewMode == .list ? ColorTheme.textPrimary : ColorTheme.textTertiary)
-                            .frame(width: 28, height: 26)
-                            .background(viewModel.viewMode == .list ? ColorTheme.cardBackground : Color.clear)
-                            .cornerRadius(6)
-                    }
-                    .buttonStyle(.plain)
-                    .pointingHandOnHover()
-                }
-                .padding(2)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                )
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(ColorTheme.inputBackground.opacity(0.4))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            }
+            #if os(macOS)
+            .keyboardShortcut("r", modifiers: .command)
+            #endif
+            .help("Sync Library with Server (⌘R)")
             
             #if os(macOS)
-            // Spotlight ⌘K Quick Button
+            // 2. Spotlight ⌘K Quick Button (Buscar)
             Button(action: {
                 withAnimation(.spring(response: 0.28, dampingFraction: 0.85)) {
                     viewModel.toggleSpotlight()
@@ -203,6 +173,63 @@ struct HeaderBarView: View {
             .pointingHandOnHover()
             .help("Buscador Spotlight (⌘K)")
             #endif
+
+            // 3. Grid / List Toggle (Vista: mosaico, lista - only at root tab view)
+            if viewModel.navigationStack.isEmpty {
+                HStack(spacing: 2) {
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            viewModel.viewMode = .grid
+                        }
+                    }) {
+                        Image(systemName: "square.grid.2x2")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(viewModel.viewMode == .grid ? ColorTheme.textPrimary : ColorTheme.textTertiary)
+                            .frame(width: 30, height: 26)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                    .fill(viewModel.viewMode == .grid ? ColorTheme.cardBackground : Color.clear)
+                            )
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .contentShape(Rectangle())
+                    .pointingHandOnHover()
+                    
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            viewModel.viewMode = .list
+                        }
+                    }) {
+                        Image(systemName: "list.bullet")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(viewModel.viewMode == .list ? ColorTheme.textPrimary : ColorTheme.textTertiary)
+                            .frame(width: 30, height: 26)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                    .fill(viewModel.viewMode == .list ? ColorTheme.cardBackground : Color.clear)
+                            )
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .contentShape(Rectangle())
+                    .pointingHandOnHover()
+                }
+                .padding(2)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                )
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(ColorTheme.inputBackground.opacity(0.4))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
 
             // Search Bar Pill (Desactivado a favor del buscador Spotlight ⌘K, código conservado)
             if false {
