@@ -44,10 +44,14 @@ struct CachedAsyncImage<Placeholder: View>: View {
                 return
             }
             
-            // If already displaying this image from synchronous cache, skip redundant load
-            if loadedImage != nil && ArtworkCacheManager.shared.hasImage(for: targetURL) {
+            // Check synchronous memory / fast disk cache first for instant render
+            if let cached = ArtworkCacheManager.shared.syncImage(for: targetURL) {
+                self.loadedImage = cached
                 return
             }
+            
+            // Clear previous image so stale artwork is never shown while loading
+            self.loadedImage = nil
             
             // Load from cache or fetch via deduplicated network loader
             if let img = await ArtworkCacheManager.shared.loadImage(for: targetURL) {

@@ -11,6 +11,12 @@ import Combine
 import SwiftUI
 import CryptoKit
 
+enum RepeatMode: String, CaseIterable {
+    case off
+    case all
+    case one
+}
+
 enum SidebarTab: String, CaseIterable, Identifiable {
     case browse = "Browse"
     case recentlyAdded = "Recently Added"
@@ -237,6 +243,8 @@ final class PlayerViewModel: ObservableObject {
     @Published var queue: [SongItem] = []
     @Published var queueIndex: Int = 0
     @Published var showQueueSheet: Bool = false
+    @Published var isShuffleEnabled: Bool = false
+    @Published var repeatMode: RepeatMode = .off
     
     // Selection / Sheets
     @Published var selectedAlbumForDetail: AlbumItem?
@@ -292,7 +300,13 @@ final class PlayerViewModel: ObservableObject {
         // Continuous playback: automatically play the next track in queue when a song finishes
         processManager.onTrackFinished = { [weak self] in
             Task { @MainActor [weak self] in
-                self?.nextTrack()
+                guard let self = self else { return }
+                if self.repeatMode == .one {
+                    self.mpv.seek(to: 0.0)
+                    self.syncNowPlaying()
+                } else {
+                    self.nextTrack()
+                }
             }
         }
         
@@ -1048,10 +1062,43 @@ final class PlayerViewModel: ObservableObject {
         syncNowPlaying()
     }
     
+    func toggleShuffle() {
+        isShuffleEnabled.toggle()
+    }
+    
+    func cycleRepeatMode() {
+        switch repeatMode {
+        case .off:
+            repeatMode = .all
+        case .all:
+            repeatMode = .one
+        case .one:
+            repeatMode = .off
+        }
+    }
+    
     func nextTrack() {
         guard !queue.isEmpty else { return }
+        
+        if isShuffleEnabled && queue.count > 1 {
+            var candidates = Array(0..<queue.count)
+            candidates.removeAll { $0 == queueIndex }
+            if let randomIndex = candidates.randomElement() {
+                queueIndex = randomIndex
+                let next = queue[queueIndex]
+                let nextAlbum = self.albums.first(where: { $0.id == next.parent || (next.album != nil && $0.name == next.album) }) ?? (next.album == currentAlbum?.name ? currentAlbum : nil)
+                playSong(next, inAlbum: nextAlbum, queue: queue)
+                return
+            }
+        }
+        
         if queueIndex + 1 < queue.count {
             queueIndex += 1
+            let next = queue[queueIndex]
+            let nextAlbum = self.albums.first(where: { $0.id == next.parent || (next.album != nil && $0.name == next.album) }) ?? (next.album == currentAlbum?.name ? currentAlbum : nil)
+            playSong(next, inAlbum: nextAlbum, queue: queue)
+        } else if repeatMode == .all {
+            queueIndex = 0
             let next = queue[queueIndex]
             let nextAlbum = self.albums.first(where: { $0.id == next.parent || (next.album != nil && $0.name == next.album) }) ?? (next.album == currentAlbum?.name ? currentAlbum : nil)
             playSong(next, inAlbum: nextAlbum, queue: queue)
@@ -1397,7 +1444,8 @@ final class PlayerViewModel: ObservableObject {
         if let parentId = song.parent, !parentId.isEmpty {
             return coverArtURL(for: parentId)
         }
-        return nil
+        // Fallback: Navidrome / Subsonic supports resolving cover art via track ID
+        return coverArtURL(for: song.id)
     }
     
     func artistAvatarURL(for artist: ArtistItem) -> URL? {

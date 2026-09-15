@@ -259,42 +259,60 @@ struct IOSMainView: View {
     private var miniPlayerBar: some View {
         miniPlayerControls
             .background(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(.ultraThinMaterial)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                    
+                    // Luminous translucent tint (pure white glass in light mode, deep glass in dark mode)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.dynamic(light: "FFFFFF", dark: "242426").opacity(0.75))
+                }
             )
-            .background(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(ColorTheme.cardBackground.opacity(0.35))
-            )
+            // Specular reflection / Rim light (Apple top-edge reflection)
             .overlay(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            stops: [
+                                Gradient.Stop(color: Color.white.opacity(0.90), location: 0.0),
+                                Gradient.Stop(color: Color.white.opacity(0.35), location: 0.35),
+                                Gradient.Stop(color: Color.white.opacity(0.10), location: 0.75),
+                                Gradient.Stop(color: Color.black.opacity(0.06), location: 1.0)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        lineWidth: 1.0
+                    )
             )
-            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-            .shadow(color: Color.black.opacity(0.14), radius: 16, x: 0, y: 6)
+            // Inner specular top glow
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .inset(by: 1.0)
+                    .strokeBorder(
+                        LinearGradient(
+                            stops: [
+                                Gradient.Stop(color: Color.white.opacity(0.55), location: 0.0),
+                                Gradient.Stop(color: Color.clear, location: 0.4)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        lineWidth: 0.8
+                    )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            // Dual-depth shadow (soft ambient + crisp contact)
+            .shadow(color: Color.black.opacity(0.12), radius: 18, x: 0, y: 7)
+            .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
     }
     
-    // MARK: - Shared player controls layout (Expanded Height ~1.6x)
+    // MARK: - Shared player controls layout (Apple Music iPhone mini player style)
     private var miniPlayerControls: some View {
         Button(action: { showNowPlayingSheet = true }) {
             VStack(spacing: 0) {
-                // Subtle progress indicator on top
-                GeometryReader { geo in
-                    let progress = viewModel.mpv.duration > 0 ? (viewModel.mpv.currentTime / viewModel.mpv.duration) : 0.0
-                    ZStack(alignment: .leading) {
-                        Rectangle()
-                            .fill(Color.primary.opacity(0.12))
-                            .frame(height: 3)
-                        
-                        Rectangle()
-                            .fill(ColorTheme.terracotta)
-                            .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 3)
-                    }
-                }
-                .frame(height: 3)
-                
                 HStack(spacing: 12) {
-                    // Mini Album Cover (Enlarged to 66x66)
+                    // Mini Album Cover (Compact 44x44, Apple Music iOS size)
                     let artURL: URL? = {
                         if let coverId = viewModel.currentSong?.coverArt ?? viewModel.currentAlbum?.coverArt {
                             return viewModel.coverArtURL(for: coverId)
@@ -304,75 +322,72 @@ struct IOSMainView: View {
                     
                     CachedAsyncImage(url: artURL) {
                         ZStack {
-                            ColorTheme.cardBorder.opacity(0.5)
-                            Image(systemName: "opticaldisc")
-                                .font(.system(size: 24))
-                                .foregroundColor(ColorTheme.terracotta)
+                            Color.primary.opacity(0.06)
+                            Image(systemName: "music.note")
+                                .font(.system(size: 16))
+                                .foregroundColor(Color.primary.opacity(0.4))
                         }
                     }
-                    .frame(width: 66, height: 66)
-                    .cornerRadius(14)
-                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(ColorTheme.cardBorder, lineWidth: 0.8))
-                    .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 3)
+                    .frame(width: 44, height: 44)
+                    .cornerRadius(8)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.08), lineWidth: 0.5))
+                    .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
                     
-                    // Metadata & Audio Format Badge
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(viewModel.currentSong?.title ?? "")
-                            .font(.system(size: 15, weight: .bold))
-                            .foregroundColor(ColorTheme.textPrimary)
+                    // Song Title & Artist (Clean Apple typography, uncluttered)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(viewModel.currentSong?.title ?? "Ninguna canción")
+                            .font(.system(size: 14.5, weight: .semibold))
+                            .foregroundColor(Color.primary)
                             .lineLimit(1)
                         
-                        Text(viewModel.currentSong?.displayArtist ?? "")
-                            .font(.system(size: 12.5, weight: .medium))
-                            .foregroundColor(ColorTheme.textSecondary)
+                        Text(viewModel.currentSong?.displayArtist ?? "mpvg player")
+                            .font(.system(size: 12.5, weight: .regular))
+                            .foregroundColor(Color.primary.opacity(0.60))
                             .lineLimit(1)
-                        
-                        HStack(spacing: 5) {
-                            if let suffix = viewModel.currentSong?.suffix?.uppercased(), !suffix.isEmpty {
-                                Text(suffix)
-                                    .font(.system(size: 9, weight: .heavy, design: .monospaced))
-                                    .foregroundColor(ColorTheme.terracotta)
-                                    .padding(.horizontal, 5)
-                                    .padding(.vertical, 1.5)
-                                    .background(ColorTheme.terracottaLight.opacity(0.6))
-                                    .cornerRadius(4)
-                            }
-                            
-                            if let rate = viewModel.mpv.audioSampleRate {
-                                Text("\(rate / 1000)kHz")
-                                    .font(.system(size: 9.5, weight: .semibold, design: .monospaced))
-                                    .foregroundColor(ColorTheme.textTertiary)
-                            } else if let bitRate = viewModel.currentSong?.bitRate {
-                                Text("\(bitRate)kbps")
-                                    .font(.system(size: 9.5, weight: .semibold, design: .monospaced))
-                                    .foregroundColor(ColorTheme.textTertiary)
-                            }
-                        }
                     }
                     
                     Spacer(minLength: 8)
                     
-                    // Touch-Friendly Playback Controls
-                    HStack(spacing: 4) {
+                    // Touch-Friendly Playback Controls (Play/Pause & Next)
+                    HStack(spacing: 2) {
                         Button(action: { viewModel.togglePlayPause() }) {
                             Image(systemName: viewModel.mpv.isPaused ? "play.fill" : "pause.fill")
-                                .font(.system(size: 22, weight: .semibold))
-                                .foregroundColor(ColorTheme.textPrimary)
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(Color.primary)
                                 .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                         
                         Button(action: { viewModel.nextTrack() }) {
                             Image(systemName: "forward.fill")
-                                .font(.system(size: 19, weight: .medium))
-                                .foregroundColor(ColorTheme.textPrimary)
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(Color.primary.opacity(0.85))
                                 .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 14)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                
+                // Discreet bottom micro-progress bar
+                if viewModel.mpv.duration > 0 {
+                    GeometryReader { geo in
+                        let progress = viewModel.mpv.duration > 0 ? (viewModel.mpv.currentTime / viewModel.mpv.duration) : 0.0
+                        ZStack(alignment: .leading) {
+                            Rectangle()
+                                .fill(Color.primary.opacity(0.06))
+                                .frame(height: 2)
+                            
+                            Rectangle()
+                                .fill(ColorTheme.accent)
+                                .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 2)
+                        }
+                    }
+                    .frame(height: 2)
+                }
             }
         }
         .buttonStyle(.plain)

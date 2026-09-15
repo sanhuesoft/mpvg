@@ -26,6 +26,7 @@ final class MPVProcessManager: ObservableObject {
     private var nativeItemStatusObserver: AnyCancellable?
     private var nativeEndObserverToken: Any?
     private var nativeErrorObserverToken: Any?
+    private var hoggedDeviceID: AudioDeviceID? = nil
     
     static var isSandboxed: Bool {
         ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
@@ -108,6 +109,9 @@ final class MPVProcessManager: ObservableObject {
         }
         nativeItemStatusObserver?.cancel()
         nativePlayer?.pause()
+        if let hogged = hoggedDeviceID {
+            Self.setHogMode(for: hogged, enable: false)
+        }
         if let proc = process, proc.isRunning {
             let pid = proc.processIdentifier
             proc.terminate()
@@ -205,14 +209,165 @@ final class MPVProcessManager: ObservableObject {
         self.binaryPath = "Apple CoreAudio / AVFoundation (Native)"
     }
     
+    // MARK: - Native CoreAudio HAL Helpers
+    static func defaultOutputDeviceID() -> AudioDeviceID? {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var devID: AudioDeviceID = 0
+        var size = UInt32(MemoryLayout<AudioDeviceID>.size)
+        if AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &devID) == noErr {
+            return devID
+        }
+        return nil
+    }
+    
+    static func audioDeviceID(for uid: String) -> AudioDeviceID? {
+        var propSize: UInt32 = 0
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDevices,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        guard AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &propSize) == noErr else { return nil }
+        let count = Int(propSize) / MemoryLayout<AudioDeviceID>.size
+        var deviceIDs = [AudioDeviceID](repeating: 0, count: count)
+        guard AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &propSize, &deviceIDs) == noErr else { return nil }
+        
+        for devID in deviceIDs {
+            var uidAddr = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyDeviceUID,
+                mScope: kAudioObjectPropertyScopeGlobal,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            var unmanagedUID: Unmanaged<CFString>?
+            var size = UInt32(MemoryLayout<Unmanaged<CFString>?>.size)
+            if AudioObjectGetPropertyData(devID, &uidAddr, 0, nil, &size, &unmanagedUID) == noErr,
+               let cf = unmanagedUID?.takeRetainedValue() as String?,
+               cf == uid {
+                return devID
+            }
+        }
+        return nil
+    }
+    
+    static func nominalSampleRate(for deviceID: AudioDeviceID) -> Int? {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyNominalSampleRate,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var rate: Float64 = 0
+        var size = UInt32(MemoryLayout<Float64>.size)
+        if AudioObjectGetPropertyData(deviceID, &address, 0, nil, &size, &rate) == noErr, rate > 0 {
+            return Int(rate)
+        }
+        return nil
+    }
+    
+    nonisolated static func setHogMode(for deviceID: AudioDeviceID, enable: Bool) {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyHogMode,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var pid: pid_t = enable ? getpid() : -1
+        let size = UInt32(MemoryLayout<pid_t>.size)
+        _ = AudioObjectSetPropertyData(deviceID, &address, 0, nil, size, &pid)
+    }
+    
+    static func detectAudioDevicesViaCoreAudio() -> [AudioDeviceInfo] {
+        var propSize: UInt32 = 0
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDevices,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        
+        guard AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &propSize) == noErr, propSize > 0 else {
+            return [
+                AudioDeviceInfo(id: "auto", name: "Default System Device", driver: "CoreAudio", isExclusiveCapable: false)
+            ]
+        }
+        
+        let count = Int(propSize) / MemoryLayout<AudioDeviceID>.size
+        var deviceIDs = [AudioDeviceID](repeating: 0, count: count)
+        guard AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &propSize, &deviceIDs) == noErr else {
+            return [
+                AudioDeviceInfo(id: "auto", name: "Default System Device", driver: "CoreAudio", isExclusiveCapable: false)
+            ]
+        }
+        
+        var devices: [AudioDeviceInfo] = [
+            AudioDeviceInfo(id: "auto", name: "Default System Device", driver: "auto", isExclusiveCapable: false)
+        ]
+        
+        for devID in deviceIDs {
+            // Check if device has output streams
+            var streamSize: UInt32 = 0
+            var streamAddr = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyStreams,
+                mScope: kAudioObjectPropertyScopeOutput,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            guard AudioObjectGetPropertyDataSize(devID, &streamAddr, 0, nil, &streamSize) == noErr, streamSize > 0 else { continue }
+            
+            // Get Device Name
+            var nameAddr = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyDeviceNameCFString,
+                mScope: kAudioObjectPropertyScopeGlobal,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            var unmanagedName: Unmanaged<CFString>?
+            var nameSize = UInt32(MemoryLayout<Unmanaged<CFString>?>.size)
+            let nameStatus = AudioObjectGetPropertyData(devID, &nameAddr, 0, nil, &nameSize, &unmanagedName)
+            let devName = (nameStatus == noErr && unmanagedName != nil) ? (unmanagedName!.takeRetainedValue() as String) : "Audio Device"
+            
+            // Get Device UID
+            var uidAddr = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyDeviceUID,
+                mScope: kAudioObjectPropertyScopeGlobal,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            var unmanagedUID: Unmanaged<CFString>?
+            var uidSize = UInt32(MemoryLayout<Unmanaged<CFString>?>.size)
+            guard AudioObjectGetPropertyData(devID, &uidAddr, 0, nil, &uidSize, &unmanagedUID) == noErr,
+                  let devUID = unmanagedUID?.takeRetainedValue() as String? else { continue }
+            
+            // Check Transport Type
+            var transportType: UInt32 = 0
+            var transportSize = UInt32(MemoryLayout<UInt32>.size)
+            var transportAddr = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyTransportType,
+                mScope: kAudioObjectPropertyScopeGlobal,
+                mElement: kAudioObjectPropertyElementMain
+            )
+            _ = AudioObjectGetPropertyData(devID, &transportAddr, 0, nil, &transportSize, &transportType)
+            
+            let isUSB = (transportType == kAudioDeviceTransportTypeUSB)
+            let isBuiltIn = devUID.contains("BuiltInSpeakerDevice")
+            let isExclusive = isUSB || (!isBuiltIn && !devUID.contains("BuiltIn"))
+            
+            devices.append(AudioDeviceInfo(
+                id: devUID,
+                name: devName,
+                driver: "CoreAudio",
+                isExclusiveCapable: isExclusive
+            ))
+        }
+        
+        return devices
+    }
+    
     // MARK: - Audio Device Detection & Resolution
     func detectAudioDevices() {
         if isUsingNativeEngine || Self.isSandboxed || !FileManager.default.fileExists(atPath: binaryPath) {
-            if self.availableDevices.isEmpty {
-                self.availableDevices = [
-                    AudioDeviceInfo(id: "auto", name: "Default System Device", driver: "CoreAudio", isExclusiveCapable: false)
-                ]
-            }
+            let devices = Self.detectAudioDevicesViaCoreAudio()
+            self.availableDevices = devices
+            resolveActiveDevice(from: devices)
+            applyNativeDeviceRouting()
             return
         }
         guard FileManager.default.fileExists(atPath: binaryPath) else { return }
@@ -411,6 +566,35 @@ final class MPVProcessManager: ObservableObject {
             nativePlayer?.automaticallyWaitsToMinimizeStalling = true
             nativePlayer?.volume = Float(volume / 100.0)
         }
+        applyNativeDeviceRouting()
+    }
+    
+    private func applyNativeDeviceRouting() {
+        guard isUsingNativeEngine else { return }
+        
+        let targetUID: String? = (currentDevice != "auto" && isDeviceConnected) ? currentDevice : nil
+        nativePlayer?.audioOutputDeviceUniqueID = targetUID
+        
+        if let uid = targetUID, let devID = Self.audioDeviceID(for: uid) {
+            if let rate = Self.nominalSampleRate(for: devID) {
+                self.audioSampleRate = rate
+            }
+            if isExclusive {
+                Self.setHogMode(for: devID, enable: true)
+                hoggedDeviceID = devID
+            } else if hoggedDeviceID == devID {
+                Self.setHogMode(for: devID, enable: false)
+                hoggedDeviceID = nil
+            }
+        } else {
+            if let hogged = hoggedDeviceID {
+                Self.setHogMode(for: hogged, enable: false)
+                hoggedDeviceID = nil
+            }
+            if let defaultID = Self.defaultOutputDeviceID(), let rate = Self.nominalSampleRate(for: defaultID) {
+                self.audioSampleRate = rate
+            }
+        }
     }
     
     func stop() {
@@ -420,6 +604,10 @@ final class MPVProcessManager: ObservableObject {
         if isUsingNativeEngine {
             nativePlayer?.pause()
             cleanupNativeObservers()
+            if let hogged = hoggedDeviceID {
+                Self.setHogMode(for: hogged, enable: false)
+                hoggedDeviceID = nil
+            }
             self.isRunning = false
             self.isPaused = true
             self.currentTime = 0.0
@@ -448,6 +636,7 @@ final class MPVProcessManager: ObservableObject {
     
     func restart() {
         if isUsingNativeEngine {
+            applyNativeDeviceRouting()
             return
         }
         stop()
@@ -572,6 +761,7 @@ final class MPVProcessManager: ObservableObject {
         } else {
             nativePlayer?.replaceCurrentItem(with: item)
         }
+        applyNativeDeviceRouting()
         
         nativePlayer?.automaticallyWaitsToMinimizeStalling = true
         nativePlayer?.volume = Float(volume / 100.0)

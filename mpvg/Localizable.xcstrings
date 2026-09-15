@@ -382,6 +382,9 @@
         }
       }
     },
+    "Activar Modo Exclusivo (Bit-Perfect)" : {
+
+    },
     "Active Output Device" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -566,6 +569,12 @@
     "Aleatorio" : {
 
     },
+    "Aleatorio activado" : {
+
+    },
+    "Aleatorio desactivado" : {
+
+    },
     "All Albums" : {
       "localizations" : {
         "en" : {
@@ -582,7 +591,13 @@
         }
       }
     },
+    "Alternar tiempo restante / duración total" : {
+
+    },
     "Añadir a continuación" : {
+
+    },
+    "Añadir a Favoritas" : {
 
     },
     "Añadir al final de la cola" : {
@@ -1097,6 +1112,9 @@
         }
       }
     },
+    "Cola de reproducción" : {
+
+    },
     "Configure your Navidrome server connection and audiophile CoreAudio playback." : {
       "localizations" : {
         "en" : {
@@ -1195,6 +1213,7 @@
       }
     },
     "CoreAudio Exclusive Mode (Bit-Perfect)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1226,6 +1245,9 @@
           }
         }
       }
+    },
+    "CoreAudio Modo Exclusivo (Bit-Perfect)" : {
+
     },
     "CoreAudio Output Device" : {
       "extractionState" : "stale",
@@ -1309,7 +1331,11 @@
         }
       }
     },
+    "Desactivar Modo Exclusivo (Bit-Perfect)" : {
+
+    },
     "Disable Exclusive Mode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1390,6 +1416,12 @@
         }
       }
     },
+    "Dispositivo de salida" : {
+
+    },
+    "Dispositivo de salida:" : {
+
+    },
     "Done" : {
       "localizations" : {
         "en" : {
@@ -1426,6 +1458,7 @@
 
     },
     "Enable Exclusive Mode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1976,6 +2009,9 @@
         }
       }
     },
+    "Ninguna canción en reproducción" : {
+
+    },
     "No albums found" : {
       "localizations" : {
         "en" : {
@@ -2079,6 +2115,7 @@
 
     },
     "No track playing" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2176,6 +2213,7 @@
       }
     },
     "Output device:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2207,7 +2245,16 @@
         }
       }
     },
+    "Pausar" : {
+
+    },
     "Pausar álbum" : {
+
+    },
+    "Pista anterior" : {
+
+    },
+    "Pista siguiente" : {
 
     },
     "PLAY" : {
@@ -2439,6 +2486,9 @@
         }
       }
     },
+    "Quitar de Favoritas" : {
+
+    },
     "RATING" : {
       "localizations" : {
         "en" : {
@@ -2454,6 +2504,9 @@
           }
         }
       }
+    },
+    "Reactivar audio" : {
+
     },
     "Recently Added" : {
       "localizations" : {
@@ -2802,6 +2855,7 @@
       }
     },
     "Shared Audio Mode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2833,6 +2887,9 @@
           }
         }
       }
+    },
+    "Silenciar" : {
+
     },
     "Sin resultados para \"%@\"" : {
 
