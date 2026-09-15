@@ -49,8 +49,8 @@ struct SpotlightSearchView: View {
     
     var body: some View {
         ZStack {
-            // Semi-transparent backdrop blur that dismisses when clicked
-            Color.black.opacity(0.4)
+            // Translucent click-to-dismiss backdrop (clean & completely aligned with window)
+            Color.black.opacity(0.001)
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -95,6 +95,7 @@ struct SpotlightSearchView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .shadow(color: Color.black.opacity(0.35), radius: 32, x: 0, y: 16)
+            .scaleEffect(viewModel.isSpotlightPresented ? 1.0 : 0.96)
             .padding(.top, 70)
             .frame(maxHeight: .infinity, alignment: .top)
         }

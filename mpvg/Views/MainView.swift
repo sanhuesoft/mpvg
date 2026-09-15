@@ -23,6 +23,8 @@ struct MainView: View {
             #if os(macOS)
             desktopLayout
                 .frame(minWidth: 960, maxWidth: .infinity, minHeight: 620, maxHeight: .infinity)
+                .blur(radius: viewModel.isSpotlightPresented ? 3 : 0)
+                .animation(.spring(response: 0.26, dampingFraction: 0.84), value: viewModel.isSpotlightPresented)
                 .task {
                     viewModel.mpv.start()
                 }
@@ -52,8 +54,8 @@ struct MainView: View {
             #if os(macOS)
             // Spotlight Search Overlay (⌘K) - Preloaded in hierarchy for instantaneous, fluid animation
             SpotlightSearchView(viewModel: viewModel)
+                .ignoresSafeArea()
                 .opacity(viewModel.isSpotlightPresented ? 1 : 0)
-                .scaleEffect(viewModel.isSpotlightPresented ? 1.0 : 0.98)
                 .allowsHitTesting(viewModel.isSpotlightPresented)
                 .animation(.spring(response: 0.26, dampingFraction: 0.84), value: viewModel.isSpotlightPresented)
                 .zIndex(300)
