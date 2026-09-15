@@ -167,12 +167,6 @@
     "%lld/5" : {
 
     },
-    "%lldkbps" : {
-
-    },
-    "%lldkHz" : {
-
-    },
     "•" : {
 
     },
@@ -601,6 +595,9 @@
 
     },
     "Añadir al final de la cola" : {
+
+    },
+    "App Sandbox active. Bit-Perfect Exclusive mode is disabled. Use Direct Version for full DAC control." : {
 
     },
     "Appearance" : {

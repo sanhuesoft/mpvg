@@ -269,7 +269,22 @@ struct SettingsView: View {
                     .background(ColorTheme.sageGreenBg.opacity(0.4))
                 }
                 
+                if viewModel.mpv.isUsingNativeEngine {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.shield.fill")
+                            .foregroundColor(.orange)
+                        Text(LocalizedStringKey("App Sandbox active. Bit-Perfect Exclusive mode is disabled. Use Direct Version for full DAC control."))
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.orange)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Color.orange.opacity(0.1))
+                }
+                
                 Divider().background(ColorTheme.cardBorder)
+
                 
                 // Row 2: CoreAudio Exclusive Mode
                 macOSFormRow(
