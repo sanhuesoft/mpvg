@@ -12,25 +12,6 @@ import SwiftUI
 
 #if os(macOS)
 import AppKit
-
-private struct LiquidGlassRepresentable: NSViewRepresentable {
-    var material: NSVisualEffectView.Material = .popover
-    var blendingMode: NSVisualEffectView.BlendingMode = .withinWindow
-    
-    func makeNSView(context: Context) -> NSVisualEffectView {
-        let view = NSVisualEffectView()
-        view.material = material
-        view.blendingMode = blendingMode
-        view.state = .active
-        return view
-    }
-    
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
-        nsView.material = material
-        nsView.blendingMode = blendingMode
-        nsView.state = .active
-    }
-}
 #endif
 
 struct PlayerBarView: View {
@@ -359,58 +340,8 @@ struct PlayerBarView: View {
             self.barWidth = newWidth
         }
         // Authentic Apple Music Liquid Glass Capsule
-        .background(
-            ZStack {
-                #if os(macOS)
-                LiquidGlassRepresentable(material: .popover, blendingMode: .withinWindow)
-                    .clipShape(Capsule())
-                #else
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                #endif
-                
-                // Luminous translucent tint (pure white glass in light mode, deep glass in dark mode)
-                Capsule()
-                    .fill(Color.dynamic(light: "FFFFFF", dark: "242426").opacity(0.72))
-            }
-        )
-        // Specular reflection / Rim light (Apple top-edge reflection)
-        .overlay(
-            Capsule()
-                .strokeBorder(
-                    LinearGradient(
-                        stops: [
-                            Gradient.Stop(color: Color.white.opacity(0.95), location: 0.0),
-                            Gradient.Stop(color: Color.white.opacity(0.40), location: 0.35),
-                            Gradient.Stop(color: Color.white.opacity(0.12), location: 0.75),
-                            Gradient.Stop(color: Color.black.opacity(0.06), location: 1.0)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ),
-                    lineWidth: 1.0
-                )
-        )
-        // Inner specular top glow
-        .overlay(
-            Capsule()
-                .inset(by: 1.0)
-                .strokeBorder(
-                    LinearGradient(
-                        stops: [
-                            Gradient.Stop(color: Color.white.opacity(0.55), location: 0.0),
-                            Gradient.Stop(color: Color.clear, location: 0.4)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ),
-                    lineWidth: 0.8
-                )
-        )
-        .clipShape(Capsule())
-        // Dual-depth shadow (soft ambient + crisp contact)
-        .shadow(color: Color.black.opacity(0.12), radius: 20, x: 0, y: 8)
-        .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
+        .liquidGlassCapsule()
+
     }
     
     // MARK: - Helpers

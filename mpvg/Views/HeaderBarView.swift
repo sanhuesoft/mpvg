@@ -28,19 +28,7 @@ struct HeaderBarView: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(ColorTheme.textSecondary)
                         .frame(width: 28, height: 26)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(.ultraThinMaterial)
-                        )
-                        .background(
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(ColorTheme.inputBackground.opacity(0.4))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .liquidGlassRounded(cornerRadius: 8)
                 }
                 .buttonStyle(.plain)
                 .pointingHandOnHover()
@@ -114,19 +102,14 @@ struct HeaderBarView: View {
                         .foregroundColor(ColorTheme.textTertiary)
                         .padding(.horizontal, 4)
                         .padding(.vertical, 1)
-                        .background(ColorTheme.cardBorder.opacity(0.6))
+                        .background(Color.primary.opacity(0.06))
                         .cornerRadius(4)
                     #endif
                 }
                 .foregroundColor(viewModel.isSyncingLibrary ? ColorTheme.terracotta : ColorTheme.textSecondary)
                 .frame(height: 26)
                 .padding(.horizontal, 9)
-                .background(ColorTheme.inputBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(ColorTheme.inputBorder, lineWidth: 1)
-                )
-                .cornerRadius(8)
+                .liquidGlassRounded(cornerRadius: 8)
             }
             .buttonStyle(.plain)
             .pointingHandOnHover()
@@ -157,17 +140,12 @@ struct HeaderBarView: View {
                         .foregroundColor(ColorTheme.textTertiary)
                         .padding(.horizontal, 4)
                         .padding(.vertical, 1)
-                        .background(ColorTheme.cardBorder.opacity(0.6))
+                        .background(Color.primary.opacity(0.06))
                         .cornerRadius(4)
                 }
                 .frame(height: 26)
                 .padding(.horizontal, 9)
-                .background(ColorTheme.inputBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(ColorTheme.inputBorder, lineWidth: 1)
-                )
-                .cornerRadius(8)
+                .liquidGlassRounded(cornerRadius: 8)
             }
             .buttonStyle(.plain)
             .pointingHandOnHover()
@@ -187,8 +165,13 @@ struct HeaderBarView: View {
                             .foregroundColor(viewModel.viewMode == .grid ? ColorTheme.textPrimary : ColorTheme.textTertiary)
                             .frame(width: 30, height: 26)
                             .background(
-                                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                    .fill(viewModel.viewMode == .grid ? ColorTheme.cardBackground : Color.clear)
+                                Group {
+                                    if viewModel.viewMode == .grid {
+                                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                            .fill(ColorTheme.cardBackground)
+                                            .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
+                                    }
+                                }
                             )
                             .contentShape(Rectangle())
                     }
@@ -206,8 +189,13 @@ struct HeaderBarView: View {
                             .foregroundColor(viewModel.viewMode == .list ? ColorTheme.textPrimary : ColorTheme.textTertiary)
                             .frame(width: 30, height: 26)
                             .background(
-                                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                    .fill(viewModel.viewMode == .list ? ColorTheme.cardBackground : Color.clear)
+                                Group {
+                                    if viewModel.viewMode == .list {
+                                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                            .fill(ColorTheme.cardBackground)
+                                            .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
+                                    }
+                                }
                             )
                             .contentShape(Rectangle())
                     }
@@ -216,19 +204,7 @@ struct HeaderBarView: View {
                     .pointingHandOnHover()
                 }
                 .padding(2)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                )
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(ColorTheme.inputBackground.opacity(0.4))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .stroke(ColorTheme.cardBorder, lineWidth: 0.8)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .liquidGlassRounded(cornerRadius: 8)
             }
 
             // Search Bar Pill (Desactivado a favor del buscador Spotlight ⌘K, código conservado)
